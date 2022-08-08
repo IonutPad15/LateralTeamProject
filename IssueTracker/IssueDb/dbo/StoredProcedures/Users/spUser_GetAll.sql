@@ -2,6 +2,6 @@
 AS
 begin
 	select * 
-	from dbo.[Users]
+	from dbo.[User]
 	where IsDeleted = 0;
 end

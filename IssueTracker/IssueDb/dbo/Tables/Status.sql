@@ -1,4 +1,4 @@
-﻿CREATE TABLE [dbo].[Priorities]
+﻿CREATE TABLE [dbo].[Status]
 (
 	[Id] INT NOT NULL PRIMARY KEY IDENTITY,
 	[Type] NVARCHAR(20) NOT NULL

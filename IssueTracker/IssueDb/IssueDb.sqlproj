@@ -62,16 +62,28 @@
     <Folder Include="dbo\StoredProcedures\Users" />
   </ItemGroup>
   <ItemGroup>
-    <Build Include="dbo\Tables\Users.sql" />
-    <Build Include="dbo\Tables\Priorities.sql" />
-    <Build Include="dbo\Tables\IssueTypes.sql" />
-    <Build Include="dbo\Tables\Statuses.sql" />
-    <Build Include="dbo\Tables\Roles.sql" />
-    <Build Include="dbo\Tables\Comments.sql" />
-    <Build Include="dbo\Tables\Issues.sql" />
-    <Build Include="dbo\Tables\Projects.sql" />
-    <Build Include="dbo\Tables\Participants.sql" />
+    <Build Include="dbo\Tables\User.sql" />
+    <Build Include="dbo\Tables\Priority.sql" />
+    <Build Include="dbo\Tables\IssueType.sql" />
+    <Build Include="dbo\Tables\Status.sql" />
+    <Build Include="dbo\Tables\Role.sql" />
+    <Build Include="dbo\Tables\Comment.sql" />
+    <Build Include="dbo\Tables\Issue.sql" />
+    <Build Include="dbo\Tables\Project.sql" />
+    <Build Include="dbo\Tables\Participant.sql" />
     <Build Include="dbo\StoredProcedures\Users\spUser_GetAll.sql" />
-    <Build Include="dbo\StoredProcedures\Users\sbUser_Get.sql" />
+    <Build Include="dbo\StoredProcedures\Users\spUser_GetById.sql" />
+    <Build Include="dbo\StoredProcedures\Users\spUser_Update.sql" />
+    <Build Include="dbo\StoredProcedures\Users\spUser_Delete.sql" />
+    <Build Include="dbo\StoredProcedures\Users\spUser_Insert.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <PostDeploy Include="Script.PostDeployment.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="IssueDb.publish.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <RefactorLog Include="IssueDb.refactorlog" />
   </ItemGroup>
 </Project>

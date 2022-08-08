@@ -1,4 +1,4 @@
-﻿CREATE TABLE [dbo].[IssueTypes]
+﻿CREATE TABLE [dbo].[IssueType]
 (
 	[Id] INT NOT NULL PRIMARY KEY IDENTITY,
 	[Type] NVARCHAR(30) NOT NULL
