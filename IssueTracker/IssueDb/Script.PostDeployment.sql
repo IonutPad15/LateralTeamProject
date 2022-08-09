@@ -20,8 +20,9 @@ begin
 	insert into dbo.[Status] 
 	values ('ToDo'),
 	('InProgress'),
-	('Done'),
-	('Closed');
+	('ReadyForTesting'),
+	('Testing'),
+	('Done');
 end
 if not exists (select 1 from dbo.[Role])
 begin

@@ -14,7 +14,7 @@ namespace DataAccess.Models
         public string Body { get; set; } = null!;
         public DateTime Created { get; set; }
         public DateTime Updated { get; set; }
-        public bool isDeleted { get; set; }
+        public bool IsDeleted { get; set; }
         public User? User { get; set; }
     }
 }

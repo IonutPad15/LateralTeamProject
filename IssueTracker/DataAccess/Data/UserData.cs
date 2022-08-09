@@ -15,27 +15,33 @@ namespace DataAccess.Data
         {
             _db = db;
         }
-        public Task<IEnumerable<User>> GetUsers()
+        public Task<IEnumerable<User>> GetUsersAsync()
         {
             return _db.LoadData<User, dynamic>("dbo.spUser_GetAll", new { });
         }
-        public async Task<User?> GetUserById(Guid id)
+        public async Task<User?> GetUserByIdAsync(Guid id)
         {
             var result = await _db.LoadData<User, dynamic>(
                 "dbo.spUser_GetById", new { Id = id });
             return result.FirstOrDefault();
         }
-        public Task InsertUser(User user)
+        public async Task<User?> GetUserByUsernameAndEmailAsync(string username, string email)
         {
-            return _db.SaveData("dbo.spUser_Insert", new { user.UserName, user.Email,user.Password });
+            var result = await _db.LoadData<User, dynamic>(
+                "dbo.spUser_GetByUsernameANDEmail", new { username, email  });
+            return result.FirstOrDefault();
         }
-        public Task UpdateUser(User user)
+        public async Task InsertUserAsync(User user)
         {
-            return _db.SaveData("dbo.spUser_Update", user);
+            await _db.SaveData("dbo.spUser_Insert", new { user.UserName, user.Email,user.Password });
         }
-        public Task DeleteUser(Guid id)
+        public async Task UpdateUserAsync(User user)
         {
-            return _db.SaveData("dbo.spUser_Delete", new { Id = id });
+            await _db.SaveData("dbo.spUser_Update", user);
+        }
+        public async Task DeleteUserAsync(Guid id)
+        {
+            await _db.SaveData("dbo.spUser_Delete", new { Id = id });
         }
     }
 }

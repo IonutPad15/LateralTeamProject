@@ -4,10 +4,11 @@ namespace DataAccess.Data
 {
     public interface IUserData
     {
-        Task<User?> GetUserById(Guid id);
-        Task<IEnumerable<User>> GetUsers();
-        Task InsertUser(User user);
-        Task UpdateUser(User user);
-        Task DeleteUser(Guid id);
+        Task<User?> GetUserByIdAsync(Guid id);
+        Task<IEnumerable<User>> GetUsersAsync();
+        Task InsertUserAsync(User user);
+        Task UpdateUserAsync(User user);
+        Task DeleteUserAsync(Guid id);
+        Task<User?> GetUserByUsernameAndEmailAsync(string username, string email);
     }
 }

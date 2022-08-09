@@ -7,7 +7,7 @@
 	[Updated] [datetime2](7) NOT NULL,
 	[ProjectId] INT NOT NULL,
 	[IssueTypeId] INT NOT NULL,
-	[UserAssignedId] UNIQUEIDENTIFIER NOT NULL, 
+	[UserAssignedId] UNIQUEIDENTIFIER, 
 	[PriorityId] INT NOT NULL,  
 	[StatusId] INT NOT NULL, 
 	[RoleId] INT NOT NULL,

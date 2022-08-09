@@ -110,6 +110,7 @@
     <Build Include="dbo\StoredProcedures\Issue\spIssue_GetAll.sql" />
     <Build Include="dbo\StoredProcedures\Issue\spIssue_Get.sql" />
     <Build Include="dbo\StoredProcedures\Issue\spIssue_Insert.sql" />
+    <Build Include="dbo\StoredProcedures\User\spUser_GetByUsernameANDEmail.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Script.PostDeployment.sql" />
