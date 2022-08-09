@@ -31,5 +31,10 @@ begin
 	('Owner'),
 	('Collaborator');
 end
+if not exists (select 1 from dbo.[User])
+begin
+	insert into dbo.[User](UserName,Email,Password,IsDeleted)
+	values('Mihai','mihai@yahoo.com','ef797c8118f02dfb649607dd5d3f8c7623048c9c063d532cc95c5ed7a898a64f',0);
+end
 
 

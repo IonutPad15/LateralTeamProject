@@ -2,6 +2,7 @@
 using DataAccess.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using DataAccess.Utils;
 
 namespace IssueTrackerAPI.Controllers
 {
@@ -31,7 +32,7 @@ namespace IssueTrackerAPI.Controllers
         {
             try
             {
-                var results = await _data.GetUser(id);
+                var results = await _data.GetUserById(id);
                 if (results == null) return Results.NotFound();
                 return Results.Ok(results);
             }
@@ -45,6 +46,9 @@ namespace IssueTrackerAPI.Controllers
         {
             try
             {
+                HashHelper hashHelper = new HashHelper();
+                user.Password = hashHelper.GetHash(user.Password);
+
                 await _data.InsertUser(user);
                 return Results.Ok();
             }
