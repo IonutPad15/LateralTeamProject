@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace DataAccess.Models
+﻿namespace DataAccess.Models
 {
     public class Participant
     {
@@ -14,3 +8,4 @@ namespace DataAccess.Models
         public int IssueId { get; set; }
     }
 }
+//TODO: object foreignKey User

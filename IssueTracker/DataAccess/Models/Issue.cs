@@ -24,3 +24,5 @@ namespace DataAccess.Models
         public IssueType? IssueType { get; set; }
     }
 }
+
+//TODO: Object FK Priority & Status & Role & Project

@@ -13,7 +13,7 @@ namespace DataAccess.Data
         }
 
         public async Task<IEnumerable<Status>> GetAllAsync() =>
-             await _db.LoadData<Status, dynamic>("dbo.spStatus_GetAll", new { });
+             await _db.LoadData<Status>("dbo.spStatus_GetAll");
 
         public async Task<Status?> GetByIdAsync(int id) =>
             (await _db.LoadData<Status, dynamic>("dbo.spStatus_Get", new { Id = id })).FirstOrDefault();
