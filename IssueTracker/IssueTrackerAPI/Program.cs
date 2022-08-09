@@ -1,4 +1,5 @@
 using DataAccess.Data;
+using DataAccess.Data.IData;
 using DataAccess.DbAccess;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -15,6 +16,7 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddSingleton<ISQLDataAccess, SQLDataAccess>();
 builder.Services.AddSingleton<IUserData, UserData>();
+
 builder.Services.AddAuthentication(options =>
 
 {
@@ -32,6 +34,11 @@ builder.Services.AddAuthentication(options =>
         ClockSkew = TimeSpan.FromMinutes(5)
     };
 });
+
+builder.Services.AddSingleton<IRoleData, RoleData>();
+builder.Services.AddSingleton<IIssueTypeData, IssueTypeData>();
+builder.Services.AddSingleton<IPriorityData, PriorityData>();
+builder.Services.AddSingleton<IStatusData, StatusData>();
 
 var app = builder.Build();
 
