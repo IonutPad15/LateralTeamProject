@@ -18,70 +18,42 @@ namespace IssueTrackerAPI.Controllers
         [HttpGet]
         public async Task<IResult> GetUsers()
         {
-            try
-            {
-                return Results.Ok(await _data.GetUsers());
-            }
-            catch (Exception ex)
-            {
-                return Results.Problem(ex.Message);
-            }
+            return Results.Ok(await _data.GetUsersAsync());
         }
         [HttpGet("{id}")]
         public async Task<IResult> GetUser(Guid id)
         {
-            try
-            {
-                var results = await _data.GetUserById(id);
-                if (results == null) return Results.NotFound();
-                return Results.Ok(results);
-            }
-            catch (Exception ex)
-            {
-                return Results.Problem(ex.Message);
-            }
+            var results = await _data.GetUserByIdAsync(id);
+            if (results == null) return Results.NotFound();
+            return Results.Ok(results);
+
         }
-        [HttpPost]
+        [HttpPost("register")]
         public async Task<IResult> InsertUser(User user)
         {
-            try
-            {
-                HashHelper hashHelper = new HashHelper();
-                user.Password = hashHelper.GetHash(user.Password);
+            var userexists = await _data.GetUserByUsernameAndEmailAsync(user.UserName, user.Email);
+            if (userexists != null) return Results.BadRequest();
+            HashHelper hashHelper = new HashHelper();
+            user.Password = hashHelper.GetHash(user.Password);
 
-                await _data.InsertUser(user);
-                return Results.Ok();
-            }
-            catch (Exception ex)
-            {
-                return Results.Problem(ex.Message);
-            }
+            await _data.InsertUserAsync(user);
+            return Results.Ok();
+            
         }
         [HttpPut]
         public async Task<IResult> UpdateUser(User user)
         {
-            try
-            {
-                await _data.UpdateUser(user);
-                return Results.Ok();
-            }
-            catch (Exception ex)
-            {
-                return Results.Problem(ex.Message);
-            }
+            await _data.UpdateUserAsync(user);
+            return Results.Ok();
+            
         }
         [HttpDelete]
         public async Task<IResult> DeleteUser(Guid id)
         {
-            try
-            {
-                await _data.DeleteUser(id);
-                return Results.Ok();
-            }
-            catch (Exception ex)
-            {
-                return Results.Problem(ex.Message);
-            }
+            
+            await _data.DeleteUserAsync(id);
+            return Results.Ok();
+            
         }
     }
 }
