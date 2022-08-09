@@ -1,4 +1,4 @@
-﻿CREATE PROCEDURE [dbo].[sbUser_Update]
+﻿CREATE PROCEDURE [dbo].[spUser_Update]
 	@Id [uniqueidentifier],
 	@UserName nvarchar(50),
 	@Email nvarchar(450),

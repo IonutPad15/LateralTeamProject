@@ -19,7 +19,7 @@ namespace DataAccess.Data
         {
             return _db.LoadData<User, dynamic>("dbo.spUser_GetAll", new { });
         }
-        public async Task<User?> GetUser(Guid id)
+        public async Task<User?> GetUserById(Guid id)
         {
             var result = await _db.LoadData<User, dynamic>(
                 "dbo.spUser_GetById", new { Id = id });
