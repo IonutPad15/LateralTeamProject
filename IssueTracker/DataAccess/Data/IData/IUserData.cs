@@ -1,6 +1,6 @@
 ﻿using DataAccess.Models;
 
-namespace DataAccess.Data
+namespace DataAccess.Data.IData
 {
     public interface IUserData
     {

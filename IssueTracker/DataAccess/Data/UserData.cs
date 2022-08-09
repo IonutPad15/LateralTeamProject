@@ -1,4 +1,5 @@
-﻿using DataAccess.DbAccess;
+﻿using DataAccess.Data.IData;
+using DataAccess.DbAccess;
 using DataAccess.Models;
 using System;
 using System.Collections.Generic;

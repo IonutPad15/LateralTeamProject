@@ -1,8 +1,11 @@
-﻿using DataAccess.Data;
-using DataAccess.Models;
+﻿using DataAccess.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using DataAccess.Utils;
+using DataAccess.Data.IData;
+using Models.Info;
+using AutoMapper;
+using Validation;
 
 namespace IssueTrackerAPI.Controllers
 {
@@ -11,9 +14,14 @@ namespace IssueTrackerAPI.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserData _data;
+        private readonly MapperConfiguration config = new MapperConfiguration(cfg => {
+            cfg.CreateMap<UserRequest, User>();
+        });
+        private readonly Mapper mapper;
         public UserController(IUserData data)
         {
             _data = data;
+            mapper = new Mapper(config);
         }
         [HttpGet]
         public async Task<IResult> GetUsers()
@@ -29,15 +37,22 @@ namespace IssueTrackerAPI.Controllers
 
         }
         [HttpPost("register")]
-        public async Task<IResult> InsertUser(User user)
+        public async Task<IResult> InsertUser(UserRequest userRequest)
         {
-            var userexists = await _data.GetUserByUsernameAndEmailAsync(user.UserName, user.Email);
-            if (userexists != null) return Results.BadRequest();
-            HashHelper hashHelper = new HashHelper();
-            user.Password = hashHelper.GetHash(user.Password);
-
-            await _data.InsertUserAsync(user);
-            return Results.Ok();
+            if (!UserValidation.isValid(userRequest))
+            {
+                return Results.BadRequest("Invalid Input");
+            }
+            else
+            {
+                var userexists = await _data.GetUserByUsernameAndEmailAsync(userRequest.UserName!, userRequest.Email!);
+                if (userexists != null) return Results.BadRequest();
+                HashHelper hashHelper = new HashHelper();
+                userRequest.Password = hashHelper.GetHash(userRequest.Password!);
+                var user = mapper.Map<User>(userRequest);
+                await _data.InsertUserAsync(user);
+                return Results.Ok();
+            }
             
         }
         [HttpPut]
