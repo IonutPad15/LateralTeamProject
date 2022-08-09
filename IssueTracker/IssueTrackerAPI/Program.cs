@@ -1,4 +1,5 @@
 using DataAccess.Data;
+using DataAccess.Data.IData;
 using DataAccess.DbAccess;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,6 +13,10 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddSingleton<ISQLDataAccess, SQLDataAccess>();
 builder.Services.AddSingleton<IUserData, UserData>();
+builder.Services.AddSingleton<IRoleData, RoleData>();
+builder.Services.AddSingleton<IIssueTypeData, IssueTypeData>();
+builder.Services.AddSingleton<IPriorityData, PriorityData>();
+builder.Services.AddSingleton<IStatusData, StatusData>();
 
 var app = builder.Build();
 
