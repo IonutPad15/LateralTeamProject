@@ -19,6 +19,6 @@ namespace DataAccess.Models
         public int StatusId { get; set; }
         public int RoleId { get; set; }
         public bool IsDeleted { get; set; }
-        public IssueType IssueType { get; set; }
+        public IssueType? IssueType { get; set; }
     }
 }

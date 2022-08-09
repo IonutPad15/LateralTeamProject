@@ -59,7 +59,15 @@
     <Folder Include="dbo" />
     <Folder Include="dbo\Tables" />
     <Folder Include="dbo\StoredProcedures" />
-    <Folder Include="dbo\StoredProcedures\Users" />
+    <Folder Include="dbo\StoredProcedures\User" />
+    <Folder Include="dbo\StoredProcedures\IssueType" />
+    <Folder Include="dbo\StoredProcedures\Priority" />
+    <Folder Include="dbo\StoredProcedures\Role" />
+    <Folder Include="dbo\StoredProcedures\Status" />
+    <Folder Include="dbo\StoredProcedures\Participant" />
+    <Folder Include="dbo\StoredProcedures\Project" />
+    <Folder Include="dbo\StoredProcedures\Comment" />
+    <Folder Include="dbo\StoredProcedures\Issue" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="dbo\Tables\User.sql" />
@@ -71,11 +79,37 @@
     <Build Include="dbo\Tables\Issue.sql" />
     <Build Include="dbo\Tables\Project.sql" />
     <Build Include="dbo\Tables\Participant.sql" />
-    <Build Include="dbo\StoredProcedures\Users\spUser_GetAll.sql" />
-    <Build Include="dbo\StoredProcedures\Users\spUser_GetById.sql" />
-    <Build Include="dbo\StoredProcedures\Users\spUser_Update.sql" />
-    <Build Include="dbo\StoredProcedures\Users\spUser_Delete.sql" />
-    <Build Include="dbo\StoredProcedures\Users\spUser_Insert.sql" />
+    <Build Include="dbo\StoredProcedures\User\spUser_GetAll.sql" />
+    <Build Include="dbo\StoredProcedures\User\spUser_GetById.sql" />
+    <Build Include="dbo\StoredProcedures\User\spUser_Update.sql" />
+    <Build Include="dbo\StoredProcedures\User\spUser_Delete.sql" />
+    <Build Include="dbo\StoredProcedures\User\spUser_Insert.sql" />
+    <Build Include="dbo\StoredProcedures\IssueType\spIssueType_GetAll.sql" />
+    <Build Include="dbo\StoredProcedures\IssueType\spIssueType_Get.sql" />
+    <Build Include="dbo\StoredProcedures\Priority\spPriority_GetAll.sql" />
+    <Build Include="dbo\StoredProcedures\Priority\spPriority_Get.sql" />
+    <Build Include="dbo\StoredProcedures\Role\spRole_GetAll.sql" />
+    <Build Include="dbo\StoredProcedures\Role\spRole_Get.sql" />
+    <Build Include="dbo\StoredProcedures\Status\spStatus_GetAll.sql" />
+    <Build Include="dbo\StoredProcedures\Status\spStatus_Get.sql" />
+    <Build Include="dbo\StoredProcedures\Participant\spParticipant_GetAll.sql" />
+    <Build Include="dbo\StoredProcedures\Participant\spParticipant_Get.sql" />
+    <Build Include="dbo\StoredProcedures\Participant\spParticipant_Insert.sql" />
+    <Build Include="dbo\StoredProcedures\Participant\spParticipant_Update.sql" />
+    <Build Include="dbo\StoredProcedures\Participant\spParticipant_Delete.sql" />
+    <Build Include="dbo\StoredProcedures\Project\spProject_GetAll.sql" />
+    <Build Include="dbo\StoredProcedures\Project\spProject_Get.sql" />
+    <Build Include="dbo\StoredProcedures\Project\spProject_Insert.sql" />
+    <Build Include="dbo\StoredProcedures\Project\spProject_Edit.sql" />
+    <Build Include="dbo\StoredProcedures\Project\spProject_Delete.sql" />
+    <Build Include="dbo\StoredProcedures\Comment\spComment_GetAll.sql" />
+    <Build Include="dbo\StoredProcedures\Comment\spComment_Get.sql" />
+    <Build Include="dbo\StoredProcedures\Comment\spComment_Insert.sql" />
+    <Build Include="dbo\StoredProcedures\Comment\spComment_Update.sql" />
+    <Build Include="dbo\StoredProcedures\Comment\spComment_Delete.sql" />
+    <Build Include="dbo\StoredProcedures\Issue\spIssue_GetAll.sql" />
+    <Build Include="dbo\StoredProcedures\Issue\spIssue_Get.sql" />
+    <Build Include="dbo\StoredProcedures\Issue\spIssue_Insert.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Script.PostDeployment.sql" />
