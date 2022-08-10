@@ -2,7 +2,9 @@
 	@Id INT
 AS
 begin
-	select Id, Title, Description, Created, IsDeleted
+	select *
 	from dbo.[Project]
-	where IsDeleted = 0;
+	Inner join Participant
+	on Project.Id = Participant.ProjectId
+	where Project.Id = @Id AND Project.IsDeleted = 0;
 end	

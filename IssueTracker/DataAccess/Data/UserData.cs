@@ -17,31 +17,31 @@ namespace DataAccess.Data
         }
         public Task<IEnumerable<User>> GetUsersAsync()
         {
-            return _db.LoadData<User, dynamic>("dbo.spUser_GetAll", new { });
+            return _db.LoadDataAsync<User, dynamic>("dbo.spUser_GetAll", new { });
         }
         public async Task<User?> GetUserByIdAsync(Guid id)
         {
-            var result = await _db.LoadData<User, dynamic>(
+            var result = await _db.LoadDataAsync<User, dynamic>(
                 "dbo.spUser_GetById", new { Id = id });
             return result.FirstOrDefault();
         }
         public async Task<User?> GetUserByUsernameAndEmailAsync(string username, string email)
         {
-            var result = await _db.LoadData<User, dynamic>(
+            var result = await _db.LoadDataAsync<User, dynamic>(
                 "dbo.spUser_GetByUsernameANDEmail", new { username, email  });
             return result.FirstOrDefault();
         }
         public async Task InsertUserAsync(User user)
         {
-            await _db.SaveData("dbo.spUser_Insert", new { user.UserName, user.Email,user.Password });
+            await _db.SaveDataAsync("dbo.spUser_Insert", new { user.UserName, user.Email,user.Password });
         }
         public async Task UpdateUserAsync(User user)
         {
-            await _db.SaveData("dbo.spUser_Update", user);
+            await _db.SaveDataAsync("dbo.spUser_Update", user);
         }
         public async Task DeleteUserAsync(Guid id)
         {
-            await _db.SaveData("dbo.spUser_Delete", new { Id = id });
+            await _db.SaveDataAsync("dbo.spUser_Delete", new { Id = id });
         }
     }
 }
