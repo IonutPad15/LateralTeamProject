@@ -1,4 +1,4 @@
-﻿namespace Models.Response
+﻿namespace Models.Request
 {
     public class Credentials
     {
