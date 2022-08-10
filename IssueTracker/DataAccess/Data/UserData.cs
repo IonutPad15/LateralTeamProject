@@ -32,13 +32,25 @@ namespace DataAccess.Data
                 "dbo.spUser_GetByUsernameANDEmail", new { username, email  });
             return result.FirstOrDefault();
         }
+        public async Task<User?> GetUserByCredentialsAsync(string nameEmail, string password)
+        {
+            var result = await _db.LoadData<User, dynamic>(
+                "dbo.spUser_GetByCredentials", new { nameEmail, password });
+            return result.FirstOrDefault();
+        }
+        public async Task<User?> GetAboutUserAsync(Guid id)
+        {
+            var result = await _db.LoadData<User, dynamic>(
+                "dbo.spUser_AboutUser", new { Id = id });
+            return result.FirstOrDefault();
+        }
         public async Task InsertUserAsync(User user)
         {
             await _db.SaveData("dbo.spUser_Insert", new { user.UserName, user.Email,user.Password });
         }
-        public async Task UpdateUserAsync(User user)
+        public async Task UpdateUserAsync(Guid id, string newPass)
         {
-            await _db.SaveData("dbo.spUser_Update", user);
+            await _db.SaveData("dbo.spUser_Update", new {Id=id, Password = newPass});
         }
         public async Task DeleteUserAsync(Guid id)
         {
