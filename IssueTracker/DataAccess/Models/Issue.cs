@@ -22,7 +22,10 @@ namespace DataAccess.Models
         public int RoleId { get; set; }
         public bool IsDeleted { get; set; }
         public IssueType? IssueType { get; set; }
+        public Priority? Priority { get; set; }
+        public Status? Status { get; set; }
+        public Role? Role { get; set; }
+        public Project? Project { get; set; }
+
     }
 }
-
-//TODO: Object FK Priority & Status & Role & Project

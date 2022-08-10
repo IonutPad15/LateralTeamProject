@@ -9,30 +9,44 @@ namespace IssueTrackerAPI.Controllers
     [ApiController]
     public class ProjectController : ControllerBase
     {
-        private readonly IProjectData _project;
-        public ProjectController(IProjectData project)
+        private readonly IProjectData _projectdb;
+        public ProjectController(IProjectData projectdb)
         {
-            _project = project;
+            _projectdb = projectdb;
         }
 
         [HttpPost("add-project")]
-        public async Task AddProject(ProjectRequest entity) =>
-            await _project.AddAsync(entity);
+        public async Task AddProject(ProjectRequest entity)
+        {
+            var project = new Project
+            {
+                Title = entity.Title!,
+                Description = entity.Description!
+            };
+            await _projectdb.AddAsync(project);
+        }
 
         [HttpGet("getAll-project")]
-        public async Task<List<Project>> GetAll() =>
-            (await _project.GetAllAsync()).ToList();//TODO: aici ar trebui sa imi dea return de Model.projectinfo dupa mapare
+        public async Task<IEnumerable<Project>> GetAll() =>
+            await _projectdb.GetAllAsync();
 
         [HttpGet("getById-project")]
         public async Task<Project?> GetById(int id) =>
-            await _project.GetByIdAsync(id);//TODO: aici ar trebui sa imi dea return de Model.projectinfo dupa mapare
+            await _projectdb.GetByIdAsync(id);
 
         [HttpPut("update-project")]
-        public async Task Update(ProjectRequest entity) =>
-            await _project.UpdateAsync(entity);
-
+        public async Task Update(ProjectRequest entity)
+        {
+            var project = new Project
+            {
+                Id = entity.Id,
+                Title = entity.Title!,
+                Description = entity.Description!
+            };
+            await _projectdb.UpdateAsync(project);
+        }
         [HttpDelete("delete-project")]
         public async Task Update(int id) =>
-            await _project.DeleteAsync(id);
+            await _projectdb.DeleteAsync(id);
     }
 }

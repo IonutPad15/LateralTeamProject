@@ -12,9 +12,9 @@ namespace DataAccess.Data
             _db = db;
         }
         public async Task<IEnumerable<Role>> GetAllAsync() =>
-            await _db.LoadData<Role>("dbo.spRole_GetAll");
+            await _db.LoadDataAsync<Role>("dbo.spRole_GetAll");
 
         public async Task<Role?> GetByIdAsync(int id) =>
-            (await _db.LoadData<Role, dynamic>("dbo.spRole_Get", new { Id = id })).FirstOrDefault();
+            (await _db.LoadDataAsync<Role, dynamic>("dbo.spRole_Get", new { Id = id })).FirstOrDefault();
     }
 }

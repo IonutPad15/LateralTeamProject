@@ -1,4 +1,4 @@
-﻿namespace Models.Info
+﻿namespace Models.Response
 {
     public class IssueInfo
     {
