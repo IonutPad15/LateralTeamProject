@@ -18,7 +18,7 @@ namespace DataAccess.Data
         }
         public Task<IEnumerable<User>> GetUsersAsync()
         {
-            return _db.LoadDataAsync<User, dynamic>("dbo.spUser_GetAll", new { });
+            return _db.LoadDataAsync<User>("dbo.spUser_GetAll");
         }
         public async Task<User?> GetUserByIdAsync(Guid id)
         {
@@ -34,13 +34,13 @@ namespace DataAccess.Data
         }
         public async Task<User?> GetUserByCredentialsAsync(string nameEmail, string password)
         {
-            var result = await _db.LoadData<User, dynamic>(
+            var result = await _db.LoadDataAsync<User, dynamic>(
                 "dbo.spUser_GetByCredentials", new { nameEmail, password });
             return result.FirstOrDefault();
         }
         public async Task<User?> GetAboutUserAsync(Guid id)
         {
-            var result = await _db.LoadData<User, dynamic>(
+            var result = await _db.LoadDataAsync<User, dynamic>(
                 "dbo.spUser_AboutUser", new { Id = id });
             return result.FirstOrDefault();
         }
@@ -48,9 +48,10 @@ namespace DataAccess.Data
         {
             await _db.SaveDataAsync("dbo.spUser_Insert", new { user.UserName, user.Email,user.Password });
         }
-        public async Task UpdateUserAsync(Guid id, string newPass)
+        public async Task UpdateUserAsync(User user)
         {
-            await _db.SaveDataAsync("dbo.spUser_Update", new {Id=id, Password = newPass});
+            await _db.SaveDataAsync("dbo.spUser_Update", 
+                new { Id=user.Id, UserName = user.UserName, Email = user.Email, Password = user.Password });
         }
         public async Task DeleteUserAsync(Guid id)
         {

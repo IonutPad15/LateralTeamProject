@@ -2,16 +2,14 @@
 using Microsoft.AspNetCore.Mvc;
 using DataAccess.Utils;
 using DataAccess.Data.IData;
-using Models.Info;
+using Models.Request;
 using AutoMapper;
 using Validation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Models.Response;
 using System.Security.Claims;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
-using System.IdentityModel.Tokens.Jwt;
+using IssueTrackerAPI.Utils;
 
 namespace IssueTrackerAPI.Controllers
 {
@@ -55,7 +53,7 @@ namespace IssueTrackerAPI.Controllers
         [HttpPost("register")]
         public async Task<IResult> InsertUser(UserRequest userRequest)
         {
-            if (!UserValidation.isValid(userRequest))
+            if (!UserValidation.IsValid(userRequest))
             {
                 return Results.BadRequest("Invalid Input");
             }
@@ -75,30 +73,32 @@ namespace IssueTrackerAPI.Controllers
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IResult> UpdateUser(UserRequest userRequest)
         {
-            if (!UserValidation.isValid(userRequest))
+            if (!UserValidation.IsValid(userRequest))
             {
                 return Results.BadRequest("Invalid Input");
             }
             else
             {
                 var userExists = await _data.GetUserByUsernameAndEmailAsync(userRequest.UserName!, userRequest.Email!);
-                if (userExists == null) return Results.BadRequest();
-                else
+                if (userExists == null) 
+                    return Results.BadRequest();
+               
+                var userclaim = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimTypes.Name));
+                var emailclaim = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimTypes.Email));
+                if (userclaim != null && emailclaim != null)
                 {
-                    var userclaim = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimTypes.Name));
-                    var emailclaim = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimTypes.Email));
-                    if (userclaim != null && emailclaim != null)
-                    {
 
-                        if (!userclaim.Value.Equals(userExists.UserName) || !emailclaim.Value.Equals(userExists.Email))
-                            return Results.BadRequest("Not his account");
-                    }
-                    HashHelper hashHelper = new HashHelper();
-                    userExists.Password = hashHelper.GetHash(userRequest.Password!);
-                    
-                    await _data.UpdateUserAsync(userExists.Id, userExists.Password);
-                    return Results.Ok(userExists);
+                    if (!userclaim.Value.Equals(userExists.UserName) || !emailclaim.Value.Equals(userExists.Email))
+                        return Results.BadRequest("Not his account");
                 }
+                HashHelper hashHelper = new HashHelper();
+                    
+                var user = mapper.Map<User>(userRequest);
+                user.Password = hashHelper.GetHash(userRequest.Password!);
+                user.Id = userExists.Id;
+                await _data.UpdateUserAsync(user);
+                return Results.Ok(user);
+               
             }
 
         }
@@ -126,47 +126,19 @@ namespace IssueTrackerAPI.Controllers
         [HttpPost("login")]
         public async Task<ActionResult<UserToken>> Login([FromBody] Credentials credentials)
         {
-            if (!CredentialsValidation.isValid(credentials)) 
+            if (!CredentialsValidation.IsValid(credentials)) 
                 return BadRequest("All Fields Required");
+
             HashHelper hashHelper = new HashHelper();
             string hashedPassword = hashHelper.GetHash(credentials.Password!);
             credentials.Password = hashedPassword;
             var user = await _data.GetUserByCredentialsAsync(credentials.NameEmail!, credentials.Password);
-            if (user == null) return BadRequest("Invalid login attempt");
-            else return BuildToken(user);
+
+            if (user == null) 
+                return BadRequest("Invalid login attempt");
+            return Builder.BuildToken(user,_configuration);
         }
 
-        private UserToken BuildToken(User user)
-        {
-            if (UserValidation.isValid(user))
-            {
-                var expiration = DateTime.Now.AddDays(30);
-
-                var claims = new List<Claim>()
-                {
-                    new Claim(ClaimTypes.Name, user.UserName),
-                    new Claim(ClaimTypes.Email, user.Email)
-                    
-                };
-
-                var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWTkey"]));
-                var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-                JwtSecurityToken token = new JwtSecurityToken(
-                    issuer: null,
-                    audience: null,
-                    claims: claims,
-                    expires: expiration,
-                    signingCredentials: creds);
-
-                return new UserToken()
-                {
-                    Token = new JwtSecurityTokenHandler().WriteToken(token),
-                    ExpirationDate = expiration,
-                    UserId = user.Id
-                };
-            }
-            return new UserToken();
-        }
+        
     }
 }

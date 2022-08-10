@@ -1,11 +1,10 @@
-﻿using Models.Response;
-
+﻿using Models.Request;
 
 namespace Validation
 {
     public class CredentialsValidation
     {
-        public static bool isValid(Credentials credentials)
+        public static bool IsValid(Credentials credentials)
         {
             if (credentials == null) return false;
             if (string.IsNullOrEmpty(credentials.NameEmail) || string.IsNullOrEmpty(credentials.Password))
