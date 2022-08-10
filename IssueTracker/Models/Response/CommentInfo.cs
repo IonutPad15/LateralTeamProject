@@ -14,6 +14,6 @@ namespace Models.Response
         public string Body { get; set; } = null!;
         public DateTime Created { get; set; }
         public DateTime Updated { get; set; }
-        public UserInfo? User { get; set; }
+        public UserResponse? User { get; set; }
     }
 }

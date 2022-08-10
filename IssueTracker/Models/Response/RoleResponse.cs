@@ -1,6 +1,6 @@
 ﻿namespace Models.Response
 {
-    public class RoleInfo
+    public class RoleResponse
     {
        public int Id { get; set; }
        public string? Name { get; set; }

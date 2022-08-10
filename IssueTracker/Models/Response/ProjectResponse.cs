@@ -1,8 +1,8 @@
 ﻿namespace Models.Response
 {
-    public class ProjectInfo
+    public class ProjectResponse
     {
-        public ProjectInfo()
+        public ProjectResponse()
         {
             Participants = new();
             Issues = new();
@@ -11,7 +11,7 @@
         public string? Title { get; set; }
         public string? Description { get; set; }
         public DateTime Created { get; set; }
-        public List<ParticipantInfo>? Participants { get; set; }
-        public List<IssueInfo>? Issues { get; set; }
+        public List<ParticipantResponse>? Participants { get; set; }
+        public List<IssueResponse>? Issues { get; set; }
     }
 }

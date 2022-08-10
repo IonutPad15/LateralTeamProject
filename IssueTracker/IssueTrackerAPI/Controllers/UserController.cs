@@ -20,7 +20,7 @@ namespace IssueTrackerAPI.Controllers
         private readonly IUserData _data;
         private readonly MapperConfiguration config = new MapperConfiguration(cfg => {
             cfg.CreateMap<UserRequest, User>();
-            cfg.CreateMap<User, UserInfo>();
+            cfg.CreateMap<User, UserResponse>();
         });
         private readonly Mapper mapper;
         private readonly IConfiguration _configuration;
@@ -34,7 +34,7 @@ namespace IssueTrackerAPI.Controllers
         public async Task<IResult> GetUsers()
         {
             var result = await _data.GetUsersAsync();
-            var users = mapper.Map<IEnumerable<UserInfo>>(result);
+            var users = mapper.Map<IEnumerable<UserResponse>>(result);
             return Results.Ok(users);
         }
         [HttpGet("{id}")]
@@ -42,7 +42,7 @@ namespace IssueTrackerAPI.Controllers
         {
             var results = await _data.GetUserByIdAsync(id);
             if (results == null) return Results.NotFound();
-            var userinfo = mapper.Map<UserInfo>(results);
+            var userinfo = mapper.Map<UserResponse>(results);
             return Results.Ok(userinfo);
 
         }
@@ -51,7 +51,7 @@ namespace IssueTrackerAPI.Controllers
         {
             var results = await _data.GetAboutUserAsync(id);
             if (results == null) return Results.NotFound();
-            var userinfo = mapper.Map<UserInfo>(results);
+            var userinfo = mapper.Map<UserResponse>(results);
             return Results.Ok(userinfo);
 
         }

@@ -1,6 +1,6 @@
 ﻿namespace Models.Response
 {
-    public class UserInfo
+    public class UserResponse
     {
         public Guid Id { get; set; }
         public string UserName { get; set; } = string.Empty;
