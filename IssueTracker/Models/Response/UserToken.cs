@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Models.Info
+namespace Models.Response
 {
     public class UserToken
     {

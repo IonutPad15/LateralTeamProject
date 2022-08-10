@@ -12,7 +12,18 @@ namespace DataAccess.DbAccess
         {
             _config = config;
         }
-        public async Task<IEnumerable<T>> LoadData<T, U>(
+
+        public async Task<IEnumerable<T>> LoadDataAsync<T>(
+            string storedProcedure,
+            string connectionId = "Default")
+        {
+            using (IDbConnection connection = new SqlConnection(_config.GetConnectionString(connectionId)))
+            {
+                return await connection.QueryAsync<T>(storedProcedure,
+                    commandType: CommandType.StoredProcedure);
+            }
+        }
+        public async Task<IEnumerable<T>> LoadDataAsync<T, U>(
             string storedProcedure,
             U parameters,
             string connectionId = "Default")
@@ -23,7 +34,7 @@ namespace DataAccess.DbAccess
                     commandType: CommandType.StoredProcedure);
             }
         }
-        public async Task SaveData<T>(
+        public async Task SaveDataAsync<T>(
             string storedProcedure,
             T parameters,
             string connectionId = "Default")
