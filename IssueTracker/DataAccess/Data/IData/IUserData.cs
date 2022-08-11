@@ -12,5 +12,6 @@ namespace DataAccess.Data.IData
         Task<User?> GetUserByUsernameAndEmailAsync(string username, string email);
         Task<User?> GetUserByCredentialsAsync(string nameEmail, string password);
         Task<User?> GetAboutUserAsync(Guid id);
+        Task<User?> LoadUserDataAsync<T>(T parameters, string connectionId = "Default");
     }
 }

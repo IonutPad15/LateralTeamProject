@@ -17,6 +17,7 @@ namespace IssueTrackerAPI.Controllers
             cfg.CreateMap<UserRequest, User>();
             cfg.CreateMap<User, UserResponse>();
             cfg.CreateMap<Participant, ParticipantResponse>();
+            cfg.CreateMap<ParticipantRequest, Participant>();
             cfg.CreateMap<Role, RoleResponse>();
             cfg.CreateMap<Project, ProjectResponse>();
         });
@@ -31,7 +32,7 @@ namespace IssueTrackerAPI.Controllers
         {
             var result = await _participantData.GetAllAsync();
             var participants = mapper.Map<IEnumerable<ParticipantResponse>>(result);
-            if(participants.Any())
+            if (participants.Any())
                 return Results.Ok(participants);
             return Results.NoContent();
         }
@@ -44,5 +45,27 @@ namespace IssueTrackerAPI.Controllers
             return Results.Ok(participantResponse);
 
         }
+        [HttpPost("create")]
+        public async Task<IResult> CreateParticipant(ParticipantRequest participantRequest)
+        {
+            participantRequest.Id = 0;
+            var participant = mapper.Map<Participant>(participantRequest);
+            await _participantData.AddAsync(participant);
+            return Results.Ok();
+        }
+        [HttpPut]
+        public async Task<IResult> UpdateParticipant(ParticipantRequest participantRequest)
+        {
+            var participant = mapper.Map<Participant>(participantRequest);
+            await _participantData.UpdateAsync(participant);
+            return Results.Ok();
+        }
+        [HttpDelete]
+        public async Task<IResult> DeleteParticipant(int id)
+        {
+            await _participantData.DeleteAsync(id);
+            return Results.NoContent();
+        }
+
     }
 }

@@ -28,7 +28,7 @@ namespace DataAccess.Data
             (await _db.LoadDataAsync<Participant, dynamic>("dbo.spParticipant_Get", new { Id = id })).FirstOrDefault();
 
         public async Task UpdateAsync(Participant participant) =>
-            await _db.SaveDataAsync("dbo.spParticipant_Edit", new { participant.Id, participant.UserId, participant.ProjectId, participant.RoleId });
+            await _db.SaveDataAsync("dbo.spParticipant_Update", new { participant.Id, participant.UserId, participant.ProjectId, participant.RoleId });
 
         public async Task DeleteAsync(int id) =>
             await _db.SaveDataAsync("dbo.spParticipant_Delete", new { Id = id });

@@ -1,11 +1,9 @@
 ﻿CREATE PROCEDURE [dbo].[spParticipant_Get]
-	@Id int
+	@Id INT
 AS
 begin
-	select *
-	from dbo.[Participant]
-	inner join Project
-	ON Project.Id = Participant.ProjectId
-	where @Id= Participant.Id AND Participant.IsDeleted = 0;
+	select * 
+	from dbo.Participant
+	where Id=@Id AND IsDeleted = 0
 end
 

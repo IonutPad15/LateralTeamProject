@@ -21,6 +21,8 @@ namespace IssueTrackerAPI.Controllers
         private readonly MapperConfiguration config = new MapperConfiguration(cfg => {
             cfg.CreateMap<UserRequest, User>();
             cfg.CreateMap<User, UserResponse>();
+            cfg.CreateMap<Participant, ParticipantResponse>();
+            cfg.CreateMap<ParticipantRequest, Participant>();
         });
         private readonly Mapper mapper;
         private readonly IConfiguration _configuration;
@@ -49,7 +51,7 @@ namespace IssueTrackerAPI.Controllers
         [HttpGet("profile/{id}")]
         public async Task<IResult> GetAboutUser(Guid id)
         {
-            var results = await _data.GetAboutUserAsync(id);
+            var results = await _data.LoadUserDataAsync(new { Id = id });
             if (results == null) return Results.NotFound();
             var userinfo = mapper.Map<UserResponse>(results);
             return Results.Ok(userinfo);
