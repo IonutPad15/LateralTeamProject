@@ -11,7 +11,5 @@ namespace DataAccess.Data.IData
         Task DeleteUserAsync(Guid id);
         Task<User?> GetUserByUsernameAndEmailAsync(string username, string email);
         Task<User?> GetUserByCredentialsAsync(string nameEmail, string password);
-        Task<User?> GetAboutUserAsync(Guid id);
-        Task<User?> LoadUserDataAsync<T>(T parameters, string connectionId = "Default");
     }
 }

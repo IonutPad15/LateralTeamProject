@@ -27,23 +27,6 @@ namespace DataAccess.Data
                 "dbo.spUser_GetById", new { Id = id });
             return result.FirstOrDefault();
         }
-        public async Task<User?> LoadUserDataAsync<T>(
-            T parameters,
-            string connectionId = "Default")
-        {
-            string storedProcedure = "dbo.spUser_AboutUser";
-            //string storedProcedure =
-            using (IDbConnection connection = new SqlConnection(_config.GetConnectionString(connectionId)))
-            {
-                IEnumerable<User?> users = await connection.QueryAsync<User, IEnumerable<Comment>, User?>(storedProcedure,
-                    (user, comment)=> { user.Comments = comment; return user; },
-                     parameters,
-                     splitOn:"Id, Id",
-                    commandType: CommandType.StoredProcedure);
-                var user = users.FirstOrDefault();
-                return user;
-            }
-        }
         public async Task<User?> GetUserByUsernameAndEmailAsync(string username, string email)
         {
             var result = await _db.LoadDataAsync<User, dynamic>(
@@ -54,12 +37,6 @@ namespace DataAccess.Data
         {
             var result = await _db.LoadDataAsync<User, dynamic>(
                 "dbo.spUser_GetByCredentials", new { nameEmail, password });
-            return result.FirstOrDefault();
-        }
-        public async Task<User?> GetAboutUserAsync(Guid id)
-        {
-            var result = await _db.LoadDataAsync<User, dynamic>(
-                "dbo.spUser_AboutUser", new { Id = id });
             return result.FirstOrDefault();
         }
         public async Task InsertUserAsync(User user)

@@ -48,15 +48,6 @@ namespace IssueTrackerAPI.Controllers
             return Results.Ok(userinfo);
 
         }
-        [HttpGet("profile/{id}")]
-        public async Task<IResult> GetAboutUser(Guid id)
-        {
-            var results = await _data.LoadUserDataAsync(new { Id = id });
-            if (results == null) return Results.NotFound();
-            var userinfo = mapper.Map<UserResponse>(results);
-            return Results.Ok(userinfo);
-
-        }
         [HttpPost("register")]
         public async Task<IResult> InsertUser(UserRequest userRequest)
         {
