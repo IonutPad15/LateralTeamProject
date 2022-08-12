@@ -117,6 +117,7 @@
     <Build Include="dbo\StoredProcedures\Comment\spComment_GetAllByUserId.sql" />
     <Build Include="dbo\StoredProcedures\Comment\spComment_GetAllByIssueId.sql" />
     <Build Include="dbo\StoredProcedures\Comment\spComment_GetAllByCommentId.sql" />
+    <Build Include="dbo\StoredProcedures\Participant\spParticipant_GetOwnersAndCollabsByProjectId.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Script.PostDeployment.sql" />

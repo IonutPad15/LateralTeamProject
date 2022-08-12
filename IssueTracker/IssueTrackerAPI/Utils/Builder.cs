@@ -14,11 +14,11 @@ namespace IssueTrackerAPI.Utils
 
             var expiration = DateTime.Now.AddDays(30);
 
-            var claims = new List<Claim>()
+            var claims = new []
                 {
                     new Claim(ClaimTypes.Name, user.UserName),
-                    new Claim(ClaimTypes.Email, user.Email)
-
+                    new Claim(ClaimTypes.Email, user.Email),
+                    new Claim("UserId",user.Id.ToString())
                 };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWTkey"]));
