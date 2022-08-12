@@ -10,5 +10,5 @@
 	@StatusId INT, 
 	@RoleId INT
 AS
-	insert into dbo.[Issue](Title, Description, Created, Updated,IssueTypeId, ProjectId, UserAssignedId, PriorityId, StatusId, RoleId)
+	insert into dbo.[Issue](Title, Description, Created, Updated, IssueTypeId, ProjectId, UserAssignedId, PriorityId, StatusId, RoleId)
 	values(@Title , @Description, @Created, @Updated ,@IssueTypeId, @ProjectId, @UserAssignedId , @PriorityId, @StatusId, @RoleId )

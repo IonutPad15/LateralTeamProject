@@ -13,7 +13,7 @@ namespace DataAccess.Data
         }
 
         public async Task AddAsync(Project project) =>
-            await _db.SaveDataAsync("dbo.spProject_Insert", new { project.Title, project.Description, DateTime.UtcNow});
+            await _db.SaveDataAsync("dbo.spProject_Insert", new { project.Title, project.Description, Created = DateTime.UtcNow});
 
         public async Task<IEnumerable<Project>> GetAllAsync() =>
             await _db.LoadDataAsync<Project>("dbo.spProject_GetAll");

@@ -17,6 +17,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton<ISQLDataAccess, SQLDataAccess>();
 builder.Services.AddSingleton<IUserData, UserData>();
 builder.Services.AddSingleton<IProjectData, ProjectData>();
+builder.Services.AddSingleton<IIssueData, IssueData>();
 
 builder.Services.AddAuthentication(options =>
 

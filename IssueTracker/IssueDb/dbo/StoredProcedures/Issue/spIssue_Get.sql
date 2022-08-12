@@ -2,7 +2,13 @@
 	@Id INT
 AS
 begin
-	select Id, Title, Description, Created, Updated, ProjectId, UserAssignedId, PriorityId, StatusId, RoleId, IsDeleted
+	select *
 	from dbo.[Issue]
-	where IsDeleted = 0;
+	inner join Project on Project.Id = ProjectId 
+	inner join Status on Status.Id = StatusId
+	inner join Priority on Priority.Id = PriorityId
+	inner join Role on Role.Id = RoleId
+	inner join IssueType on IssueType.Id = IssueTypeId
+	inner join [User] on [User].Id = UserAssignedId
+	where Issue.IsDeleted = 0 and Issue.Id = @Id;
 end
