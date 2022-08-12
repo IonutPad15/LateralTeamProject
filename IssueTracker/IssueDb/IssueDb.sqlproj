@@ -113,6 +113,7 @@
     <Build Include="dbo\StoredProcedures\User\spUser_GetByUsernameANDEmail.sql" />
     <Build Include="dbo\StoredProcedures\User\spUser_GetByCredentials.sql" />
     <Build Include="dbo\StoredProcedures\User\spUser_AboutUser.sql" />
+    <Build Include="dbo\StoredProcedures\Participant\spParticipant_GetAllByProjectId.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Script.PostDeployment.sql" />

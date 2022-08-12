@@ -1,6 +1,8 @@
+using Dapper;
 using DataAccess.Data;
 using DataAccess.Data.IData;
 using DataAccess.DbAccess;
+using DataAccess.Utils;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -17,6 +19,9 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton<ISQLDataAccess, SQLDataAccess>();
 builder.Services.AddSingleton<IUserData, UserData>();
 builder.Services.AddSingleton<IProjectData, ProjectData>();
+builder.Services.AddSingleton<IParticipantData, ParticipantData>();
+
+
 
 builder.Services.AddAuthentication(options =>
 

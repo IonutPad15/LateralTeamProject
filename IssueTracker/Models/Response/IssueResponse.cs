@@ -1,6 +1,6 @@
 ﻿namespace Models.Response
 {
-    public class IssueInfo
+    public class IssueResponse
     {
     }
 }
