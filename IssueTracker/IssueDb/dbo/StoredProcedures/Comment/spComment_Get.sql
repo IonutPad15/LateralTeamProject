@@ -2,7 +2,7 @@
 	@Id INT
 AS
 begin
-	select Id, UserId, IssueId, Body, Created, Updated, IsDeleted
+	select *
 	from dbo.[Comment] 
-	where IsDeleted = 0;
+	where IsDeleted = 0 AND [Comment].Id = @Id;
 end	

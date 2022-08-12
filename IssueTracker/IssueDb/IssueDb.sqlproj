@@ -114,6 +114,9 @@
     <Build Include="dbo\StoredProcedures\User\spUser_GetByCredentials.sql" />
     <Build Include="dbo\StoredProcedures\User\spUser_AboutUser.sql" />
     <Build Include="dbo\StoredProcedures\Participant\spParticipant_GetAllByProjectId.sql" />
+    <Build Include="dbo\StoredProcedures\Comment\spComment_GetAllByUserId.sql" />
+    <Build Include="dbo\StoredProcedures\Comment\spComment_GetAllByIssueId.sql" />
+    <Build Include="dbo\StoredProcedures\Comment\spComment_GetAllByCommentId.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Script.PostDeployment.sql" />
