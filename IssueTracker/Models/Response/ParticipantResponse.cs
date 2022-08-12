@@ -4,7 +4,7 @@
     {
         public int Id { get; set; }
         public UserResponse? User { get; set; }
-        public IssueResponse? Issue { get; set; }
+        public RoleResponse? Role { get; set; }
         public ProjectResponse? Project { get; set; }
     }
 }

@@ -2,11 +2,10 @@
 	@Id INT,
 	@UserId UNIQUEIDENTIFIER,
 	@ProjectId INT,
-	@IssueId INT,
 	@RoleId INT
 AS
 begin
 	update dbo.[Participant]
-	set UserId = @UserId, ProjectId = @ProjectId, IssueId = @IssueId, RoleId = @RoleId
+	set UserId = @UserId, ProjectId = @ProjectId, RoleId = @RoleId
 	where Id=@Id;
 end

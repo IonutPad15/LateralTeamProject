@@ -20,6 +20,9 @@ namespace IssueTrackerAPI.Controllers
         private readonly IUserData _data;
         private readonly MapperConfiguration config = new MapperConfiguration(cfg => {
             cfg.CreateMap<UserRequest, User>();
+            cfg.CreateMap<User, UserResponse>();
+            cfg.CreateMap<Participant, ParticipantResponse>();
+            cfg.CreateMap<ParticipantRequest, Participant>();
         });
         private readonly Mapper mapper;
         private readonly IConfiguration _configuration;
@@ -32,22 +35,17 @@ namespace IssueTrackerAPI.Controllers
         [HttpGet]
         public async Task<IResult> GetUsers()
         {
-            return Results.Ok(await _data.GetUsersAsync());
+            var result = await _data.GetUsersAsync();
+            var users = mapper.Map<IEnumerable<UserResponse>>(result);
+            return Results.Ok(users);
         }
         [HttpGet("{id}")]
         public async Task<IResult> GetUser(Guid id)
         {
             var results = await _data.GetUserByIdAsync(id);
             if (results == null) return Results.NotFound();
-            return Results.Ok(results);
-
-        }
-        [HttpGet("profile/{id}")]
-        public async Task<IResult> GetAboutUser(Guid id)
-        {
-            var results = await _data.GetAboutUserAsync(id);
-            if (results == null) return Results.NotFound();
-            return Results.Ok(results);
+            var userinfo = mapper.Map<UserResponse>(results);
+            return Results.Ok(userinfo);
 
         }
         [HttpPost("register")]
@@ -65,7 +63,7 @@ namespace IssueTrackerAPI.Controllers
                 userRequest.Password = hashHelper.GetHash(userRequest.Password!);
                 var user = mapper.Map<User>(userRequest);
                 await _data.InsertUserAsync(user);
-                return Results.Ok();
+                return Results.Ok("Account created");
             }
             
         }
@@ -97,7 +95,7 @@ namespace IssueTrackerAPI.Controllers
                 user.Password = hashHelper.GetHash(userRequest.Password!);
                 user.Id = userExists.Id;
                 await _data.UpdateUserAsync(user);
-                return Results.Ok(user);
+                return Results.Ok("Account updated");
                
             }
 
@@ -119,7 +117,7 @@ namespace IssueTrackerAPI.Controllers
                         return Results.BadRequest("Not his account");
                 }
                 await _data.DeleteUserAsync(id);
-                return Results.Ok();
+                return Results.Ok("Account deleted");
             }
             
         }
