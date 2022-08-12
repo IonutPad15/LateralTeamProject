@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using DataAccess.Data.IData;
 using DataAccess.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Models.Request;
 using Validation;
@@ -21,7 +22,8 @@ namespace IssueTrackerAPI.Controllers
             _issueDb = issueDb;
             _mapper = new Mapper(_config);
         }
-
+        
+        [Authorize]
         [HttpPost("add-Issue")]
         public async Task<IActionResult> AddIssue(IssueRequest entity)
         {
@@ -42,6 +44,7 @@ namespace IssueTrackerAPI.Controllers
         public async Task<Issue?> GetByIdIssue(int id) =>
             await _issueDb.GetByIdAsync(id);
 
+        [Authorize]
         [HttpPut("update-Issue")]
         public async Task<IActionResult> UpdateIssue(IssueRequest entity)
         {
@@ -54,6 +57,7 @@ namespace IssueTrackerAPI.Controllers
             return BadRequest("Error validation!");
         }
 
+        [Authorize]
         [HttpDelete("delete-Issue")]
         public async Task<IActionResult> DeleteIssue(int id)
         {
