@@ -1,6 +1,6 @@
 ﻿CREATE PROCEDURE [dbo].[spComment_Update]
 	@Id INT,
-	@Body NVARCHAR(max),
+	@Body NVARCHAR(450),
 	@Updated datetime2(7)
 AS
 begin

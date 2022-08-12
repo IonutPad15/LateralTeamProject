@@ -1,10 +1,13 @@
 ﻿using AutoMapper;
 using DataAccess.Data.IData;
 using DataAccess.Models;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Models.Request;
 using Models.Response;
+using System.Security.Claims;
 
 namespace IssueTrackerAPI.Controllers
 {
@@ -23,10 +26,12 @@ namespace IssueTrackerAPI.Controllers
             
         });
         private readonly Mapper mapper;
-        public ParticipantController(IParticipantData participantData)
+        private readonly IUserData _userData;
+        public ParticipantController(IParticipantData participantData, IUserData userData)
         {
             _participantData = participantData;
             mapper = new Mapper(config);
+            _userData = userData;
         }
         [HttpGet]
         public async Task<IResult> GeParticipants()
@@ -40,7 +45,7 @@ namespace IssueTrackerAPI.Controllers
         [HttpGet("projectid")]
         public async Task <IResult> GetParticipantsByProjectId(int projectId)
         {
-            var results = await _participantData.GetByProjectIdAsync(projectId);
+            var results = await _participantData.GetByProjectIdAsync("spParticipant_GetAllByProjectId", projectId);
             if (results == null) return Results.NotFound();
             IEnumerable<ParticipantResponse>participantResponse = mapper.Map<IEnumerable<ParticipantResponse>>(results);
             return Results.Ok(participantResponse);
@@ -57,17 +62,38 @@ namespace IssueTrackerAPI.Controllers
         [HttpPost("create")]
         public async Task<IResult> CreateParticipant(ParticipantRequest participantRequest)
         {
-            participantRequest.Id = 0;
             var participant = mapper.Map<Participant>(participantRequest);
             await _participantData.AddAsync(participant);
             return Results.Ok();
         }
         [HttpPut]
-        public async Task<IResult> UpdateParticipant(ParticipantRequest participantRequest)
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<IResult> UpdateParticipant(ParticipantUpdateRequest participantRequest)
         {
-            var participant = mapper.Map<Participant>(participantRequest);
-            await _participantData.UpdateAsync(participant);
-            return Results.Ok();
+            var participant = await _participantData.GetByIdAsync(participantRequest.Id);
+            if (participant == null) return Results.NotFound();
+            var userclaim = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimTypes.Name));
+            var emailclaim = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimTypes.Email));
+            var idclaim = User.Claims.FirstOrDefault(x => x.Type.Equals("UserId"));
+            if (userclaim != null && emailclaim != null && idclaim != null)
+            {
+                var results = await _participantData.GetByProjectIdAsync(
+                    "spParticipant_GetOwnersAndCollabsByProjectId",participantRequest.ProjectId);
+                if (results == null) return Results.NotFound();
+                var participants = results.ToList();
+                for (int i = 0; i < participants.Count; ++i)
+                {
+
+                    if (participants[i].UserId == Guid.Parse(idclaim.Value) 
+                        && (participants[i].RoleId == 3 || participants[i].RoleId ==4))
+                    {
+                        participant.RoleId = participantRequest.RoleId;
+                        await _participantData.UpdateAsync(participant);
+                        return Results.Ok();
+                    }
+                }
+            }
+            return Results.Unauthorized();
         }
         [HttpDelete]
         public async Task<IResult> DeleteParticipant(int id)
