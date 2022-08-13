@@ -1,5 +1,7 @@
-﻿using DataAccess.Data.IData;
+﻿using AutoMapper;
+using DataAccess.Data.IData;
 using DataAccess.Models;
+using IssueTrackerAPI.Utils;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IssueTrackerAPI.Controllers
@@ -12,12 +14,14 @@ namespace IssueTrackerAPI.Controllers
         private readonly IIssueTypeData _iType;
         private readonly IPriorityData _priority;
         private readonly IStatusData _status;
+        private readonly Mapper mapper;
         public ConstantsController(IRoleData role, IIssueTypeData iType, IPriorityData priority, IStatusData status)
         {
             _role = role;
             _iType = iType;
             _priority = priority;
             _status = status;
+            mapper = AutoMapperConfig.Config();
         }
 
         [HttpGet("get-role")]

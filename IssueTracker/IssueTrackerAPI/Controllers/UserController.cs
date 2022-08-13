@@ -18,18 +18,12 @@ namespace IssueTrackerAPI.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserData _data;
-        private readonly MapperConfiguration config = new MapperConfiguration(cfg => {
-            cfg.CreateMap<UserRequest, User>();
-            cfg.CreateMap<User, UserResponse>();
-            cfg.CreateMap<Participant, ParticipantResponse>();
-            cfg.CreateMap<ParticipantRequest, Participant>();
-        });
         private readonly Mapper mapper;
         private readonly IConfiguration _configuration;
         public UserController(IUserData data, IConfiguration configuration)
         {
             _data = data;
-            mapper = new Mapper(config);
+            mapper = AutoMapperConfig.Config();
             _configuration = configuration;
         }
         [HttpGet]

@@ -35,7 +35,7 @@ namespace DataAccess.Data
 
         public async Task UpdateAsync(Participant participant) =>
             await _db.SaveDataAsync("dbo.spParticipant_Update", new { participant.Id, participant.RoleId });
-        public async Task<IEnumerable<Participant>> GetByProjectIdAsync(string storedProcedure, int id, string connectionId = "Default")
+        public async Task<IEnumerable<Participant>> GetByProjectIdAsync(int id, string storedProcedure = "dbo.spParticipant_GetAllByProjectId", string connectionId = "Default")
         {
             var param = new
             {

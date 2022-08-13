@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using DataAccess.Data.IData;
 using DataAccess.Models;
+using IssueTrackerAPI.Utils;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -16,21 +17,12 @@ namespace IssueTrackerAPI.Controllers
     public class ParticipantController : ControllerBase
     {
         private readonly IParticipantData _participantData;
-        private readonly MapperConfiguration config = new MapperConfiguration(cfg => {
-            cfg.CreateMap<UserRequest, User>();
-            cfg.CreateMap<User, UserResponse>();
-            cfg.CreateMap<ParticipantRequest, Participant>();
-            cfg.CreateMap<Role, RoleResponse>();
-            cfg.CreateMap<Project, ProjectResponse>();
-            cfg.CreateMap<Participant, ParticipantResponse>();
-            
-        });
         private readonly Mapper mapper;
         private readonly IUserData _userData;
         public ParticipantController(IParticipantData participantData, IUserData userData)
         {
             _participantData = participantData;
-            mapper = new Mapper(config);
+            mapper = AutoMapperConfig.Config();
             _userData = userData;
         }
         [HttpGet]

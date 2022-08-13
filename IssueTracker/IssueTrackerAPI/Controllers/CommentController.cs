@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using DataAccess.Data.IData;
 using DataAccess.Models;
+using IssueTrackerAPI.Utils;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -18,17 +19,12 @@ namespace IssueTrackerAPI.Controllers
     {
         private readonly ICommentData _commentData;
         private readonly IUserData _userData;
-        private readonly MapperConfiguration config = new MapperConfiguration(cfg => {
-            cfg.CreateMap<Comment, CommentController>();
-            cfg.CreateMap<Comment, CommentResponse>();
-
-        });
         private readonly Mapper mapper;
         public CommentController(ICommentData commentData, IUserData userData)
         {
             _userData = userData;
             _commentData = commentData;
-            mapper = new Mapper(config);
+            mapper = AutoMapperConfig.Config();
 
         }
         [HttpGet("")]

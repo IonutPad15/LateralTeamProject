@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using DataAccess.Data.IData;
 using DataAccess.Models;
+using IssueTrackerAPI.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Models.Request;
 using Validation;
@@ -12,14 +13,11 @@ namespace IssueTrackerAPI.Controllers
     public class ProjectController : ControllerBase
     {
         private readonly IProjectData _projectdb;
-        private readonly MapperConfiguration config = new MapperConfiguration(cfg => {
-            cfg.CreateMap<ProjectRequest, Project>();
-        });
         private readonly Mapper _mapper;
         public ProjectController(IProjectData projectdb)
         {
             _projectdb = projectdb;
-            _mapper = new Mapper(config);
+            _mapper = AutoMapperConfig.Config();
         }
 
         [HttpPost("add-project")]

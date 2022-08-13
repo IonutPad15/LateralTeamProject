@@ -52,5 +52,11 @@ namespace DataAccess.Data
         }
         public async Task DeleteAsync(int id) =>
             await _db.SaveDataAsync("dbo.spIssue_Delete", new {Id = id});
+        public async Task NextPreview(int id, string method = "next")
+        {
+            var issue = (await _db.LoadDataAsync<Issue, dynamic>("dbo.spIssue_Get", new { Id = id })).FirstOrDefault();
+            if(issue == null) return;
+            await _db.SaveDataAsync("dbo.spIssue_NextPreviewStatus", new { Id = id, Method = method, StatusId = issue.StatusId });
+        }
     }
 }
