@@ -1,21 +1,14 @@
-﻿using Dapper;
-using DataAccess.Data.IData;
+﻿using DataAccess.Data.IData;
 using DataAccess.DbAccess;
 using DataAccess.Models;
-using Microsoft.Extensions.Configuration;
-using System.Data;
-using System.Data.SqlClient;
-
 namespace DataAccess.Data
 {
     public class UserData : IUserData
     {
         private readonly ISQLDataAccess _db;
-        private readonly IConfiguration _config;
-        public UserData(ISQLDataAccess db, IConfiguration config)
+        public UserData(ISQLDataAccess db)
         {
             _db = db;
-            _config = config;
         }
         public Task<IEnumerable<User>> GetUsersAsync()
         {

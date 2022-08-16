@@ -1,12 +1,15 @@
 ﻿using AutoMapper;
 using DataAccess.Data.IData;
 using DataAccess.Models;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Models.Request;
 using Models.Response;
+using System.IdentityModel.Tokens.Jwt;
+using System.Net;
+using System.Net.Http.Headers;
 using System.Security.Claims;
 using Validation;
 
@@ -63,23 +66,39 @@ namespace IssueTrackerAPI.Controllers
             var commentsResponse = mapper.Map<IEnumerable<CommentResponse>>(comment);
             return Results.Ok(commentsResponse);
         }
-        [HttpPost("loggedin")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public async Task<IResult> CreateLoggedIn([FromBody] CommentRequest commentRequest)
+        [HttpPost]
+        public async Task<IResult> Create([FromBody] CommentRequest commentRequest)
         {
             if (!CommentRequestValidation.IsValid(commentRequest))
                 return Results.BadRequest("InputNotValid");
-            Comment comment = new Comment();
-            var userclaim = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimTypes.Name));
-            var emailclaim = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimTypes.Email));
-            if (userclaim != null && emailclaim!= null)
+            var value = Request.Headers["Authorization"];
+            if (!AuthenticationHeaderValue.TryParse(Request.Headers["Authorization"], out AuthenticationHeaderValue? headerValue))
             {
-                var user = await _userData.GetUserByUsernameAndEmailAsync(userclaim.Value, emailclaim.Value);
-                if (user != null)
+                Comment comment = new Comment();
+                comment.Body = commentRequest.Body;
+                Random rnd = new Random();
+                comment.Author = $"Anonymous{rnd.Next(99999)}";
+                comment.IssueId = commentRequest.IssueId;
+                comment.CommentId = commentRequest.CommentId;
+                comment.Updated = DateTime.Now;
+                comment.Created = DateTime.Now;
+                await _commentData.AddAsync(comment);
+                return Results.Ok();
+
+            }
+            if(headerValue != null)
+            {
+                var token = headerValue.Parameter;
+                var handler = new JwtSecurityTokenHandler();
+                var jwtSecurityToken = handler.ReadJwtToken(token);
+                var userid = jwtSecurityToken.Claims.FirstOrDefault(x => x.Type.Equals("UserId"));
+                var userclaim = jwtSecurityToken.Claims.FirstOrDefault(x => x.Type.Equals(ClaimTypes.Name));
+                if (userid != null && userclaim != null)
                 {
+                    Comment comment = new Comment();
                     comment.Body = commentRequest.Body;
-                    comment.Author = user.UserName;
-                    comment.UserId = user.Id;
+                    comment.Author = userclaim.Value;
+                    comment.UserId = Guid.Parse(userid.Value);
                     comment.IssueId = commentRequest.IssueId;
                     comment.CommentId = commentRequest.CommentId;
                     comment.Updated = DateTime.Now;
@@ -88,25 +107,7 @@ namespace IssueTrackerAPI.Controllers
                     return Results.Ok();
                 }
             }
-            return Results.StatusCode(StatusCodes.Status500InternalServerError);
-            
-
-        }
-        [HttpPost("anonyme")]
-        public async Task<IResult> CreateAnonyme([FromBody] CommentRequest commentRequest)
-        {
-            if (!CommentRequestValidation.IsValid(commentRequest))
-                return Results.BadRequest("InputNotValid");
-            Comment comment = new Comment();
-            comment.Body = commentRequest.Body;
-            Random rnd = new Random();
-            comment.Author = $"Anonymous{rnd.Next(99999)}";
-            comment.IssueId = commentRequest.IssueId;
-            comment.CommentId = commentRequest.CommentId;
-            comment.Updated = DateTime.Now;
-            comment.Created = DateTime.Now;
-            await _commentData.AddAsync(comment);
-            return Results.Ok();
+            return Results.BadRequest();
         }
         [HttpPut("{id}")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
