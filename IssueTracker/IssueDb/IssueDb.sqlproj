@@ -120,7 +120,7 @@
     <Build Include="dbo\StoredProcedures\Comment\spComment_GetAllByIssueId.sql" />
     <Build Include="dbo\StoredProcedures\Comment\spComment_GetAllByCommentId.sql" />
     <Build Include="dbo\StoredProcedures\Participant\spParticipant_GetOwnersAndCollabsByProjectId.sql" />
-    <Build Include="dbo\StoredProcedures\Issue\spIssue_NextPreviewStatus.sql" />
+    <Build Include="dbo\StoredProcedures\Issue\spIssue_UpdateStatus.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Script.PostDeployment.sql" />

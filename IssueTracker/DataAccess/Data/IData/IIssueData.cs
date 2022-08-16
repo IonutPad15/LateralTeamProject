@@ -9,6 +9,7 @@ namespace DataAccess.Data.IData
         Task<Issue?> GetByIdAsync(int id);
         Task UpdateAsync(Issue entity);
         Task DeleteAsync(int id);
-        Task NextPreview(int id, string method = "next");
+        Task NextStatusOfIssueAsync(int id, int statusId);
+        Task PreviewStatusOfIssueAsync(int id, int statusId);
     }
 }

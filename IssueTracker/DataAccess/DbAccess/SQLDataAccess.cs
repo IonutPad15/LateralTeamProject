@@ -38,7 +38,7 @@ namespace DataAccess.DbAccess
                 return await connection.QueryAsync<TFirst>(storedProcedure, parameter,
                     commandType: CommandType.StoredProcedure);
             }
-        } //TODO: de gandit putin la aceste metode!
+        }
         public async Task<IEnumerable<TFirst>> LoadDataAsync<TFirst, TSecond>(string storedProcedure, string connectionId = "Default")
             where TFirst : class where TSecond : class
         {
@@ -516,17 +516,6 @@ namespace DataAccess.DbAccess
                     commandType: CommandType.StoredProcedure);
             }
         }
-        //public async Task<IEnumerable<T>> LoadDataAsync<T,V, U>(
-        //    string storedProcedure,
-        //    U parameters,
-        //    string connectionId = "Default")
-        //{
-        //    using (IDbConnection connection = new SqlConnection(_config.GetConnectionString(connectionId)))
-        //    {
-        //        var result =  await connection.QueryAsync<T,V>(storedProcedure, parameters,
-        //            commandType: CommandType.StoredProcedure);
-        //    }
-        //}
         public async Task SaveDataAsync<T>(
             string storedProcedure,
             T parameters,

@@ -16,10 +16,10 @@
         public int StatusId { get; set; }
         public int RoleId { get; set; }
         public bool IsDeleted { get; set; }
-        public IssueType? IssueType { get; set; } = new IssueType();
-        public Priority? Priority { get; set; } = new Priority();
-        public Status? Status { get; set; } = new Status();
-        public Role? Role { get; set; } = new Role();
+        public IssueType IssueType { get; set; } = new IssueType();
+        public Priority Priority { get; set; } = new Priority();
+        public Status Status { get; set; } = new Status();
+        public Role Role { get; set; } = new Role();
         public Project Project { get; set; } = new Project();
         public User User { get; set; } = new User();
 

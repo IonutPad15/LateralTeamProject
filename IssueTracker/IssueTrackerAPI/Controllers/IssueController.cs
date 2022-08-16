@@ -15,13 +15,13 @@ namespace IssueTrackerAPI.Controllers
     [ApiController]
     public class IssueController : ControllerBase
     {
-        private readonly IIssueData _issueDb;
-        private readonly IParticipantData _participantDb;
+        private readonly IIssueData _issue;
+        private readonly IParticipantData _participant;
         private readonly Mapper mapper;
         public IssueController(IIssueData issueDb, IParticipantData participantData)
         {
-            _participantDb = participantData;
-            _issueDb = issueDb;
+            _participant = participantData;
+            _issue = issueDb;
             mapper = AutoMapperConfig.Config();
         }
         
@@ -32,7 +32,7 @@ namespace IssueTrackerAPI.Controllers
             if (IssueValidation.IsValid(entity))
             {
                 var issue = mapper.Map<Issue>(entity);
-                await _issueDb.AddAsync(issue);
+                await _issue.AddAsync(issue);
                 return Ok();
             }
             return BadRequest("Error validation!");
@@ -41,7 +41,7 @@ namespace IssueTrackerAPI.Controllers
         [HttpGet("getAll-Issue")]
         public async Task<IActionResult> GetAllIssue()
         {
-            var result = await _issueDb.GetAllAsync();
+            var result = await _issue.GetAllAsync();
             var listIssue = mapper.Map<IEnumerable<IssueResponse>>(result);
             return Ok(listIssue);
         }
@@ -49,7 +49,7 @@ namespace IssueTrackerAPI.Controllers
         [HttpGet("getById-Issue")]
         public async Task<IActionResult> GetByIdIssue(int id)
         {
-            var result = await _issueDb.GetByIdAsync(id);
+            var result = await _issue.GetByIdAsync(id);
             var issue = mapper.Map<Issue>(result);
             return Ok(issue);
         }
@@ -58,18 +58,20 @@ namespace IssueTrackerAPI.Controllers
         [HttpPut("next-Status")]
         public async Task<IActionResult> NextStatusIssue(int id)
         {
-            var userId = ClaimsPrincipal.Current?.FindFirst("UserId")?.Value;
-            if (userId == null) return NotFound("Null UserId into claim!");
+            var userId = ClaimsPrincipal.Current!.FindFirst("UserId")!.Value;
 
-            var issue = await _issueDb.GetByIdAsync(id);
+            var issue = await _issue.GetByIdAsync(id);
             if (issue == null) return NotFound("Issue not found!");
-
-            var participants = await _participantDb.GetByProjectIdAsync(issue.ProjectId);
+            
+            issue.StatusId++;
+            if (issue.StatusId > 4) return BadRequest("Id of Status is out of range!");
+            
+            var participants = await _participant.GetByProjectIdAsync(issue.ProjectId);
             if (participants == null) return NotFound("Project not found!");
 
-            if (participants.Any(p => p.UserId == Guid.Parse(userId)))
+            if (participants.Any(p => p.UserId == Guid.Parse(userId))) //TODO: testing schibat guid
             {
-                await _issueDb.NextPreview(id);
+                await _issue.NextStatusOfIssueAsync(id, issue.StatusId);
                 return Ok("Status update successful!");
             }
             return BadRequest("Error validation!");
@@ -79,18 +81,20 @@ namespace IssueTrackerAPI.Controllers
         [HttpPut("preview-Status")]
         public async Task<IActionResult> PreviewStatusIssue(int id)
         {
-            var userId = ClaimsPrincipal.Current?.FindFirst("UserId")?.Value;
-            if (userId == null) return NotFound("Null UserId into claim!");
+            var userId = ClaimsPrincipal.Current!.FindFirst("UserId")!.Value;
 
-            var issue = await _issueDb.GetByIdAsync(id);
+            var issue = await _issue.GetByIdAsync(id);
             if(issue == null) return NotFound("Issue not found!");
 
-            var participants = await _participantDb.GetByProjectIdAsync(issue.ProjectId);
+            issue.StatusId--;
+            if (issue.StatusId < 1) return BadRequest("Id of Status is out of range!");
+
+            var participants = await _participant.GetByProjectIdAsync(issue.ProjectId);
             if (participants == null) return NotFound("Project not found!");
 
             if(participants.Any(p => p.UserId == Guid.Parse(userId)))
             {
-                await _issueDb.NextPreview(id, "preview");
+                await _issue.PreviewStatusOfIssueAsync(id, issue.StatusId);
                 return Ok("Status update successful!");
             }
             return BadRequest("Error validation!");
@@ -103,7 +107,7 @@ namespace IssueTrackerAPI.Controllers
             if (IssueValidation.IsValid(entity) && entity.Id > 0)
             {
                 var issue = mapper.Map<Issue>(entity);
-                await _issueDb.UpdateAsync(issue);
+                await _issue.UpdateAsync(issue);
                 return Ok();
             }
             return BadRequest("Error validation!");
@@ -115,7 +119,7 @@ namespace IssueTrackerAPI.Controllers
         {
             if (id > 0)
             {
-                await _issueDb.DeleteAsync(id);
+                await _issue.DeleteAsync(id);
                 return Ok();
             }
             return BadRequest("Error validation!");
