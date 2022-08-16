@@ -18,10 +18,10 @@ namespace IssueTrackerAPI.Controllers
         private readonly IIssueData _issue;
         private readonly IParticipantData _participant;
         private readonly Mapper mapper;
-        public IssueController(IIssueData issueDb, IParticipantData participantData)
+        public IssueController(IIssueData issue, IParticipantData participant)
         {
-            _participant = participantData;
-            _issue = issueDb;
+            _participant = participant;
+            _issue = issue;
             mapper = AutoMapperConfig.Config();
         }
         
