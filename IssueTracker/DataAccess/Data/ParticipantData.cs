@@ -3,13 +3,8 @@ using DataAccess.Data.IData;
 using DataAccess.DbAccess;
 using DataAccess.Models;
 using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DataAccess.Data
 {
@@ -35,8 +30,10 @@ namespace DataAccess.Data
 
         public async Task UpdateAsync(Participant participant) =>
             await _db.SaveDataAsync("dbo.spParticipant_Update", new { participant.Id, participant.RoleId });
-        public async Task<IEnumerable<Participant>> GetByProjectIdAsync(int id, string storedProcedure = "dbo.spParticipant_GetAllByProjectId", string connectionId = "Default")
+        public async Task<IEnumerable<Participant>> GetByProjectIdAsync(int id)
         {
+            string storedProcedure = "dbo.spParticipant_GetAllByProjectId";
+            string connectionId = "Default";
             var param = new
             {
                 ProjectId = id

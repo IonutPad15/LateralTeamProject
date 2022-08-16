@@ -9,6 +9,6 @@ namespace DataAccess.Data.IData
         Task<IEnumerable<Participant>> GetAllAsync();
         Task<Participant?> GetByIdAsync(int id);
         Task UpdateAsync(Participant participant);
-        Task<IEnumerable<Participant>> GetByProjectIdAsync(int id, string storedProcedure = "dbo.spParticipant_GetAllByProjectId", string connectionId = "Default");
+        Task<IEnumerable<Participant>> GetByProjectIdAsync(int id);
     }
 }
