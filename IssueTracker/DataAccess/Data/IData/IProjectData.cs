@@ -1,5 +1,4 @@
 ﻿using DataAccess.Models;
-using Models.Request;
 
 namespace DataAccess.Data.IData
 {
