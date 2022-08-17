@@ -3,6 +3,6 @@
 AS
 begin
 	update dbo.[Comment]
-	set IsDeleted = 1
+	set IsDeleted = 1/*TRUE*/
 	where Id = @Id;
 end

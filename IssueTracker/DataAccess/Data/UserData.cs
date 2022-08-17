@@ -1,21 +1,14 @@
-﻿using Dapper;
-using DataAccess.Data.IData;
+﻿using DataAccess.Data.IData;
 using DataAccess.DbAccess;
 using DataAccess.Models;
-using Microsoft.Extensions.Configuration;
-using System.Data;
-using System.Data.SqlClient;
-
 namespace DataAccess.Data
 {
     public class UserData : IUserData
     {
         private readonly ISQLDataAccess _db;
-        private readonly IConfiguration _config;
-        public UserData(ISQLDataAccess db, IConfiguration config)
+        public UserData(ISQLDataAccess db)
         {
             _db = db;
-            _config = config;
         }
         public Task<IEnumerable<User>> GetUsersAsync()
         {
@@ -23,19 +16,19 @@ namespace DataAccess.Data
         }
         public async Task<User?> GetUserByIdAsync(Guid id)
         {
-            var result = await _db.LoadDataAsync<User, dynamic>(
+            var result = await _db.LoadDataAsync<User, object>(
                 "dbo.spUser_GetById", new { Id = id });
             return result.FirstOrDefault();
         }
         public async Task<User?> GetUserByUsernameAndEmailAsync(string username, string email)
         {
-            var result = await _db.LoadDataAsync<User, dynamic>(
+            var result = await _db.LoadDataAsync<User, object>(
                 "dbo.spUser_GetByUsernameANDEmail", new { username, email  });
             return result.FirstOrDefault();
         }
         public async Task<User?> GetUserByCredentialsAsync(string nameEmail, string password)
         {
-            var result = await _db.LoadDataAsync<User, dynamic>(
+            var result = await _db.LoadDataAsync<User, object>(
                 "dbo.spUser_GetByCredentials", new { nameEmail, password });
             return result.FirstOrDefault();
         }

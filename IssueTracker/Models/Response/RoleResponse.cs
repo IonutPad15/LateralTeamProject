@@ -2,11 +2,20 @@
 {
     public class RoleResponse
     {
-        public RoleResponse()
+        public RoleResponse(RoleType id, string name)
         {
-            Name = String.Empty;
+            Id = id;
+            Name = name;
         }
-       public int Id { get; set; }
+
+        public RoleType Id { get; set; }
        public string Name { get; set; }
+    }
+    public enum RoleType
+    {
+        Developer = 1,
+        Tester = 2,
+        Owner = 3, 
+        Collaborator = 4
     }
 }

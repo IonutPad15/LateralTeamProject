@@ -18,8 +18,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DataAccess\DataAccess.csproj" />
-	  <ProjectReference Include="..\Validation\Validation.csproj" />
     <ProjectReference Include="..\Models\Models.csproj" />
+	  <ProjectReference Include="..\Validation\Validation.csproj" />
   </ItemGroup>
 
 </Project>

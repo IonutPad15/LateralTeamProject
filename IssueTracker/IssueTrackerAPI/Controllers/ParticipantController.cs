@@ -4,11 +4,11 @@ using DataAccess.Models;
 using IssueTrackerAPI.Utils;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Models.Request;
 using Models.Response;
 using System.Security.Claims;
+using Validation;
 
 namespace IssueTrackerAPI.Controllers
 {
@@ -18,12 +18,10 @@ namespace IssueTrackerAPI.Controllers
     {
         private readonly IParticipantData _participantData;
         private readonly Mapper mapper;
-        private readonly IUserData _userData;
-        public ParticipantController(IParticipantData participantData, IUserData userData)
+        public ParticipantController(IParticipantData participantData, IRoleData roleData)
         {
             _participantData = participantData;
             mapper = AutoMapperConfig.Config();
-            _userData = userData;
         }
         [HttpGet]
         public async Task<IResult> GeParticipants()
@@ -51,12 +49,66 @@ namespace IssueTrackerAPI.Controllers
             return Results.Ok(participantResponse);
 
         }
+        [HttpPost("createowner")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<IResult> CreateOwner([FromBody]int projectId)
+        {
+            if (projectId > 0)
+            {
+                var idclaim = User.Claims.FirstOrDefault(x => x.Type.Equals("UserId"));
+                if (idclaim != null)
+                {
+                    bool result = await CheckRole.OwnerExists(_participantData, projectId);
+                    if (result == false)
+                    {
+                        Participant participant = new Participant()
+                        {
+                            ProjectId = projectId,
+                            RoleId = RolesType.Owner,
+                            UserId = Guid.Parse(idclaim.Value)
+
+                        };
+                        await _participantData.AddAsync(participant);
+                        return Results.Ok();
+                    }
+                }
+            }
+            return Results.BadRequest();
+        }
         [HttpPost("create")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IResult> CreateParticipant(ParticipantRequest participantRequest)
         {
-            var participant = mapper.Map<Participant>(participantRequest);
-            await _participantData.AddAsync(participant);
-            return Results.Ok();
+            if(!ParticipantRequestValidation.IsValid(participantRequest)) return Results.BadRequest();
+            var idclaim = User.Claims.FirstOrDefault(x => x.Type.Equals("UserId"));
+            if (idclaim != null)
+            {
+                if (participantRequest.RoleId== RoleType.Developer 
+                    || participantRequest.RoleId == RoleType.Tester)
+                {
+                    var result = await CheckRole.IsOwnerOrColllab(_participantData,
+                    Guid.Parse(idclaim.Value), participantRequest.ProjectId);
+                    if (result == true)
+                    {
+                        var participant = mapper.Map<Participant>(participantRequest);
+                        await _participantData.AddAsync(participant);
+                        return Results.Ok();
+                    }
+                }
+                if (participantRequest.RoleId == RoleType.Collaborator)
+                {
+                    var result = await CheckRole.IsOwner(_participantData,
+                    Guid.Parse(idclaim.Value), participantRequest.ProjectId);
+                    if (result == true)
+                    {
+                        var participant = mapper.Map<Participant>(participantRequest);
+                        await _participantData.AddAsync(participant);
+                        return Results.Ok();
+                    }
+                }
+
+            }
+            return Results.Unauthorized();
         }
         [HttpPut]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
@@ -64,33 +116,68 @@ namespace IssueTrackerAPI.Controllers
         {
             var participant = await _participantData.GetByIdAsync(participantRequest.Id);
             if (participant == null) return Results.NotFound();
-            var userclaim = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimTypes.Name));
-            var emailclaim = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimTypes.Email));
             var idclaim = User.Claims.FirstOrDefault(x => x.Type.Equals("UserId"));
-            if (userclaim != null && emailclaim != null && idclaim != null)
+            if (idclaim != null)
             {
-                var results = await _participantData.GetByProjectIdAsync(participantRequest.ProjectId);
-                if (results == null) return Results.NotFound();
-                var participants = results.ToList();
-                for (int i = 0; i < participants.Count(); ++i)
+                bool result;
+                if (participantRequest.RoleId == RoleType.Owner
+                    || participantRequest.RoleId == RoleType.Collaborator)
                 {
-
-                    if (participants[i].UserId == Guid.Parse(idclaim.Value) 
-                        && (participants[i].RoleId == 3 || participants[i].RoleId ==4))
-                    {
-                        participant.RoleId = participantRequest.RoleId;
-                        await _participantData.UpdateAsync(participant);
-                        return Results.Ok();
-                    }
+                    result = await CheckRole.IsOwner(_participantData,
+                    Guid.Parse(idclaim.Value), participantRequest.ProjectId);
+                }
+                else
+                {
+                    result = await CheckRole.IsOwnerOrColllab(_participantData,
+                       Guid.Parse(idclaim.Value), participantRequest.ProjectId);
+                }
+                if (result == true)
+                {
+                    participant.RoleId = (RolesType)participantRequest.RoleId;
+                    await _participantData.UpdateAsync(participant);
+                    return Results.Ok(participant.Id);
                 }
             }
             return Results.Unauthorized();
         }
         [HttpDelete]
-        public async Task<IResult> DeleteParticipant(int id)
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<IResult> DeleteParticipant([FromBody]int id)
         {
-            await _participantData.DeleteAsync(id);
-            return Results.NoContent();
+            if (id > 0)
+            {
+                var participant = await _participantData.GetByIdAsync(id);
+                if (participant == null) return Results.NotFound();
+                var idclaim = User.Claims.FirstOrDefault(x => x.Type.Equals("UserId"));
+                if (idclaim != null)
+                {
+                    if (participant.RoleId == RolesType.Developer 
+                        || participant.RoleId == RolesType.Tester)
+                    {
+                        var result = await CheckRole.IsOwnerOrColllab(_participantData,
+                        Guid.Parse(idclaim.Value), participant.ProjectId);
+                        if (result == true)
+                        {
+                            await _participantData.DeleteAsync(id);
+                            return Results.NoContent();
+                        }
+                    }
+                    if (participant.RoleId == RolesType.Collaborator)
+                    {
+                        var result = await CheckRole.IsOwner(_participantData,
+                        Guid.Parse(idclaim.Value), participant.ProjectId);
+                        if (result == true)
+                        {
+                            await _participantData.DeleteAsync(id);
+                            return Results.NoContent();
+                        }
+                    }
+
+                }
+                return Results.Unauthorized();
+            }
+            return Results.BadRequest();
+            
         }
 
     }

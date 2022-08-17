@@ -4,5 +4,5 @@ AS
 begin
 	select *
 	from dbo.[Comment] 
-	where IsDeleted = 0 AND [Comment].Id = @Id;
+	where IsDeleted = 0/*FALSE*/ AND [Comment].Id = @Id; 
 end	
