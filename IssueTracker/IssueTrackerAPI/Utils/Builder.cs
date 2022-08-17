@@ -31,12 +31,8 @@ namespace IssueTrackerAPI.Utils
                 expires: expiration,
                 signingCredentials: creds);
 
-            return new UserToken()
-            {
-                Token = new JwtSecurityTokenHandler().WriteToken(token),
-                ExpirationDate = expiration,
-                UserId = user.Id
-            };
+            return new UserToken(new JwtSecurityTokenHandler().WriteToken(token), expiration, user.Id);
+            
         }
     }
 }

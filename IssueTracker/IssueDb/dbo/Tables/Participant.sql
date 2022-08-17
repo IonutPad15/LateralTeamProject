@@ -7,5 +7,6 @@
 	[IsDeleted] BIT DEFAULT (CONVERT([bit],(0))) NOT NULL,
 	FOREIGN KEY (UserId) REFERENCES [dbo].[User](Id),
 	FOREIGN KEY (ProjectId) REFERENCES [dbo].[Project](Id),
-	FOREIGN KEY (RoleId) REFERENCES [dbo].[Role](Id)
+	FOREIGN KEY (RoleId) REFERENCES [dbo].[Role](Id),
+	CONSTRAINT [UserId_ProjectId_RoleId_IsDeleted_Unique] UNIQUE ([UserId],[ProjectId],[RoleId], [IsDeleted])
 )

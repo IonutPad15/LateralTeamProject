@@ -4,6 +4,6 @@ AS
 begin
 	select * 
 	from dbo.[Comment]
-	where [Comment].IsDeleted = 0 AND [Comment].CommentId = @CommentId
+	where [Comment].IsDeleted = 0 /*FALSE*/ AND [Comment].CommentId = @CommentId
 	order by [Comment].Updated desc;
 end
