@@ -3,5 +3,5 @@ AS
 begin
 	select * 
 	from dbo.[Comment]
-	where IsDeleted = 0;
+	where IsDeleted = 0/*FALSE*/;
 end

@@ -16,19 +16,19 @@ namespace DataAccess.Data
         }
         public async Task<User?> GetUserByIdAsync(Guid id)
         {
-            var result = await _db.LoadDataAsync<User, dynamic>(
+            var result = await _db.LoadDataAsync<User, object>(
                 "dbo.spUser_GetById", new { Id = id });
             return result.FirstOrDefault();
         }
         public async Task<User?> GetUserByUsernameAndEmailAsync(string username, string email)
         {
-            var result = await _db.LoadDataAsync<User, dynamic>(
+            var result = await _db.LoadDataAsync<User, object>(
                 "dbo.spUser_GetByUsernameANDEmail", new { username, email  });
             return result.FirstOrDefault();
         }
         public async Task<User?> GetUserByCredentialsAsync(string nameEmail, string password)
         {
-            var result = await _db.LoadDataAsync<User, dynamic>(
+            var result = await _db.LoadDataAsync<User, object>(
                 "dbo.spUser_GetByCredentials", new { nameEmail, password });
             return result.FirstOrDefault();
         }

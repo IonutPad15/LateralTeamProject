@@ -13,11 +13,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Models\Models.csproj" />
-    <ProjectReference Include="..\Validation\Validation.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Reference Include="Models">
       <HintPath>..\..\..\..\..\LateralProject\LateralProject\API\Models\bin\Debug\Models.dll</HintPath>
     </Reference>

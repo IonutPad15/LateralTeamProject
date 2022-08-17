@@ -15,5 +15,6 @@ namespace DataAccess.Models
         public DateTime Updated { get; set; }
         public bool IsDeleted { get; set; }
         public User? User { get; set; }
+        public  List<Comment> Replies { get; set; } = new List<Comment>();
     }
 }

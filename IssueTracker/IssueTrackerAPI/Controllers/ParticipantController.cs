@@ -25,8 +25,8 @@ namespace IssueTrackerAPI.Controllers
             cfg.CreateMap<Role, RoleResponse>();
             cfg.CreateMap<Project, ProjectResponse>();
             cfg.CreateMap<Participant, ParticipantResponse>();
-            cfg.CreateMap<Roles, RolesInfo>();
-            cfg.CreateMap<RolesInfo, Role>();
+            cfg.CreateMap<RolesType, RoleType>();
+            cfg.CreateMap<RoleType, RolesType>();
             
         });
         private readonly Mapper mapper;
@@ -68,7 +68,6 @@ namespace IssueTrackerAPI.Controllers
         {
             if (projectId > 0)
             {
-                
                 var idclaim = User.Claims.FirstOrDefault(x => x.Type.Equals("UserId"));
                 if (idclaim != null)
                 {
@@ -78,7 +77,7 @@ namespace IssueTrackerAPI.Controllers
                         Participant participant = new Participant()
                         {
                             ProjectId = projectId,
-                            RoleId = Roles.Owner,
+                            RoleId = RolesType.Owner,
                             UserId = Guid.Parse(idclaim.Value)
 
                         };
@@ -94,12 +93,11 @@ namespace IssueTrackerAPI.Controllers
         public async Task<IResult> CreateParticipant(ParticipantRequest participantRequest)
         {
             if(!ParticipantRequestValidation.IsValid(participantRequest)) return Results.BadRequest();
-            var userclaim = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimTypes.Name));
-            var emailclaim = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimTypes.Email));
             var idclaim = User.Claims.FirstOrDefault(x => x.Type.Equals("UserId"));
-            if (userclaim != null && emailclaim != null && idclaim != null)
+            if (idclaim != null)
             {
-                if (participantRequest.RoleId== RolesInfo.Developer || participantRequest.RoleId ==RolesInfo.Tester)
+                if (participantRequest.RoleId== RoleType.Developer 
+                    || participantRequest.RoleId == RoleType.Tester)
                 {
                     var result = await CheckRole.IsOwnerOrColllab(_participantData,
                     Guid.Parse(idclaim.Value), participantRequest.ProjectId);
@@ -110,7 +108,7 @@ namespace IssueTrackerAPI.Controllers
                         return Results.Ok();
                     }
                 }
-                if (participantRequest.RoleId == RolesInfo.Collaborator)
+                if (participantRequest.RoleId == RoleType.Collaborator)
                 {
                     var result = await CheckRole.IsOwner(_participantData,
                     Guid.Parse(idclaim.Value), participantRequest.ProjectId);
@@ -131,13 +129,12 @@ namespace IssueTrackerAPI.Controllers
         {
             var participant = await _participantData.GetByIdAsync(participantRequest.Id);
             if (participant == null) return Results.NotFound();
-            var userclaim = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimTypes.Name));
-            var emailclaim = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimTypes.Email));
             var idclaim = User.Claims.FirstOrDefault(x => x.Type.Equals("UserId"));
-            if (userclaim != null && emailclaim != null && idclaim != null)
+            if (idclaim != null)
             {
                 bool result;
-                if (participantRequest.RoleId == RolesInfo.Owner || participantRequest.RoleId == RolesInfo.Collaborator)
+                if (participantRequest.RoleId == RoleType.Owner
+                    || participantRequest.RoleId == RoleType.Collaborator)
                 {
                     result = await CheckRole.IsOwner(_participantData,
                     Guid.Parse(idclaim.Value), participantRequest.ProjectId);
@@ -149,9 +146,9 @@ namespace IssueTrackerAPI.Controllers
                 }
                 if (result == true)
                 {
-                    participant.RoleId = (Roles)participantRequest.RoleId;
+                    participant.RoleId = (RolesType)participantRequest.RoleId;
                     await _participantData.UpdateAsync(participant);
-                    return Results.Ok();
+                    return Results.Ok(participant.Id);
                 }
             }
             return Results.Unauthorized();
@@ -164,12 +161,11 @@ namespace IssueTrackerAPI.Controllers
             {
                 var participant = await _participantData.GetByIdAsync(id);
                 if (participant == null) return Results.NotFound();
-                var userclaim = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimTypes.Name));
-                var emailclaim = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimTypes.Email));
                 var idclaim = User.Claims.FirstOrDefault(x => x.Type.Equals("UserId"));
-                if (userclaim != null && emailclaim != null && idclaim != null)
+                if (idclaim != null)
                 {
-                    if (participant.RoleId == Roles.Developer || participant.RoleId == Roles.Tester)
+                    if (participant.RoleId == RolesType.Developer 
+                        || participant.RoleId == RolesType.Tester)
                     {
                         var result = await CheckRole.IsOwnerOrColllab(_participantData,
                         Guid.Parse(idclaim.Value), participant.ProjectId);
@@ -179,7 +175,7 @@ namespace IssueTrackerAPI.Controllers
                             return Results.NoContent();
                         }
                     }
-                    if (participant.RoleId == Roles.Collaborator)
+                    if (participant.RoleId == RolesType.Collaborator)
                     {
                         var result = await CheckRole.IsOwner(_participantData,
                         Guid.Parse(idclaim.Value), participant.ProjectId);

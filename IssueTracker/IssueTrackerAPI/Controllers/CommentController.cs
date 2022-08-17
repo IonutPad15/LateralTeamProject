@@ -1,14 +1,13 @@
 ﻿using AutoMapper;
 using DataAccess.Data.IData;
 using DataAccess.Models;
-using Microsoft.AspNetCore.Authentication;
+using IssueTrackerAPI.Utils;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Models.Request;
 using Models.Response;
 using System.IdentityModel.Tokens.Jwt;
-using System.Net;
 using System.Net.Http.Headers;
 using System.Security.Claims;
 using Validation;
@@ -76,8 +75,8 @@ namespace IssueTrackerAPI.Controllers
             {
                 Comment comment = new Comment();
                 comment.Body = commentRequest.Body;
-                Random rnd = new Random();
-                comment.Author = $"Anonymous{rnd.Next(99999)}";
+                
+                comment.Author = $"Anonymous{RandomMaker.Next(99999)}";
                 comment.IssueId = commentRequest.IssueId;
                 comment.CommentId = commentRequest.CommentId;
                 comment.Updated = DateTime.Now;

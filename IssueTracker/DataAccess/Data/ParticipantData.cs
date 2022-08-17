@@ -30,7 +30,7 @@ namespace DataAccess.Data
 
         public async Task<Participant?> GetByIdAsync(int id)
         {
-            return (await _db.LoadDataAsync<Participant, dynamic>("dbo.spParticipant_Get", new { Id = id })).FirstOrDefault();
+            return (await _db.LoadDataAsync<Participant, object>("dbo.spParticipant_Get", new { Id = id })).FirstOrDefault();
         }
 
         public async Task UpdateAsync(Participant participant)
