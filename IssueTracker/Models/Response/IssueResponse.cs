@@ -19,11 +19,11 @@
         public int StatusId { get; set; }
         public int RoleId { get; set; }
         public bool IsDeleted { get; set; }
-        public IssueTypeResponse IssueType { get; set; } = new IssueTypeResponse();
-        public PriorityResponse Priority { get; set; } = new PriorityResponse();
-        public StatusResponse Status { get; set; } = new StatusResponse();
-        public RoleResponse Role { get; set; } = new RoleResponse();
-        public ProjectResponse Project { get; set; } = new ProjectResponse();
-        public UserResponse User { get; set; } = new UserResponse();
+        public IssueTypeResponse IssueType { get; set; }
+        public PriorityResponse Priority { get; set; }
+        public StatusResponse Status { get; set; }
+        public RoleResponse Role { get; set; }
+        public ProjectResponse Project { get; set; }
+        public UserResponse User { get; set; }
     }
 }

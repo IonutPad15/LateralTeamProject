@@ -66,7 +66,7 @@ namespace IssueTrackerAPI.Controllers
             issue.StatusId++;
             if (issue.StatusId > 4) return BadRequest("Id of Status is out of range!");
             
-            var participants = await _participant.GetByProjectIdAsync(issue.ProjectId);
+            var participants = await _participant.GetOwnersAndCollabsByProjectIdAsync(issue.ProjectId);
             if (participants == null) return NotFound("Project not found!");
 
             if (participants.Any(p => p.UserId == Guid.Parse(userId)))
@@ -89,7 +89,7 @@ namespace IssueTrackerAPI.Controllers
             issue.StatusId--;
             if (issue.StatusId < 1) return BadRequest("Id of Status is out of range!");
 
-            var participants = await _participant.GetByProjectIdAsync(issue.ProjectId);
+            var participants = await _participant.GetOwnersAndCollabsByProjectIdAsync(issue.ProjectId);
             if (participants == null) return NotFound("Project not found!");
 
             if(participants.Any(p => p.UserId == Guid.Parse(userId)))

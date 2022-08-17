@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using DataAccess.Data.IData;
 using DataAccess.Models;
+using DataAccess.Utils;
 using IssueTrackerAPI.Utils;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -35,7 +36,7 @@ namespace IssueTrackerAPI.Controllers
         [HttpGet("projectid")]
         public async Task <IResult> GetParticipantsByProjectId(int projectId)
         {
-            var results = await _participantData.GetByProjectIdAsync(projectId);
+            var results = await _participantData.GetOwnersAndCollabsByProjectIdAsync(projectId);
             if (results == null) return Results.NotFound();
             IEnumerable<ParticipantResponse>participantResponse = mapper.Map<IEnumerable<ParticipantResponse>>(results);
             return Results.Ok(participantResponse);
