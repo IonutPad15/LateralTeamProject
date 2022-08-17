@@ -8,11 +8,9 @@ namespace DataAccess.Data
     public class ParticipantData : IParticipantData
     {
         private readonly ISQLDataAccess _db;
-        private readonly IConfiguration _config;
         public ParticipantData(ISQLDataAccess db, IConfiguration config)
         {
             _db = db;
-            _config = config;
         }
 
         public async Task AddAsync(Participant participant) =>
