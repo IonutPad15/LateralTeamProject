@@ -50,7 +50,7 @@ namespace IssueTrackerAPI.Controllers
         public async Task<IActionResult> GetByIdIssue(int id)
         {
             var result = await _issue.GetByIdAsync(id);
-            var issue = mapper.Map<Issue>(result);
+            var issue = mapper.Map<IssueResponse>(result);
             return Ok(issue);
         }
 
