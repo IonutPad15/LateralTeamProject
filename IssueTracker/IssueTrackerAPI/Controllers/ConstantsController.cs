@@ -1,6 +1,8 @@
-﻿using DataAccess.Data.IData;
-using DataAccess.Models;
+﻿using AutoMapper;
+using DataAccess.Data.IData;
+using IssueTrackerAPI.Utils;
 using Microsoft.AspNetCore.Mvc;
+using Models.Response;
 
 namespace IssueTrackerAPI.Controllers
 {
@@ -12,44 +14,89 @@ namespace IssueTrackerAPI.Controllers
         private readonly IIssueTypeData _iType;
         private readonly IPriorityData _priority;
         private readonly IStatusData _status;
+        private readonly Mapper mapper;
         public ConstantsController(IRoleData role, IIssueTypeData iType, IPriorityData priority, IStatusData status)
         {
             _role = role;
             _iType = iType;
             _priority = priority;
             _status = status;
+            mapper = AutoMapperConfig.Config();
         }
 
         [HttpGet("get-role")]
-        public async Task<List<Role>> GetAllRole() =>
-            (await _role.GetAllAsync()).ToList();
+        public async Task<IActionResult> GetAllRole()
+        {
+            var roleList = (await _role.GetAllAsync()).ToList();
+            if(roleList == null) return NotFound("Roles not found!");
+            var roleListResponse = mapper.Map<List<RoleResponse>>(roleList);
+            return Ok(roleListResponse);
+        }
 
         [HttpGet("get-roleById")]
-        public async Task<Role?> GetById(int id) =>
-            await _role.GetByIdAsync(id);
+        public async Task<IActionResult> GetById(int id) 
+        {
+            if (id <= 0) return BadRequest("Invalid Id!");
+            var role = await _role.GetByIdAsync(id);
+            if (role == null) return NotFound("Role not found!");
+            var roleResponse = mapper.Map<RoleResponse>(role);
+            return Ok(roleResponse);
+        }
 
         [HttpGet("get-issueType")]
-        public async Task<List<IssueType>> GetAllIssueType() =>
-           (await _iType.GetAllAsync()).ToList();
-
+        public async Task<IActionResult> GetAllIssueType()
+        {
+            var issueTypeList = (await _iType.GetAllAsync()).ToList();
+            if (issueTypeList == null) return NotFound("IssueTypes not found!");
+            var issueTypeListResponse = mapper.Map<List<IssueTypeResponse>>(issueTypeList);
+            return Ok(issueTypeListResponse);
+        }
         [HttpGet("get-issueTypeById")]
-        public async Task<IssueType?> GetByIdIssueType(int id) =>
-            await _iType.GetByIdAsync(id);
+        public async Task<IActionResult> GetByIdIssueType(int id)
+        {
+            if (id <= 0) return BadRequest("Invalid Id!");
+            var issueType = await _iType.GetByIdAsync(id);
+            if (issueType == null) return NotFound("IssueType not found!");
+            var issueTypeResponse = mapper.Map<IssueTypeResponse>(issueType);
+            return Ok(issueTypeResponse);
+        }
 
         [HttpGet("get-priority")]
-        public async Task<List<Priority>> GetAllPriority() =>
-           (await _priority.GetAllAsync()).ToList();
+        public async Task<IActionResult> GetAllPriority()
+        {
+            var priorityList = (await _priority.GetAllAsync()).ToList();
+            if (priorityList == null) return NotFound("Priority not found!");
+            var priorityListResponse = mapper.Map<List<PriorityResponse>>(priorityList);
+            return Ok(priorityListResponse);
+        }  
 
         [HttpGet("get-priorityById")]
-        public async Task<Priority?> GetByIdPriority(int id) =>
-            await _priority.GetByIdAsync(id);
+        public async Task<IActionResult> GetByIdPriority(int id)
+        {
+            if (id <= 0) return BadRequest("Invalid Id!");
+            var priority = await _priority.GetByIdAsync(id);
+            if (priority == null) return NotFound("Priority not found!");
+            var priorityResponse = mapper.Map<PriorityResponse>(priority);
+            return Ok(priorityResponse);
+        }
 
         [HttpGet("get-status")]
-        public async Task<List<Status>> GetAllStatus() =>
-           (await _status.GetAllAsync()).ToList();
+        public async Task<IActionResult> GetAllStatus()
+        {
+            var statusList = (await _status.GetAllAsync()).ToList();
+            if (statusList == null) return NotFound("Priority not found!");
+            var statusListResponse = mapper.Map<List<StatusResponse>>(statusList);
+            return Ok(statusListResponse);
+        }   
 
         [HttpGet("get-statusById")]
-        public async Task<Status?> GetByIdStatus(int id) =>
-            await _status.GetByIdAsync(id);
+        public async Task<IActionResult> GetByIdStatus(int id)
+        {
+            if (id <= 0) return BadRequest("Invalid Id!");
+            var status = await _status.GetByIdAsync(id);
+            if (status == null) return NotFound("Priority not found!");
+            var ststusResponse = mapper.Map<StatusResponse>(status);
+            return Ok(ststusResponse);
+        }  
     }
 }

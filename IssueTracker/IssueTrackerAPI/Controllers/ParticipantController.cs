@@ -2,6 +2,7 @@
 using DataAccess.Data.IData;
 using DataAccess.Models;
 using DataAccess.Utils;
+using IssueTrackerAPI.Utils;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -17,24 +18,11 @@ namespace IssueTrackerAPI.Controllers
     public class ParticipantController : ControllerBase
     {
         private readonly IParticipantData _participantData;
-        private readonly IRoleData _roleData;
-        private readonly MapperConfiguration config = new MapperConfiguration(cfg => {
-            cfg.CreateMap<UserRequest, User>();
-            cfg.CreateMap<User, UserResponse>();
-            cfg.CreateMap<ParticipantRequest, Participant>();
-            cfg.CreateMap<Role, RoleResponse>();
-            cfg.CreateMap<Project, ProjectResponse>();
-            cfg.CreateMap<Participant, ParticipantResponse>();
-            cfg.CreateMap<RolesType, RoleType>();
-            cfg.CreateMap<RoleType, RolesType>();
-            
-        });
         private readonly Mapper mapper;
         public ParticipantController(IParticipantData participantData, IRoleData roleData)
         {
             _participantData = participantData;
-            _roleData = roleData;
-            mapper = new Mapper(config);
+            mapper = AutoMapperConfig.Config();
         }
         [HttpGet]
         public async Task<IResult> GeParticipants()
@@ -48,7 +36,7 @@ namespace IssueTrackerAPI.Controllers
         [HttpGet("projectid")]
         public async Task <IResult> GetParticipantsByProjectId(int projectId)
         {
-            var results = await _participantData.GetByProjectIdAsync("spParticipant_GetAllByProjectId", projectId);
+            var results = await _participantData.GetOwnersAndCollabsByProjectIdAsync(projectId);
             if (results == null) return Results.NotFound();
             IEnumerable<ParticipantResponse>participantResponse = mapper.Map<IEnumerable<ParticipantResponse>>(results);
             return Results.Ok(participantResponse);
