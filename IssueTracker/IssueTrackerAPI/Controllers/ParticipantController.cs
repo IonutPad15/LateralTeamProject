@@ -37,7 +37,7 @@ namespace IssueTrackerAPI.Controllers
         [HttpGet("projectid")]
         public async Task <IResult> GetParticipantsByProjectId(int projectId)
         {
-            var results = await _participantData.GetByProjectIdAsync("spParticipant_GetAllByProjectId", projectId);
+            var results = await _participantData.GetByProjectIdAsync(projectId);
             if (results == null) return Results.NotFound();
             IEnumerable<ParticipantResponse>participantResponse = mapper.Map<IEnumerable<ParticipantResponse>>(results);
             return Results.Ok(participantResponse);
@@ -69,11 +69,10 @@ namespace IssueTrackerAPI.Controllers
             var idclaim = User.Claims.FirstOrDefault(x => x.Type.Equals("UserId"));
             if (userclaim != null && emailclaim != null && idclaim != null)
             {
-                var results = await _participantData.GetByProjectIdAsync(
-                    "spParticipant_GetOwnersAndCollabsByProjectId",participantRequest.ProjectId);
+                var results = await _participantData.GetByProjectIdAsync(participantRequest.ProjectId);
                 if (results == null) return Results.NotFound();
                 var participants = results.ToList();
-                for (int i = 0; i < participants.Count; ++i)
+                for (int i = 0; i < participants.Count(); ++i)
                 {
 
                     if (participants[i].UserId == Guid.Parse(idclaim.Value) 

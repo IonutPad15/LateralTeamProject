@@ -2,12 +2,19 @@
 {
     public class IssueRequest
     {
-        public IssueRequest()
+        public IssueRequest(int id, int projectId, string title, string description, int issueTypeId, Guid userAssignedId, int priorityId, int statusId, int roleId)
         {
-            Title = String.Empty;
-            Description = String.Empty;
-            UserAssignedId = Guid.Empty;
+            Id = id;
+            ProjectId = projectId;
+            Title = title;
+            Description = description;
+            IssueTypeId = issueTypeId;
+            UserAssignedId = userAssignedId;
+            PriorityId = priorityId;
+            StatusId = statusId;
+            RoleId = roleId;
         }
+
         public int Id { get; set; }
         public int ProjectId { get; set; }
         public string Title { get; set; }

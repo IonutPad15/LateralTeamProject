@@ -55,7 +55,7 @@ namespace IssueTrackerAPI.Controllers
         }
 
         [Authorize]
-        [HttpPut("next-Status")]
+        [HttpPut("nextStatusIssue")]
         public async Task<IActionResult> NextStatusIssue(int id)
         {
             var userId = ClaimsPrincipal.Current!.FindFirst("UserId")!.Value;
@@ -69,7 +69,7 @@ namespace IssueTrackerAPI.Controllers
             var participants = await _participant.GetByProjectIdAsync(issue.ProjectId);
             if (participants == null) return NotFound("Project not found!");
 
-            if (participants.Any(p => p.UserId == Guid.Parse(userId))) //TODO: testing schibat guid
+            if (participants.Any(p => p.UserId == Guid.Parse(userId)))
             {
                 await _issue.NextStatusOfIssueAsync(id, issue.StatusId);
                 return Ok("Status update successful!");
@@ -78,8 +78,8 @@ namespace IssueTrackerAPI.Controllers
         }
         
         [Authorize]
-        [HttpPut("preview-Status")]
-        public async Task<IActionResult> PreviewStatusIssue(int id)
+        [HttpPut("previousStatusIssue")]
+        public async Task<IActionResult> PreviousStatusIssue(int id)
         {
             var userId = ClaimsPrincipal.Current!.FindFirst("UserId")!.Value;
 
@@ -94,7 +94,7 @@ namespace IssueTrackerAPI.Controllers
 
             if(participants.Any(p => p.UserId == Guid.Parse(userId)))
             {
-                await _issue.PreviewStatusOfIssueAsync(id, issue.StatusId);
+                await _issue.PreviousStatusOfIssueAsync(id, issue.StatusId);
                 return Ok("Status update successful!");
             }
             return BadRequest("Error validation!");

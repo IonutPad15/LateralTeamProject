@@ -34,13 +34,6 @@ namespace DataAccess.Data
         }
         public async Task<Issue?> GetByIdAsync(int id)
         {
-            var listOfTypes = new List<Type>();
-            listOfTypes.Add(typeof(Project));
-            listOfTypes.Add(typeof(Status));
-            listOfTypes.Add(typeof(Priority));
-            listOfTypes.Add(typeof(Role));
-            listOfTypes.Add(typeof(IssueType));
-            listOfTypes.Add(typeof(User));
             return (await _db.LoadDataAsync<Issue, Project, Status, Priority, Role, IssueType, User, dynamic>("dbo.spIssue_Get", new { Id = id })).FirstOrDefault();
         }
         public async Task UpdateAsync(Issue entity)
@@ -69,7 +62,7 @@ namespace DataAccess.Data
         {
             await _db.SaveDataAsync("dbo.spIssue_UpdateStatus", new { Id = id, StatusId = statusId });
         }
-        public async Task PreviewStatusOfIssueAsync(int id, int statusId)
+        public async Task PreviousStatusOfIssueAsync(int id, int statusId)
         {
             await _db.SaveDataAsync("dbo.spIssue_UpdateStatus", new { Id = id, StatusId = statusId });
         }
