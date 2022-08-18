@@ -24,6 +24,8 @@ namespace IssueTrackerAPI.Utils
                 cfg.CreateMap<IssueType, IssueTypeResponse>();
                 cfg.CreateMap<Status, StatusResponse>();
                 cfg.CreateMap<Priority, PriorityResponse>();
+                cfg.CreateMap<RolesType, RoleType>();
+                cfg.CreateMap<RoleType, RolesType>();
             });
             Mapper mapper = new Mapper(config);
             return mapper;
