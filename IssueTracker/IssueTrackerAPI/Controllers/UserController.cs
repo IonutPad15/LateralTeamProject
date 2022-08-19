@@ -53,7 +53,7 @@ namespace IssueTrackerAPI.Controllers
                 List<ValidationFailure> failures = result.Errors;
                 for(int i=0;i<failures.Count;++i)
                 {
-                    int n = failures[i].AttemptedValue.ToString()!.Count();
+                    int n = failures[i].AttemptedValue.ToString()!.Length;
                     string val = new string('*', n);
                     failures[i].AttemptedValue = val;
                 }

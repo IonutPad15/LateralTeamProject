@@ -290,5 +290,20 @@ namespace DataAccess.DbAccess
                     commandType: CommandType.StoredProcedure);
             }
         }
+        public async Task<U?> SaveDataAndGetIdAsync<T,U>(
+            string storedProcedure,
+            T parameters,
+            string connectionId = "Default")
+        {
+            using (IDbConnection connection = new SqlConnection(_config.GetConnectionString(connectionId)))
+            {
+                SqlMapper.AddTypeHandler(new DateTimeOffsetHandler());
+                SqlMapper.AddTypeHandler(new GuidHandler());
+                SqlMapper.AddTypeHandler(new TimeSpanHandler());
+                var result = await connection.QueryAsync<U>(storedProcedure, parameters,
+                    commandType: CommandType.StoredProcedure);
+                return result.FirstOrDefault();
+            }
+        }
     }
 }

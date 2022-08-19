@@ -8,6 +8,7 @@ namespace DataAccess.DbAccess
         Task<IEnumerable<T>> LoadDataAsync<T, U>(string storedProcedure, U parameters, string connectionId = "Default");
         Task<IEnumerable<Participant>> GetByProjectIdAsync(string storedProcedure, int id, string connectionId = "Default");
         Task SaveDataAsync<T>(string storedProcedure, T parameters, string connectionId = "Default");
+        Task<U?> SaveDataAndGetIdAsync<T, U>(string storedProcedure, T parameters, string connectionId = "Default");
         Task<IEnumerable<TFirst>> LoadDataAsync<TFirst, TSecond>(string storedProcedure, string connectionId = "Default")
             where TFirst : class where TSecond : class;
         Task<IEnumerable<TFirst>> LoadDataAsync<TFirst, TSecond, TParameter>(string storedProcedure, TParameter parameter, string connectionId = "Default") 
