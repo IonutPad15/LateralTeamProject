@@ -50,31 +50,25 @@ namespace IssueTrackerAPI.Controllers
             return Results.Ok(participantResponse);
 
         }
-        [HttpPost("createowner")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public async Task<IResult> CreateOwner([FromBody]int projectId)
+        public static async Task<bool> CreateOwner(int projectId, Guid userId, IParticipantData participantData)
         {
             if (projectId > 0)
             {
-                var idclaim = User.Claims.FirstOrDefault(x => x.Type.Equals("UserId"));
-                if (idclaim != null)
+                bool result = await CheckRole.OwnerExists(participantData, projectId);
+                if (result == false)
                 {
-                    bool result = await CheckRole.OwnerExists(_participantData, projectId);
-                    if (result == false)
+                    Participant participant = new Participant()
                     {
-                        Participant participant = new Participant()
-                        {
-                            ProjectId = projectId,
-                            RoleId = RolesType.Owner,
-                            UserId = Guid.Parse(idclaim.Value)
-
-                        };
-                        await _participantData.AddAsync(participant);
-                        return Results.Ok();
-                    }
+                        ProjectId = projectId,
+                        RoleId = RolesType.Owner,
+                        UserId = userId
+                    };
+                    await participantData.AddAsync(participant);
+                    return true;
                 }
             }
-            return Results.BadRequest();
+            return false;
         }
         [HttpPost("create")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]

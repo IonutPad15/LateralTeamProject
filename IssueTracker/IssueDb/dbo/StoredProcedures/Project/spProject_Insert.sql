@@ -6,4 +6,5 @@ AS
 begin
 	insert into dbo.[Project] (Title, Description, Created)
 	values (@Title, @Description, @Created);
+	select CAST(SCOPE_IDENTITY() as int);
 end

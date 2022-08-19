@@ -12,9 +12,12 @@ namespace DataAccess.Data
             _db= db;
         }
 
-        public async Task AddAsync(Project project) =>
-            await _db.SaveDataAsync("dbo.spProject_Insert", new { project.Title, project.Description, Created = DateTime.UtcNow});
+        public async Task<int> AddAsync(Project project)
+        {
+            var result = (await _db.SaveDataAndGetIdAsync<dynamic, int>("dbo.spProject_Insert", new { project.Title, project.Description, Created = DateTime.UtcNow }));
+            return result; 
 
+        }
         public async Task<IEnumerable<Project>> GetAllAsync() =>
             await _db.LoadDataAsync<Project>("dbo.spProject_GetAll");
 
