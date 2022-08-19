@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
 using DataAccess.Data.IData;
 using DataAccess.Models;
+using FluentValidation.Results;
 using IssueTrackerAPI.Utils;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Models.Request;
@@ -24,18 +26,21 @@ namespace IssueTrackerAPI.Controllers
             _issue = issue;
             mapper = AutoMapperConfig.Config();
         }
-        
-        [Authorize]
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpPost("add-Issue")]
         public async Task<IActionResult> AddIssue(IssueRequest entity)
         {
-            if (IssueValidation.IsValid(entity))
+            var validator = new IssueValidation();
+            ValidationResult result = validator.Validate(entity);
+            if (!result.IsValid)
             {
-                var issue = mapper.Map<Issue>(entity);
-                await _issue.AddAsync(issue);
-                return Ok();
+                List<ValidationFailure> failures = result.Errors;
+                return BadRequest(failures);
             }
-            return BadRequest("Error validation!");
+            var issue = mapper.Map<Issue>(entity);
+            await _issue.AddAsync(issue);
+            return Ok();
         }
 
         [HttpGet("getAll-Issue")]
@@ -54,7 +59,7 @@ namespace IssueTrackerAPI.Controllers
             return Ok(issue);
         }
 
-        [Authorize]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpPut("nextStatusIssue")]
         public async Task<IActionResult> NextStatusIssue(int id)
         {
@@ -100,20 +105,27 @@ namespace IssueTrackerAPI.Controllers
             return BadRequest("Error validation!");
         }
 
-        [Authorize]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpPut("update-Issue")]
         public async Task<IActionResult> UpdateIssue(IssueRequest entity)
         {
-            if (IssueValidation.IsValid(entity) && entity.Id > 0)
+            var validator = new IssueValidation();
+            ValidationResult result = validator.Validate(entity);
+            if (!result.IsValid)
+            {
+                List<ValidationFailure> failures = result.Errors;
+                return BadRequest(failures);
+            }
+            if (entity.Id > 0)
             {
                 var issue = mapper.Map<Issue>(entity);
                 await _issue.UpdateAsync(issue);
                 return Ok();
             }
-            return BadRequest("Error validation!");
+            return BadRequest();
         }
 
-        [Authorize]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpDelete("delete-Issue")]
         public async Task<IActionResult> DeleteIssue(int id)
         {

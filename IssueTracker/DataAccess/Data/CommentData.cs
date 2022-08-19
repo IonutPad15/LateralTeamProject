@@ -39,8 +39,7 @@ namespace DataAccess.Data
         {
             var comments = (await _db.LoadDataAsync<Comment, object>("dbo.spComment_GetAllByIssueId", new { IssueId = id })).ToList();
             var comm = comments.Where(c => c.CommentId == null).ToList();
-            int n = comm.Count();
-            for(int i = 0; i < n ; ++i)
+            for(int i = 0; i < comm.Count ; ++i)
             {
                 var replies = comments.Where(c=>c.CommentId == comm[i].Id).ToList();
                 comm[i].Replies = replies;

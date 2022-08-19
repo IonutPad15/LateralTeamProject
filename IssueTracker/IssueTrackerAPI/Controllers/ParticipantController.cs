@@ -2,13 +2,13 @@
 using DataAccess.Data.IData;
 using DataAccess.Models;
 using DataAccess.Utils;
+using FluentValidation.Results;
 using IssueTrackerAPI.Utils;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Models.Request;
 using Models.Response;
-using System.Security.Claims;
 using Validation;
 
 namespace IssueTrackerAPI.Controllers
@@ -80,7 +80,13 @@ namespace IssueTrackerAPI.Controllers
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IResult> CreateParticipant(ParticipantRequest participantRequest)
         {
-            if(!ParticipantRequestValidation.IsValid(participantRequest)) return Results.BadRequest();
+            var validator = new ParticipantRequestValidation();
+            ValidationResult results = validator.Validate(participantRequest);
+            if (!results.IsValid)
+            {
+                List<ValidationFailure> failures = results.Errors;
+                return Results.BadRequest(failures);
+            }
             var idclaim = User.Claims.FirstOrDefault(x => x.Type.Equals("UserId"));
             if (idclaim != null)
             {
@@ -115,6 +121,13 @@ namespace IssueTrackerAPI.Controllers
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IResult> UpdateParticipant(ParticipantUpdateRequest participantRequest)
         {
+            var validator = new ParticipantUpdateRequestValidation();
+            ValidationResult results = validator.Validate(participantRequest);
+            if (!results.IsValid)
+            {
+                List<ValidationFailure> failures = results.Errors;
+                return Results.BadRequest(failures);
+            }
             var participant = await _participantData.GetByIdAsync(participantRequest.Id);
             if (participant == null) return Results.NotFound();
             var idclaim = User.Claims.FirstOrDefault(x => x.Type.Equals("UserId"));

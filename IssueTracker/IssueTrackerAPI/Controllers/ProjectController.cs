@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using DataAccess.Data.IData;
 using DataAccess.Models;
+using FluentValidation.Results;
 using IssueTrackerAPI.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Models.Request;
@@ -23,13 +24,16 @@ namespace IssueTrackerAPI.Controllers
         [HttpPost("add-project")]
         public async Task<IActionResult> AddProject(ProjectRequest entity)
         {
-            if (ProjectValidation.IsValid(entity))
+            var validator = new ProjectValidation();
+            ValidationResult result = validator.Validate(entity);
+            if (!result.IsValid)
             {
-                var project = _mapper.Map<Project>(entity);
-                await _projectdb.AddAsync(project);
-                return Ok();
+                List<ValidationFailure> failures = result.Errors;
+                return BadRequest(failures);
             }
-            return BadRequest("Validation error!");
+            var project = _mapper.Map<Project>(entity);
+            await _projectdb.AddAsync(project);
+            return Ok();
         }
 
         [HttpGet("getAll-project")]
@@ -46,19 +50,26 @@ namespace IssueTrackerAPI.Controllers
         [HttpPut("update-project")]
         public async Task<IActionResult> Update(ProjectRequest entity)
         {
-            if (ProjectValidation.IsValid(entity))
+            var validator = new ProjectValidation();
+            ValidationResult result = validator.Validate(entity);
+            if (!result.IsValid)
             {
-                var project = _mapper.Map<Project>(entity);
-                await _projectdb.UpdateAsync(project);
-                return Ok();
+                List<ValidationFailure> failures = result.Errors;
+                return BadRequest(failures);
             }
-            return BadRequest("Validation error!");
+            if (entity.Id <= 0)
+            {
+                return BadRequest("Validation error!");
+            }
+            var project = _mapper.Map<Project>(entity);
+            await _projectdb.UpdateAsync(project);
+            return Ok();
         }
-        
+
         [HttpDelete("delete-project")]
         public async Task<IActionResult> Update(int id)
         {
-            if (id == 0) return BadRequest("Invalid Id!");
+            if (id <= 0) return BadRequest("Invalid Id!");
             await _projectdb.DeleteAsync(id);
             return Ok();
         }
