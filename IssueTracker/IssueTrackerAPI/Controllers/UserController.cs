@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Models.Response;
 using System.Security.Claims;
 using IssueTrackerAPI.Utils;
+using FluentValidation.Results;
 
 namespace IssueTrackerAPI.Controllers
 {
@@ -45,9 +46,18 @@ namespace IssueTrackerAPI.Controllers
         [HttpPost("register")]
         public async Task<IResult> InsertUser(UserRequest userRequest)
         {
-            if (!UserValidation.IsValid(userRequest))
+            var validator = new UserValidation();
+            ValidationResult result = validator.Validate(userRequest);
+            if (!result.IsValid)
             {
-                return Results.BadRequest("Invalid Input");
+                List<ValidationFailure> failures = result.Errors;
+                for(int i=0;i<failures.Count;++i)
+                {
+                    int n = failures[i].AttemptedValue.ToString()!.Length;
+                    string val = new string('*', n);
+                    failures[i].AttemptedValue = val;
+                }
+                return Results.BadRequest(failures);
             }
             else
             {
@@ -118,8 +128,13 @@ namespace IssueTrackerAPI.Controllers
         [HttpPost("login")]
         public async Task<ActionResult<UserToken>> Login([FromBody] Credentials credentials)
         {
-            if (!CredentialsValidation.IsValid(credentials)) 
-                return BadRequest("All Fields Required");
+            var validator = new CredentialsValidation();
+            ValidationResult result = validator.Validate(credentials);
+            if (!result.IsValid)
+            {
+                List<ValidationFailure> failures = result.Errors;
+                return BadRequest(failures);
+            }
 
             HashHelper hashHelper = new HashHelper();
             string hashedPassword = hashHelper.GetHash(credentials.Password!);

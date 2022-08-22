@@ -2,13 +2,13 @@
 using DataAccess.Data.IData;
 using DataAccess.Models;
 using DataAccess.Utils;
+using FluentValidation.Results;
 using IssueTrackerAPI.Utils;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Models.Request;
 using Models.Response;
-using System.Security.Claims;
 using Validation;
 
 namespace IssueTrackerAPI.Controllers
@@ -50,37 +50,37 @@ namespace IssueTrackerAPI.Controllers
             return Results.Ok(participantResponse);
 
         }
-        [HttpPost("createowner")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public async Task<IResult> CreateOwner([FromBody]int projectId)
+        public static async Task<bool> CreateOwner(int projectId, Guid userId, IParticipantData participantData)
         {
             if (projectId > 0)
             {
-                var idclaim = User.Claims.FirstOrDefault(x => x.Type.Equals("UserId"));
-                if (idclaim != null)
+                bool result = await CheckRole.OwnerExists(participantData, projectId);
+                if (result == false)
                 {
-                    bool result = await CheckRole.OwnerExists(_participantData, projectId);
-                    if (result == false)
+                    Participant participant = new Participant()
                     {
-                        Participant participant = new Participant()
-                        {
-                            ProjectId = projectId,
-                            RoleId = RolesType.Owner,
-                            UserId = Guid.Parse(idclaim.Value)
-
-                        };
-                        await _participantData.AddAsync(participant);
-                        return Results.Ok();
-                    }
+                        ProjectId = projectId,
+                        RoleId = RolesType.Owner,
+                        UserId = userId
+                    };
+                    await participantData.AddAsync(participant);
+                    return true;
                 }
             }
-            return Results.BadRequest();
+            return false;
         }
         [HttpPost("create")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IResult> CreateParticipant(ParticipantRequest participantRequest)
         {
-            if(!ParticipantRequestValidation.IsValid(participantRequest)) return Results.BadRequest();
+            var validator = new ParticipantRequestValidation();
+            ValidationResult results = validator.Validate(participantRequest);
+            if (!results.IsValid)
+            {
+                List<ValidationFailure> failures = results.Errors;
+                return Results.BadRequest(failures);
+            }
             var idclaim = User.Claims.FirstOrDefault(x => x.Type.Equals("UserId"));
             if (idclaim != null)
             {
@@ -115,6 +115,13 @@ namespace IssueTrackerAPI.Controllers
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IResult> UpdateParticipant(ParticipantUpdateRequest participantRequest)
         {
+            var validator = new ParticipantUpdateRequestValidation();
+            ValidationResult results = validator.Validate(participantRequest);
+            if (!results.IsValid)
+            {
+                List<ValidationFailure> failures = results.Errors;
+                return Results.BadRequest(failures);
+            }
             var participant = await _participantData.GetByIdAsync(participantRequest.Id);
             if (participant == null) return Results.NotFound();
             var idclaim = User.Claims.FirstOrDefault(x => x.Type.Equals("UserId"));

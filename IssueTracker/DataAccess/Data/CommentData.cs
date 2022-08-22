@@ -37,21 +37,14 @@ namespace DataAccess.Data
         
         public async Task<IEnumerable<Comment?>> GetAllByIssueIdAsync(int id)
         {
-            var comments = (await _db.LoadDataAsync<Comment, object>("dbo.spComment_GetAllByIssueId", new { IssueId = id })).ToArray();
-            int n = comments.Count();
-            for(int i = 0; i < n ; ++i)
-            { 
-                if (comments[i].IssueId == null)
-                {
-                    var commToReply = comments.Where(c=>c.Id == comments[i].CommentId).FirstOrDefault();
-                    int index = Array.IndexOf(comments, commToReply);
-                    comments[index].Replies.Add(comments[i]);
-                    comments = Extensions.RemoveAt(comments, i);
-                    --i;
-                    --n;
-                }
+            var comments = (await _db.LoadDataAsync<Comment, object>("dbo.spComment_GetAllByIssueId", new { IssueId = id })).ToList();
+            var comm = comments.Where(c => c.CommentId == null).ToList();
+            for(int i = 0; i < comm.Count ; ++i)
+            {
+                var replies = comments.Where(c=>c.CommentId == comm[i].Id).ToList();
+                comm[i].Replies = replies;
             }
-            IEnumerable<Comment> result = comments;
+            IEnumerable<Comment> result = comm;
             return result;
         }
         public async Task<IEnumerable<Comment?>> GetAllByCommentIdAsync(int id)

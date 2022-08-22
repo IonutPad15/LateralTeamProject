@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using DataAccess.Data.IData;
 using DataAccess.Models;
+using FluentValidation.Results;
 using IssueTrackerAPI.Utils;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -63,8 +64,13 @@ namespace IssueTrackerAPI.Controllers
         [HttpPost]
         public async Task<IResult> Create([FromBody] CommentRequest commentRequest)
         {
-            if (!CommentRequestValidation.IsValid(commentRequest))
-                return Results.BadRequest("InputNotValid");
+            var validator = new CommentRequestValidation();
+            ValidationResult result = validator.Validate(commentRequest);
+            if (!result.IsValid)
+            {
+                List<ValidationFailure> failures = result.Errors;
+                return Results.BadRequest(failures);
+            }
             var value = Request.Headers["Authorization"];
             if (!AuthenticationHeaderValue.TryParse(Request.Headers["Authorization"], out AuthenticationHeaderValue? headerValue))
             {
