@@ -3,7 +3,14 @@
 	@RoleId INT
 AS
 begin
-	update dbo.[Participant]
-	set RoleId = @RoleId
-	where Id=@Id;
+	IF EXISTS(SELECT * FROM dbo.[Participant] WHERE Id=@Id)
+	begin
+		update dbo.[Participant]
+		set RoleId = @RoleId
+		where Id=@Id;
+	end
+	ELSE
+	begin;
+		THROW 51000, 'The record does not exist.', 1;
+	end
 end

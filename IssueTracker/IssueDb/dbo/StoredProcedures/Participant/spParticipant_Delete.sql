@@ -2,7 +2,14 @@
 	@Id INT
 AS
 begin
-	update dbo.[Participant]
-	set IsDeleted = 1 /*TRUE*/
-	where Id=@Id;
+	IF EXISTS(SELECT * FROM dbo.[Participant] WHERE Id=@Id)
+	begin
+		update dbo.[Participant]
+		set IsDeleted = 1 /*TRUE*/
+		where Id=@Id
+	end
+	ELSE
+	begin;
+		THROW 51000, 'The record does not exist.', 1;
+	end
 end
