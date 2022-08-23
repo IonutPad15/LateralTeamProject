@@ -14,8 +14,7 @@ namespace IssueTracker.UnitTest
         }
 
         [TestMethod]
-        [Owner("P.Claudiu")]
-        [Description("Return null, db don't have this id!")]
+        [Description("Given request in db WHEN id = 0 THEN return null!")]
         public async Task GetIssueById0()
         {
             var issue = await issueData.GetByIdAsync(0);
@@ -24,8 +23,7 @@ namespace IssueTracker.UnitTest
         }
         
         [TestMethod]
-        [Owner("P.Claudiu")]
-        [Description("Return entity, db have id 1!")]
+        [Description("Given request in db WHEN id = 1 THEN return success!")]
         public async Task GetIssueById1()
         {
             var issue = await issueData.GetByIdAsync(1);
@@ -34,8 +32,7 @@ namespace IssueTracker.UnitTest
         }
 
         [TestMethod]
-        [Owner("P.Claudiu")]
-        [Description("Work, entity is correct!")]
+        [Description("Given with corect data in issue object WHEN updateAsync is call THEN return success")]
         public async Task Updated()
         {
             var issue = new Issue{
@@ -43,22 +40,20 @@ namespace IssueTracker.UnitTest
                 StatusId = 3,
                 Description = "test",
                 PriorityId = 1,
-                UserAssignedId = Guid.NewGuid(),
+                UserAssignedId = Guid.Parse("13E12278-2EB1-4FC7-9C20-639A9CFC8F21"),
                 Updated = DateTime.UtcNow,
                 Title = "test",
-                ProjectId = 1,
+                ProjectId = 2,
                 RoleId = 3,
                 IssueTypeId = 2
             };
-                await issueData.UpdateAsync(issue);
+            await issueData.UpdateAsync(issue);
             Assert.IsTrue(true);
         }
 
         [TestMethod]
-        [Owner("P.Claudiu")]
-        [Description("Don't Work, entity isn't correct!")]
-        [ExpectedException(typeof(ArgumentNullException))]
-        public async Task Updated_EntityNotCorrect_Error()
+        [Description("Given without title issue object WHEN updateAsync is call THEN return error")]
+        public async Task Updated_EntityWithoutTitle_Error()
         {
             var issue = new Issue
             {
@@ -68,12 +63,19 @@ namespace IssueTracker.UnitTest
                 PriorityId = 1,
                 UserAssignedId = Guid.NewGuid(),
                 Updated = DateTime.UtcNow,
-                ProjectId = 1,
+                ProjectId = 2,
                 RoleId = 3,
                 IssueTypeId = 2
             };
-            await issueData.UpdateAsync(issue);
-            Assert.IsTrue(true);
+            try
+            {
+                await issueData.UpdateAsync(issue);
+            }
+            catch
+            {
+                Assert.IsTrue(true);
+            }
+
         }
     }
 }
