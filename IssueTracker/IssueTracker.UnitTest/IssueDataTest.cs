@@ -1,10 +1,17 @@
 ﻿using DataAccess.Models;
+using Microsoft.Extensions.Configuration;
 
 namespace IssueTracker.UnitTest
 {
     [TestClass]
     public class IssueDataTest : BaseClass
     {
+
+        public IssueDataTest() 
+        {
+        }
+        
+
         [TestMethod]
         public async Task GetAllIssue_AreSame_ReturnListIssue()
         {

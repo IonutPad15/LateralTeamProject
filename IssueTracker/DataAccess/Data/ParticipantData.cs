@@ -8,7 +8,7 @@ namespace DataAccess.Data
     public class ParticipantData : IParticipantData
     {
         private readonly ISQLDataAccess _db;
-        public ParticipantData(ISQLDataAccess db, IConfiguration config)
+        public ParticipantData(ISQLDataAccess db)
         {
             _db = db;
         }
