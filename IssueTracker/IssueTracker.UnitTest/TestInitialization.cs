@@ -6,110 +6,112 @@ using Microsoft.Extensions.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 
-namespace IssueTracker.UnitTest;
-
-[TestClass]
-public class TestInitialization
+namespace IssueTracker.UnitTest
 {
 
-    [AssemblyInitialize()]
-    public static void AssemblyInitialize(TestContext tc)
+    [TestClass]
+    public class TestInitialization
     {
-        try
+
+        [AssemblyInitialize()]
+        public static void AssemblyInitialize(TestContext tc)
         {
-            var configuration = new ConfigurationBuilder()
-           .SetBasePath(Directory.GetParent(AppContext.BaseDirectory)!.FullName)
-           .AddJsonFile("appsettings.json", optional: false)
-           .Build();
-            BaseClass.IssueData = new IssueData(new SQLDataAccess(configuration));
-            BaseClass.ParticipantData = new ParticipantData(new SQLDataAccess(configuration));
-            BaseClass.TestContext = tc;
-
-
-            string? conn = tc.Properties["ConnectionString"]!.ToString();
-            string sql = "TRUNCATE TABLE dbo.[Participant]";
-            using (SqlConnection ConnectionObject = new SqlConnection(conn!))
+            try
             {
-                ConnectionObject.Open();
-                using (SqlCommand CommandObject = new SqlCommand(sql, ConnectionObject))
-                {
-                    int rows = CommandObject.ExecuteNonQuery();
-                }
-                sql = "SELECT * FROM dbo.[User]";
-                var userID = Guid.Empty;
-                using (SqlCommand CommandObject = new SqlCommand(sql, ConnectionObject))
-                {
-                    using (SqlDataAdapter da = new SqlDataAdapter(CommandObject))
-                    {
-                        DataTable TestDataTable = new DataTable();
-                        da.Fill(TestDataTable);
-                        var row = TestDataTable.Rows[0];
-                        userID = Guid.Parse(row["Id"].ToString()!);
+                var configuration = new ConfigurationBuilder()
+               .SetBasePath(Directory.GetParent(AppContext.BaseDirectory)!.FullName)
+               .AddJsonFile("appsettings.json", optional: false)
+               .Build();
+                BaseClass.IssueData = new IssueData(new SQLDataAccess(configuration));
+                BaseClass.ParticipantData = new ParticipantData(new SQLDataAccess(configuration));
+                BaseClass.TestContext = tc;
 
+
+                string? conn = tc.Properties["ConnectionString"]!.ToString();
+                string sql = "TRUNCATE TABLE dbo.[Participant]";
+                using (SqlConnection ConnectionObject = new SqlConnection(conn!))
+                {
+                    ConnectionObject.Open();
+                    using (SqlCommand CommandObject = new SqlCommand(sql, ConnectionObject))
+                    {
+                        int rows = CommandObject.ExecuteNonQuery();
                     }
-                }
-                Participant participant = new Participant();
-                if (userID != Guid.Empty)
-                {
-                    participant = new Participant()
+                    sql = "SELECT * FROM dbo.[User]";
+                    var userID = Guid.Empty;
+                    using (SqlCommand CommandObject = new SqlCommand(sql, ConnectionObject))
                     {
-                        UserId = userID,
-                        ProjectId = 1,
-                        RoleId = (RolesType)3
-                    };
+                        using (SqlDataAdapter da = new SqlDataAdapter(CommandObject))
+                        {
+                            DataTable TestDataTable = new DataTable();
+                            da.Fill(TestDataTable);
+                            var row = TestDataTable.Rows[0];
+                            userID = Guid.Parse(row["Id"].ToString()!);
+
+                        }
+                    }
+                    Participant participant = new Participant();
+                    if (userID != Guid.Empty)
+                    {
+                        participant = new Participant()
+                        {
+                            UserId = userID,
+                            ProjectId = 1,
+                            RoleId = (RolesType)3
+                        };
+                    }
+                    sql = $"INSERT INTO dbo.[Participant] (UserId, ProjectId, RoleId) Values(@UserId, @ProjectId, @RoleId)";
+                    using (SqlCommand CommandObject = new SqlCommand(sql, ConnectionObject))
+                    {
+                        CommandObject.Parameters.AddWithValue("@UserId", participant.UserId);
+                        CommandObject.Parameters.AddWithValue("@ProjectId", participant.ProjectId);
+                        CommandObject.Parameters.AddWithValue("@RoleId", participant.RoleId);
+                        CommandObject.ExecuteNonQuery();
+                        participant.RoleId = (RolesType)1;
+                        CommandObject.Parameters.Clear();
+                        CommandObject.Parameters.AddWithValue("@UserId", participant.UserId);
+                        CommandObject.Parameters.AddWithValue("@ProjectId", participant.ProjectId);
+                        CommandObject.Parameters.AddWithValue("@RoleId", participant.RoleId);
+                        CommandObject.ExecuteNonQuery();
+                        participant.RoleId = (RolesType)2;
+                        CommandObject.Parameters.Clear();
+                        CommandObject.Parameters.AddWithValue("@UserId", participant.UserId);
+                        CommandObject.Parameters.AddWithValue("@ProjectId", participant.ProjectId);
+                        CommandObject.Parameters.AddWithValue("@RoleId", participant.RoleId);
+                        CommandObject.ExecuteNonQuery();
+                    }
+                    ConnectionObject.Close();
                 }
-                sql = $"INSERT INTO dbo.[Participant] (UserId, ProjectId, RoleId) Values(@UserId, @ProjectId, @RoleId)";
-                using (SqlCommand CommandObject = new SqlCommand(sql, ConnectionObject))
-                {
-                    CommandObject.Parameters.AddWithValue("@UserId", participant.UserId);
-                    CommandObject.Parameters.AddWithValue("@ProjectId", participant.ProjectId);
-                    CommandObject.Parameters.AddWithValue("@RoleId", participant.RoleId);
-                    CommandObject.ExecuteNonQuery();
-                    participant.RoleId = (RolesType)1;
-                    CommandObject.Parameters.Clear();
-                    CommandObject.Parameters.AddWithValue("@UserId", participant.UserId);
-                    CommandObject.Parameters.AddWithValue("@ProjectId", participant.ProjectId);
-                    CommandObject.Parameters.AddWithValue("@RoleId", participant.RoleId);
-                    CommandObject.ExecuteNonQuery();
-                    participant.RoleId = (RolesType)2;
-                    CommandObject.Parameters.Clear();
-                    CommandObject.Parameters.AddWithValue("@UserId", participant.UserId);
-                    CommandObject.Parameters.AddWithValue("@ProjectId", participant.ProjectId);
-                    CommandObject.Parameters.AddWithValue("@RoleId", participant.RoleId);
-                    CommandObject.ExecuteNonQuery();
-                }
-                ConnectionObject.Close();
             }
-        }
-        catch (Exception ex)
-        {
-            tc.WriteLine(ex.Message);
-        }
-
-    }
-
-    [AssemblyCleanup()]
-    public static void AssemblyCleanup()
-    {
-        TestContext tc = BaseClass.TestContext;
-        try
-        {
-
-            string? conn = tc.Properties["ConnectionString"]!.ToString();
-            string sql = "TRUNCATE TABLE dbo.[Participant]";
-            using (SqlConnection ConnectionObject = new SqlConnection(conn!))
+            catch (Exception ex)
             {
-                ConnectionObject.Open();
-                using (SqlCommand CommandObject = new SqlCommand(sql, ConnectionObject))
-                {
-                    int rows = CommandObject.ExecuteNonQuery();
-                }
-                ConnectionObject.Close();
+                tc.WriteLine(ex.Message);
             }
+
         }
-        catch (Exception ex)
+
+        [AssemblyCleanup()]
+        public static void AssemblyCleanup()
         {
-            tc.WriteLine(ex.Message);
+            TestContext tc = BaseClass.TestContext;
+            try
+            {
+
+                string? conn = tc.Properties["ConnectionString"]!.ToString();
+                string sql = "TRUNCATE TABLE dbo.[Participant]";
+                using (SqlConnection ConnectionObject = new SqlConnection(conn!))
+                {
+                    ConnectionObject.Open();
+                    using (SqlCommand CommandObject = new SqlCommand(sql, ConnectionObject))
+                    {
+                        int rows = CommandObject.ExecuteNonQuery();
+                    }
+                    ConnectionObject.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                tc.WriteLine(ex.Message);
+            }
         }
     }
 }
