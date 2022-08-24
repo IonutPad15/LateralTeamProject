@@ -2,7 +2,6 @@
 using System.Data;
 
 namespace DataAccess.Utils;
-
 public abstract class SqliteTypeHandler<T> : SqlMapper.TypeHandler<T>
 {
     // Parameters are converted by Microsoft.Data.Sqlite

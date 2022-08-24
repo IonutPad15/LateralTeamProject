@@ -1,5 +1,4 @@
 ﻿namespace Models.Response;
-
 public class ParticipantResponse
 {
     public int Id { get; set; }

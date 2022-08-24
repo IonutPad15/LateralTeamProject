@@ -1,5 +1,4 @@
 ﻿namespace Models.Request;
-
 public class ProjectRequest
 {
     public int Id { get; set; }

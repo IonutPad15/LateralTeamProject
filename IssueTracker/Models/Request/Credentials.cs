@@ -1,5 +1,4 @@
 ﻿namespace Models.Request;
-
 public class Credentials
 {
     public Credentials(string nameEmail, string password)

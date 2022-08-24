@@ -1,5 +1,4 @@
 ﻿namespace Models.Request;
-
 public class IssueRequest
 {
     public IssueRequest(int id, int projectId, string title, string description, int issueTypeId, Guid userAssignedId, int priorityId, int statusId, int roleId)

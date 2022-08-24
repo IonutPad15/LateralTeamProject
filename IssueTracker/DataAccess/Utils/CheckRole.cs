@@ -1,6 +1,4 @@
-﻿#pragma warning disable IDE0073 // The file header is missing or not located at the top of the file
-using DataAccess.Data.IData;
-#pragma warning restore IDE0073 // The file header is missing or not located at the top of the file
+﻿using DataAccess.Data.IData;
 
 namespace DataAccess.Utils;
 

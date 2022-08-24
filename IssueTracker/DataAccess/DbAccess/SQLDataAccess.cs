@@ -1,6 +1,4 @@
-﻿#pragma warning disable IDE0073 // The file header is missing or not located at the top of the file
-using System.Data.SqlClient;
-#pragma warning restore IDE0073 // The file header is missing or not located at the top of the file
+﻿using System.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using Dapper;
 using System.Data;

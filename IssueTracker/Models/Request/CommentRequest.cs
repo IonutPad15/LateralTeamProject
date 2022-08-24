@@ -1,5 +1,4 @@
-﻿
-namespace Models.Request;
+﻿namespace Models.Request;
 
 public class CommentRequest
 {

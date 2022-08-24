@@ -2,7 +2,6 @@
 using Models.Request;
 
 namespace Validation;
-
 public class ProjectValidation : AbstractValidator<ProjectRequest>
 {
     public ProjectValidation()

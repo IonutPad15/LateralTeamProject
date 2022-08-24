@@ -1,5 +1,4 @@
 ﻿namespace Models.Response;
-
 public class IssueResponse
 {
     public IssueResponse(int id, string title, string description, DateTime created, DateTime updated, IssueTypeResponse issueType, PriorityResponse priority, StatusResponse status, RoleResponse role, ProjectResponse project)

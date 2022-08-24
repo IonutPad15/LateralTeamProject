@@ -1,9 +1,7 @@
 ﻿using Dapper;
 using System.Data;
 
-
 namespace DataAccess.Utils;
-
 public class MySqlGuidTypeHandler : SqlMapper.TypeHandler<Guid>
 {
     public override void SetValue(IDbDataParameter parameter, Guid guid)

@@ -1,5 +1,4 @@
 ﻿namespace Models.Response;
-
 public class RoleResponse
 {
     public RoleResponse(RoleType id, string name)
