@@ -9,6 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove=".editorconfig" />
     <None Remove="appsettings.Development.json" />
     <None Remove="appsettings.json" />
   </ItemGroup>
@@ -24,6 +25,10 @@
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EditorConfigFiles Include=".editorconfig" />
   </ItemGroup>
 
   <ItemGroup>
