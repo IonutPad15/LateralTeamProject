@@ -13,7 +13,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Models", "Models\Models.csp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Validation", "Validation\Validation.csproj", "{13207F8B-9F9B-4583-A444-7C0111911B60}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IssueTracker.UnitTest", "IssueTracker.UnitTest\IssueTracker.UnitTest.csproj", "{AAA7F66D-9926-48EF-8BB6-C96BD8B143FB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IssueTracker.UnitTest", "IssueTracker.UnitTest\IssueTracker.UnitTest.csproj", "{AAA7F66D-9926-48EF-8BB6-C96BD8B143FB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

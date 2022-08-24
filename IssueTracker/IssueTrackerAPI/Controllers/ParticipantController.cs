@@ -1,4 +1,8 @@
-﻿using AutoMapper;
+﻿// -------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License (MIT). See LICENSE in the repo root for license information.
+// -------------------------------------------------------------------------------------------------
+using AutoMapper;
 using DataAccess.Data.IData;
 using DataAccess.Models;
 using DataAccess.Utils;
@@ -11,182 +15,180 @@ using Models.Request;
 using Models.Response;
 using Validation;
 
-namespace IssueTrackerAPI.Controllers
+namespace IssueTrackerAPI.Controllers;
+
+[Route("api/[controller]")]
+[ApiController]
+public class ParticipantController : ControllerBase
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class ParticipantController : ControllerBase
+    private readonly IParticipantData _participantData;
+    private readonly Mapper _mapper;
+    public ParticipantController(IParticipantData participantData, IRoleData roleData)
     {
-        private readonly IParticipantData _participantData;
-        private readonly Mapper mapper;
-        public ParticipantController(IParticipantData participantData, IRoleData roleData)
+        _participantData = participantData;
+        _mapper = AutoMapperConfig.Config();
+    }
+    [HttpGet]
+    public async Task<IResult> GeParticipants()
+    {
+        var result = await _participantData.GetAllAsync();
+        var participants = _mapper.Map<IEnumerable<ParticipantResponse>>(result);
+        if (participants.Any())
+            return Results.Ok(participants);
+        return Results.NoContent();
+    }
+    [HttpGet("projectid")]
+    public async Task<IResult> GetParticipantsByProjectId(int projectId)
+    {
+        var results = await _participantData.GetOwnersAndCollabsByProjectIdAsync(projectId);
+        if (results == null) return Results.NotFound();
+        IEnumerable<ParticipantResponse> participantResponse = _mapper.Map<IEnumerable<ParticipantResponse>>(results);
+        return Results.Ok(participantResponse);
+    }
+    [HttpGet("{id}")]
+    public async Task<IResult> GetParticipant(int id)
+    {
+        var results = await _participantData.GetByIdAsync(id);
+        if (results == null) return Results.NotFound();
+        var participantResponse = _mapper.Map<ParticipantResponse>(results);
+        return Results.Ok(participantResponse);
+
+    }
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    public static async Task<bool> CreateOwner(int projectId, Guid userId, IParticipantData participantData)
+    {
+        if (projectId > 0)
         {
-            _participantData = participantData;
-            mapper = AutoMapperConfig.Config();
+            bool result = await CheckRole.OwnerExists(participantData, projectId);
+            if (result == false)
+            {
+                Participant participant = new Participant()
+                {
+                    ProjectId = projectId,
+                    RoleId = RolesType.Owner,
+                    UserId = userId
+                };
+                await participantData.AddAsync(participant);
+                return true;
+            }
         }
-        [HttpGet]
-        public async Task<IResult> GeParticipants()
+        return false;
+    }
+    [HttpPost("create")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    public async Task<IResult> CreateParticipant(ParticipantRequest participantRequest)
+    {
+        var validator = new ParticipantRequestValidation();
+        ValidationResult results = validator.Validate(participantRequest);
+        if (!results.IsValid)
         {
-            var result = await _participantData.GetAllAsync();
-            var participants = mapper.Map<IEnumerable<ParticipantResponse>>(result);
-            if (participants.Any())
-                return Results.Ok(participants);
-            return Results.NoContent();
+            List<ValidationFailure> failures = results.Errors;
+            return Results.BadRequest(failures);
         }
-        [HttpGet("projectid")]
-        public async Task <IResult> GetParticipantsByProjectId(int projectId)
+        var idclaim = User.Claims.FirstOrDefault(x => x.Type.Equals("UserId"));
+        if (idclaim != null)
         {
-            var results = await _participantData.GetOwnersAndCollabsByProjectIdAsync(projectId);
-            if (results == null) return Results.NotFound();
-            IEnumerable<ParticipantResponse>participantResponse = mapper.Map<IEnumerable<ParticipantResponse>>(results);
-            return Results.Ok(participantResponse);
-        }
-        [HttpGet("{id}")]
-        public async Task<IResult> GetParticipant(int id)
-        {
-            var results = await _participantData.GetByIdAsync(id);
-            if (results == null) return Results.NotFound();
-            var participantResponse = mapper.Map<ParticipantResponse>(results);
-            return Results.Ok(participantResponse);
+            if (participantRequest.RoleId == RoleType.Developer ||
+                participantRequest.RoleId == RoleType.Tester)
+            {
+                var result = await CheckRole.IsOwnerOrColllab(_participantData,
+                Guid.Parse(idclaim.Value), participantRequest.ProjectId);
+                if (result == true)
+                {
+                    var participant = _mapper.Map<Participant>(participantRequest);
+                    await _participantData.AddAsync(participant);
+                    return Results.Ok();
+                }
+            }
+            if (participantRequest.RoleId == RoleType.Collaborator)
+            {
+                var result = await CheckRole.IsOwner(_participantData,
+                Guid.Parse(idclaim.Value), participantRequest.ProjectId);
+                if (result == true)
+                {
+                    var participant = _mapper.Map<Participant>(participantRequest);
+                    await _participantData.AddAsync(participant);
+                    return Results.Ok();
+                }
+            }
 
         }
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public static async Task<bool> CreateOwner(int projectId, Guid userId, IParticipantData participantData)
+        return Results.Unauthorized();
+    }
+    [HttpPut]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    public async Task<IResult> UpdateParticipant(ParticipantUpdateRequest participantRequest)
+    {
+        var validator = new ParticipantUpdateRequestValidation();
+        ValidationResult results = validator.Validate(participantRequest);
+        if (!results.IsValid)
         {
-            if (projectId > 0)
-            {
-                bool result = await CheckRole.OwnerExists(participantData, projectId);
-                if (result == false)
-                {
-                    Participant participant = new Participant()
-                    {
-                        ProjectId = projectId,
-                        RoleId = RolesType.Owner,
-                        UserId = userId
-                    };
-                    await participantData.AddAsync(participant);
-                    return true;
-                }
-            }
-            return false;
+            List<ValidationFailure> failures = results.Errors;
+            return Results.BadRequest(failures);
         }
-        [HttpPost("create")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public async Task<IResult> CreateParticipant(ParticipantRequest participantRequest)
+        var participant = await _participantData.GetByIdAsync(participantRequest.Id);
+        if (participant == null) return Results.NotFound();
+        var idclaim = User.Claims.FirstOrDefault(x => x.Type.Equals("UserId"));
+        if (idclaim != null)
         {
-            var validator = new ParticipantRequestValidation();
-            ValidationResult results = validator.Validate(participantRequest);
-            if (!results.IsValid)
+            bool result;
+            if (participantRequest.RoleId == RoleType.Owner
+                || participantRequest.RoleId == RoleType.Collaborator)
             {
-                List<ValidationFailure> failures = results.Errors;
-                return Results.BadRequest(failures);
+                result = await CheckRole.IsOwner(_participantData,
+                Guid.Parse(idclaim.Value), participantRequest.ProjectId);
             }
-            var idclaim = User.Claims.FirstOrDefault(x => x.Type.Equals("UserId"));
-            if (idclaim != null)
+            else
             {
-                if (participantRequest.RoleId== RoleType.Developer 
-                    || participantRequest.RoleId == RoleType.Tester)
-                {
-                    var result = await CheckRole.IsOwnerOrColllab(_participantData,
-                    Guid.Parse(idclaim.Value), participantRequest.ProjectId);
-                    if (result == true)
-                    {
-                        var participant = mapper.Map<Participant>(participantRequest);
-                        await _participantData.AddAsync(participant);
-                        return Results.Ok();
-                    }
-                }
-                if (participantRequest.RoleId == RoleType.Collaborator)
-                {
-                    var result = await CheckRole.IsOwner(_participantData,
-                    Guid.Parse(idclaim.Value), participantRequest.ProjectId);
-                    if (result == true)
-                    {
-                        var participant = mapper.Map<Participant>(participantRequest);
-                        await _participantData.AddAsync(participant);
-                        return Results.Ok();
-                    }
-                }
-
+                result = await CheckRole.IsOwnerOrColllab(_participantData,
+                   Guid.Parse(idclaim.Value), participantRequest.ProjectId);
             }
-            return Results.Unauthorized();
+            if (result == true)
+            {
+                participant.RoleId = (RolesType)participantRequest.RoleId;
+                await _participantData.UpdateAsync(participant);
+                return Results.Ok(participant.Id);
+            }
         }
-        [HttpPut]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public async Task<IResult> UpdateParticipant(ParticipantUpdateRequest participantRequest)
+        return Results.Unauthorized();
+    }
+    [HttpDelete]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    public async Task<IResult> DeleteParticipant([FromBody] int id)
+    {
+        if (id > 0)
         {
-            var validator = new ParticipantUpdateRequestValidation();
-            ValidationResult results = validator.Validate(participantRequest);
-            if (!results.IsValid)
-            {
-                List<ValidationFailure> failures = results.Errors;
-                return Results.BadRequest(failures);
-            }
-            var participant = await _participantData.GetByIdAsync(participantRequest.Id);
+            var participant = await _participantData.GetByIdAsync(id);
             if (participant == null) return Results.NotFound();
             var idclaim = User.Claims.FirstOrDefault(x => x.Type.Equals("UserId"));
             if (idclaim != null)
             {
-                bool result;
-                if (participantRequest.RoleId == RoleType.Owner
-                    || participantRequest.RoleId == RoleType.Collaborator)
+                if (participant.RoleId == RolesType.Developer ||
+                    participant.RoleId == RolesType.Tester)
                 {
-                    result = await CheckRole.IsOwner(_participantData,
-                    Guid.Parse(idclaim.Value), participantRequest.ProjectId);
+                    var result = await CheckRole.IsOwnerOrColllab(_participantData,
+                    Guid.Parse(idclaim.Value), participant.ProjectId);
+                    if (result == true)
+                    {
+                        await _participantData.DeleteAsync(id);
+                        return Results.NoContent();
+                    }
                 }
-                else
+                if (participant.RoleId == RolesType.Collaborator)
                 {
-                    result = await CheckRole.IsOwnerOrColllab(_participantData,
-                       Guid.Parse(idclaim.Value), participantRequest.ProjectId);
+                    var result = await CheckRole.IsOwner(_participantData,
+                    Guid.Parse(idclaim.Value), participant.ProjectId);
+                    if (result == true)
+                    {
+                        await _participantData.DeleteAsync(id);
+                        return Results.NoContent();
+                    }
                 }
-                if (result == true)
-                {
-                    participant.RoleId = (RolesType)participantRequest.RoleId;
-                    await _participantData.UpdateAsync(participant);
-                    return Results.Ok(participant.Id);
-                }
+
             }
             return Results.Unauthorized();
         }
-        [HttpDelete]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public async Task<IResult> DeleteParticipant([FromBody]int id)
-        {
-            if (id > 0)
-            {
-                var participant = await _participantData.GetByIdAsync(id);
-                if (participant == null) return Results.NotFound();
-                var idclaim = User.Claims.FirstOrDefault(x => x.Type.Equals("UserId"));
-                if (idclaim != null)
-                {
-                    if (participant.RoleId == RolesType.Developer 
-                        || participant.RoleId == RolesType.Tester)
-                    {
-                        var result = await CheckRole.IsOwnerOrColllab(_participantData,
-                        Guid.Parse(idclaim.Value), participant.ProjectId);
-                        if (result == true)
-                        {
-                            await _participantData.DeleteAsync(id);
-                            return Results.NoContent();
-                        }
-                    }
-                    if (participant.RoleId == RolesType.Collaborator)
-                    {
-                        var result = await CheckRole.IsOwner(_participantData,
-                        Guid.Parse(idclaim.Value), participant.ProjectId);
-                        if (result == true)
-                        {
-                            await _participantData.DeleteAsync(id);
-                            return Results.NoContent();
-                        }
-                    }
-
-                }
-                return Results.Unauthorized();
-            }
-            return Results.BadRequest();
-            
-        }
-
+        return Results.BadRequest();
     }
+
 }

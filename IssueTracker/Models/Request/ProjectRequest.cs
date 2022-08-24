@@ -1,9 +1,8 @@
-﻿namespace Models.Request
+﻿namespace Models.Request;
+
+public class ProjectRequest
 {
-    public class ProjectRequest
-    {
-        public int Id { get; set; }
-        public string? Title { get; set; }
-        public string? Description { get; set; }
-    }
+    public int Id { get; set; }
+    public string? Title { get; set; }
+    public string? Description { get; set; }
 }
