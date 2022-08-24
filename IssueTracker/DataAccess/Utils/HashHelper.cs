@@ -2,7 +2,6 @@
 using System.Text;
 
 namespace DataAccess.Utils;
-
 public class HashHelper
 {
     private readonly SHA256 _hasher;

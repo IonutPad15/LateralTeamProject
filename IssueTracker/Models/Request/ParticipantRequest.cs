@@ -1,7 +1,6 @@
 ﻿using Models.Response;
 
 namespace Models.Request;
-
 public class ParticipantRequest
 {
     public ParticipantRequest(Guid userId, int projectId, RoleType roleId)

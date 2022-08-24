@@ -1,8 +1,6 @@
-﻿
-using Models.Response;
+﻿using Models.Response;
 
 namespace Models.Request;
-
 public class ParticipantUpdateRequest
 {
     public ParticipantUpdateRequest(int id, int projectId, RoleType roleId)

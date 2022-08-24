@@ -1,15 +1,8 @@
-﻿// -------------------------------------------------------------------------------------------------
-// Copyright (c) Microsoft Corporation. All rights reserved.
-// Licensed under the MIT License (MIT). See LICENSE in the repo root for license information.
-// -------------------------------------------------------------------------------------------------
-
-using DataAccess.Data.IData;
+﻿using DataAccess.Data.IData;
 using System.Data;
 using System.Data.SqlClient;
 
-
 namespace IssueTracker.UnitTest;
-
 public abstract class BaseClass
 {
     public static IIssueData IssueData = null!;

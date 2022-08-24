@@ -1,5 +1,4 @@
 ﻿namespace Models.Response;
-
 public class StatusResponse
 {
     public StatusResponse()

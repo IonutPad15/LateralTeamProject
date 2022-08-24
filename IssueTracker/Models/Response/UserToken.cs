@@ -1,6 +1,4 @@
-﻿
-namespace Models.Response;
-
+﻿namespace Models.Response;
 public class UserToken
 {
     public UserToken(string token, DateTime expirationDate, Guid userId)

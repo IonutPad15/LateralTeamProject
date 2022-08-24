@@ -1,8 +1,4 @@
-﻿#pragma warning disable IDE0073 // The file header is missing or not located at the top of the file
-
-namespace DataAccess.Models;
-#pragma warning restore IDE0073 // The file header is missing or not located at the top of the file
-
+﻿namespace DataAccess.Models;
 public class User
 {
     public Guid Id { get; set; }

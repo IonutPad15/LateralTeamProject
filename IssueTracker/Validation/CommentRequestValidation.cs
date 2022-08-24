@@ -2,7 +2,6 @@
 using FluentValidation;
 
 namespace Validation;
-
 public class CommentRequestValidation : AbstractValidator<CommentRequest>
 {
     public CommentRequestValidation()

@@ -1,8 +1,6 @@
 ﻿using DataAccess.Models;
-
 using System.Data;
 using System.Data.SqlClient;
-
 
 namespace IssueTracker.UnitTest;
 

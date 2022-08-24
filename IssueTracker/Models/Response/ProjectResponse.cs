@@ -1,5 +1,4 @@
 ﻿namespace Models.Response;
-
 public class ProjectResponse
 {
     public int Id { get; set; }

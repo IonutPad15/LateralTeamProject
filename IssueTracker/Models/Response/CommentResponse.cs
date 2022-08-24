@@ -1,6 +1,4 @@
-﻿
-namespace Models.Response;
-
+﻿namespace Models.Response;
 public class CommentResponse
 {
     public CommentResponse(int id, Guid? userId, string author, string body,

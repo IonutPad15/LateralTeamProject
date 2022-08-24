@@ -1,5 +1,4 @@
 ﻿namespace Models.Response;
-
 public class UserResponse
 {
     public UserResponse(Guid id, string userName, string email)

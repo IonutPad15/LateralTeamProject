@@ -1,5 +1,4 @@
 ﻿namespace Models.Request;
-
 public class UserRequest
 {
     public string? UserName { get; set; }
