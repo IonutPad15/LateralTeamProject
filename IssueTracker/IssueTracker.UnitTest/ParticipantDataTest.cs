@@ -1,16 +1,11 @@
 ﻿using DataAccess.Models;
-using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace IssueTracker.UnitTest
 {
     [TestClass]
-    public class ParticipantDataTest:BaseClass
+    public class ParticipantDataTest : BaseClass
     {
         
 
@@ -21,7 +16,7 @@ namespace IssueTracker.UnitTest
         {
             string sql = "SELECT * FROM dbo.[Participant]";
 
-            string? conn = testContext.Properties["ConnectionString"]!.ToString();
+            string conn = "Data Source=(local)\\SQLEXPRESS;Initial Catalog=IssueTrackerTest;Integrated Security=True";
             testContext.WriteLine(conn);
             LoadDataTable(sql, conn!);
             var participants = await _participantData.GetAllAsync();
@@ -41,7 +36,7 @@ namespace IssueTracker.UnitTest
         public async Task AddAsync_Test()
         {
             
-            string? conn = testContext.Properties["ConnectionString"]!.ToString();
+            string conn = "Data Source=(local)\\SQLEXPRESS;Initial Catalog=IssueTrackerTest;Integrated Security=True";
             string sql = "SELECT * FROM dbo.[User]";
             var userID = Guid.Empty;
             using (SqlConnection ConnectionObject = new SqlConnection(conn!))
@@ -53,16 +48,15 @@ namespace IssueTracker.UnitTest
                     {
                         DataTable TestDataTable = new DataTable();
                         da.Fill(TestDataTable);
-                        var row = TestDataTable.Rows[0];
-                        userID = Guid.Parse(row["Id"].ToString()!);
-
+                        var row = TestDataTable.Rows[0].ItemArray[0];
+                        userID = Guid.Parse(row!.ToString()!);
                     }
                 }
                 ConnectionObject.Close();
             }
-            Participant participant = new Participant()
+            Participant participant = new Participant
             {
-                ProjectId = 1,
+                ProjectId = 2,
                 RoleId = (RolesType)4,
                 UserId = userID
             };
@@ -93,19 +87,19 @@ namespace IssueTracker.UnitTest
             await _participantData.DeleteAsync(-1);
         }
         [TestMethod]
-        [Description("Given a valid request, when DeleteAsync is called" +
-            "then it should be a success")]
-        public async Task DeleteAsync_Test()
-        {
-            await _participantData.DeleteAsync(2);
-        }
-        [TestMethod]
         [Description("Given a valid request, when GetByIdAsync is called" +
             "then it should not be null")]
         public async Task GetByIdAsync_Test()
         {
-            var participant = await _participantData.GetByIdAsync(1);
+            var participant = await _participantData.GetByIdAsync(27);
             Assert.IsNotNull(participant);
+        }
+        [TestMethod]
+        [Description("Given a valid request, when DeleteAsync is called" +
+            "then it should be a success")]
+        public async Task DeleteAsync_Test()
+        {
+            await _participantData.DeleteAsync(27);
         }
         [TestMethod]
         [Description("Given an invalid request, when GetByIdAsync is called" +
@@ -137,7 +131,7 @@ namespace IssueTracker.UnitTest
             "then it should be a single Participant object")]
         public async Task GetOwnerByProjectIdAsync_Test()
         {
-            var participants = await _participantData.GetOwnerByProjectIdAsync(1);
+            var participants = await _participantData.GetOwnerByProjectIdAsync(2);
             Assert.IsTrue(participants.Count() == 1);
         }
         [TestMethod]

@@ -1,5 +1,4 @@
-﻿
-using DataAccess.Data;
+﻿using DataAccess.Data;
 using DataAccess.DbAccess;
 using DataAccess.Models;
 using Microsoft.Extensions.Configuration;
@@ -12,7 +11,7 @@ namespace IssueTracker.UnitTest
     public class TestInitialization
     {
 
-        [AssemblyInitialize()]
+        [AssemblyInitialize]
         public static void AssemblyInitialize(TestContext tc)
         {
             try
@@ -88,7 +87,7 @@ namespace IssueTracker.UnitTest
 
         }
 
-        [AssemblyCleanup()]
+        [AssemblyCleanup]
         public static void AssemblyCleanup()
         {
             TestContext tc = BaseClass.testContext;

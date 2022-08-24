@@ -1,7 +1,6 @@
 ﻿using DataAccess.Data.IData;
 using DataAccess.DbAccess;
 using DataAccess.Models;
-using Microsoft.Extensions.Configuration;
 
 namespace DataAccess.Data
 {
