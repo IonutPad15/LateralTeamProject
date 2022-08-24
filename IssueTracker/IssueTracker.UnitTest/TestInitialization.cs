@@ -53,7 +53,7 @@ namespace IssueTracker.UnitTest
                         participant = new Participant()
                         {
                             UserId = userID,
-                            ProjectId = 1,
+                            ProjectId = 2,
                             RoleId = (RolesType)3
                         };
                     }

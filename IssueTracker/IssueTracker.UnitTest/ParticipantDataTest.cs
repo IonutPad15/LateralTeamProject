@@ -7,36 +7,13 @@ namespace IssueTracker.UnitTest
     [TestClass]
     public class ParticipantDataTest : BaseClass
     {
-        
-
-        [TestMethod()]
-        [Description("Given a valid request, when GetAllAsync is called" +
-            "then it should be a success")]
-        public async Task GetAll_Test()
-        {
-            string sql = "SELECT * FROM dbo.[Participant]";
-
-            string conn = "Data Source=(local)\\SQLEXPRESS;Initial Catalog=IssueTrackerTest;Integrated Security=True";
-            testContext.WriteLine(conn);
-            LoadDataTable(sql, conn!);
-            var participants = await _participantData.GetAllAsync();
-            int value = participants.Count();
-            int expected = TestDataTable!.Rows.Count;
-            testContext.WriteLine("Testing _participant.GetAllAsync, Expected Value: '{0}', " +
-                "Actual Value: '{1}', Result: '{2}'",
-                value, expected, (value == expected ? "Succes" : "Failed"));
-            if(value != expected)
-            {
-                Assert.Fail("Data Driven Tests Have Failed, Check Additional Output For More Info");
-            }
-        }
         [TestMethod]
         [Description("Given a valid request, when AddAsync is called" +
             "then it should be a success")]
         public async Task AddAsync_Test()
         {
             
-            string conn = "Data Source=(local)\\SQLEXPRESS;Initial Catalog=IssueTrackerTest;Integrated Security=True";
+            string? conn = testContext.Properties["ConnectionString"]!.ToString();
             string sql = "SELECT * FROM dbo.[User]";
             var userID = Guid.Empty;
             using (SqlConnection ConnectionObject = new SqlConnection(conn!))
@@ -59,9 +36,29 @@ namespace IssueTracker.UnitTest
                 ProjectId = 2,
                 RoleId = (RolesType)4,
                 UserId = userID
-            };
-            await _participantData.AddAsync(participant);
-            
+            }; //TODO: daca folosesti baza de date secundara, nu ar trebui sa mai lucrezi cu baza de date principala
+            await _participantData.AddAsync(participant);   
+        }
+        [TestMethod()]
+        [Description("Given a valid request, when GetAllAsync is called" +
+            "then it should be a success")]
+        public async Task GetAll_Test()
+        {
+            string sql = "SELECT * FROM dbo.[Participant]";
+
+            string? conn = testContext.Properties["ConnectionString"]!.ToString();
+            testContext.WriteLine(conn);
+            LoadDataTable(sql, conn!);
+            var participants = await _participantData.GetAllAsync();
+            int value = participants.Count();
+            int expected = TestDataTable!.Rows.Count;
+            testContext.WriteLine("Testing _participant.GetAllAsync, Expected Value: '{0}', " +
+                "Actual Value: '{1}', Result: '{2}'",
+                value, expected, (value == expected ? "Succes" : "Failed"));
+            if(value != expected)
+            {
+                Assert.Fail("Data Driven Tests Have Failed, Check Additional Output For More Info");
+            } //TODO: aici ar trebui sa verifici daca exista raspuns in variabila, sau daca e mai mare de x elemente
         }
         [TestMethod]
         [ExpectedException(typeof(SqlException))]
@@ -75,16 +72,8 @@ namespace IssueTracker.UnitTest
                 RoleId = (RolesType)1,
                 UserId = new Guid()
             };
-            await _participantData.AddAsync(participant);
+            await _participantData.AddAsync(participant); //TODO: aici la fel
 
-        }
-        [TestMethod]
-        [ExpectedException(typeof(SqlException))]
-        [Description("Given an invalid request, when DeleteAsync is called" +
-            "then it should throw an SQLException")]
-        public async Task DeleteAsync_Test_BadId()
-        {
-            await _participantData.DeleteAsync(-1);
         }
         [TestMethod]
         [Description("Given a valid request, when GetByIdAsync is called" +
@@ -168,7 +157,6 @@ namespace IssueTracker.UnitTest
             }
         }
         [TestMethod]
-        [ExpectedException(typeof(SqlException))]
         [Description("Given an invalid Id, when UpdateAsync is called" +
             "then it should throw an SqlException")]
         public async Task UpdateAsync_Test_BadId()
@@ -188,7 +176,6 @@ namespace IssueTracker.UnitTest
             
         }
         [TestMethod]
-        [ExpectedException(typeof(SqlException))]
         [Description("Given an invalid RoleId, when UpdateAsync is called" +
             "then it should throw an SqlException")]
         public async Task UpdateAsync_Test_BadRoleId()
@@ -205,6 +192,13 @@ namespace IssueTracker.UnitTest
                 RoleId = (RolesType)4
             };
             await _participantData.UpdateAsync(participant);
+        }
+        [TestMethod]
+        [Description("Given an invalid request, when DeleteAsync is called" +
+            "then it should throw an SQLException")]
+        public async Task DeleteAsync_Test_BadId()
+        {
+            await _participantData.DeleteAsync(-1); //Verificare in procedura si aruncarea unei erori
         }
     }
 }

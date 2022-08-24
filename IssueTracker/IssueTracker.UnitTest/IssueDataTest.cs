@@ -1,4 +1,5 @@
 ﻿using DataAccess.Models;
+using System.Data.SqlClient;
 
 namespace IssueTracker.UnitTest
 {
@@ -17,9 +18,7 @@ namespace IssueTracker.UnitTest
         [Description("Given request in db WHEN id = 0 THEN return null!")]
         public async Task GetIssueById0()
         {
-            var issue = await issueData.GetByIdAsync(0);
-
-            Assert.IsNull(issue);
+            await Assert.ThrowsExceptionAsync<SqlException>(() => issueData.GetByIdAsync(0));
         }
         
         [TestMethod]
@@ -67,14 +66,7 @@ namespace IssueTracker.UnitTest
                 RoleId = 3,
                 IssueTypeId = 2
             };
-            try
-            {
-                await issueData.UpdateAsync(issue);
-            }
-            catch
-            {
-                Assert.IsTrue(true);
-            }
+            await Assert.ThrowsExceptionAsync<SqlException>(() => issueData.UpdateAsync(issue));
         }
     }
 }
