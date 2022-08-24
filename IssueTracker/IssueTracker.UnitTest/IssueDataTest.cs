@@ -11,8 +11,8 @@ namespace IssueTracker.UnitTest
         {
             var issueList = await issueData.GetAllAsync();
 
-            Assert.IsTrue(issueList.Count() > 0);
-        }
+        Assert.IsTrue(issueList.Count() > 0);
+    }
 
         [TestMethod]
         [Description("Given request in db WHEN id = 0 THEN return null!")]
@@ -30,25 +30,26 @@ namespace IssueTracker.UnitTest
             Assert.IsNotNull(issue);
         }
 
-        [TestMethod]
-        [Description("Given with corect data in issue object WHEN updateAsync is call THEN return success")]
-        public async Task Updated()
+    [TestMethod]
+    [Description("Given with corect data in issue object WHEN updateAsync is call THEN return success")]
+    public async Task Updated()
+    {
+        var issue = new Issue
         {
-            var issue = new Issue{
-                Id = 1,
-                StatusId = 3,
-                Description = "test",
-                PriorityId = 1,
-                UserAssignedId = Guid.Parse("13E12278-2EB1-4FC7-9C20-639A9CFC8F21"),
-                Updated = DateTime.UtcNow,
-                Title = "test",
-                ProjectId = 2,
-                RoleId = 3,
-                IssueTypeId = 2
-            };
-            await issueData.UpdateAsync(issue);
-            Assert.IsTrue(true);
-        }
+            Id = 1,
+            StatusId = 3,
+            Description = "test",
+            PriorityId = 1,
+            UserAssignedId = Guid.Parse("13E12278-2EB1-4FC7-9C20-639A9CFC8F21"),
+            Updated = DateTime.UtcNow,
+            Title = "test",
+            ProjectId = 2,
+            RoleId = 3,
+            IssueTypeId = 2
+        };
+        await IssueData.UpdateAsync(issue);
+        Assert.IsTrue(true);
+    }
 
         [TestMethod]
         [Description("Given without title issue object WHEN updateAsync is call THEN return error")]

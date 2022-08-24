@@ -5,11 +5,11 @@ using Microsoft.Extensions.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 
-namespace IssueTracker.UnitTest
+namespace IssueTracker.UnitTest;
+
+[TestClass]
+public class TestInitialization
 {
-    [TestClass]
-    public class TestInitialization
-    {
 
         [AssemblyInitialize]
         public static void AssemblyInitialize(TestContext tc)
@@ -25,25 +25,25 @@ namespace IssueTracker.UnitTest
                 BaseClass.testContext = tc;
 
 
-                string? conn = tc.Properties["ConnectionString"]!.ToString();
-                string sql = "TRUNCATE TABLE dbo.[Participant]";
-                using (SqlConnection ConnectionObject = new SqlConnection(conn!))
+            string? conn = tc.Properties["ConnectionString"]!.ToString();
+            string sql = "TRUNCATE TABLE dbo.[Participant]";
+            using (SqlConnection ConnectionObject = new SqlConnection(conn!))
+            {
+                ConnectionObject.Open();
+                using (SqlCommand CommandObject = new SqlCommand(sql, ConnectionObject))
                 {
-                    ConnectionObject.Open();
-                    using (SqlCommand CommandObject = new SqlCommand(sql, ConnectionObject))
+                    int rows = CommandObject.ExecuteNonQuery();
+                }
+                sql = "SELECT * FROM dbo.[User]";
+                var userID = Guid.Empty;
+                using (SqlCommand CommandObject = new SqlCommand(sql, ConnectionObject))
+                {
+                    using (SqlDataAdapter da = new SqlDataAdapter(CommandObject))
                     {
-                        int rows = CommandObject.ExecuteNonQuery();
-                    }
-                    sql = "SELECT * FROM dbo.[User]";
-                    var userID = Guid.Empty;
-                    using (SqlCommand CommandObject = new SqlCommand(sql, ConnectionObject))
-                    {
-                        using (SqlDataAdapter da = new SqlDataAdapter(CommandObject))
-                        {
-                            DataTable TestDataTable = new DataTable();
-                            da.Fill(TestDataTable);
-                            var row = TestDataTable.Rows[0];
-                            userID = Guid.Parse(row["Id"].ToString()!);
+                        DataTable TestDataTable = new DataTable();
+                        da.Fill(TestDataTable);
+                        var row = TestDataTable.Rows[0];
+                        userID = Guid.Parse(row["Id"].ToString()!);
 
                         }
                     }
@@ -85,7 +85,7 @@ namespace IssueTracker.UnitTest
                 tc.WriteLine(ex.Message);
             }
 
-        }
+    }
 
         [AssemblyCleanup]
         public static void AssemblyCleanup()
