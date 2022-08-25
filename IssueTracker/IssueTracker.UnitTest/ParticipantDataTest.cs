@@ -12,7 +12,6 @@ namespace IssueTracker.UnitTest
             "then it should be a success")]
         public async Task AddAsync_Test()
         {
-            
             string? conn = testContext.Properties["ConnectionString"]!.ToString();
             string sql = "SELECT * FROM dbo.[User]";
             var userID = Guid.Empty;
@@ -37,7 +36,7 @@ namespace IssueTracker.UnitTest
                 RoleId = (RolesType)4,
                 UserId = userID
             }; //TODO: daca folosesti baza de date secundara, nu ar trebui sa mai lucrezi cu baza de date principala
-            await _participantData.AddAsync(participant);   
+            await _participantData.AddAsync(participant);
         }
         [TestMethod()]
         [Description("Given a valid request, when GetAllAsync is called" +
@@ -55,7 +54,7 @@ namespace IssueTracker.UnitTest
             testContext.WriteLine("Testing _participant.GetAllAsync, Expected Value: '{0}', " +
                 "Actual Value: '{1}', Result: '{2}'",
                 value, expected, (value == expected ? "Succes" : "Failed"));
-            if(value != expected)
+            if (value != expected)
             {
                 Assert.Fail("Data Driven Tests Have Failed, Check Additional Output For More Info");
             } //TODO: aici ar trebui sa verifici daca exista raspuns in variabila, sau daca e mai mare de x elemente
@@ -173,7 +172,6 @@ namespace IssueTracker.UnitTest
                 RoleId = (RolesType)(-1)
             };
             await _participantData.UpdateAsync(participant);
-            
         }
         [TestMethod]
         [Description("Given an invalid RoleId, when UpdateAsync is called" +
