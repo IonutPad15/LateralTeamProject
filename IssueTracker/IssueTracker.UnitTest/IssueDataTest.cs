@@ -1,15 +1,15 @@
 ﻿using DataAccess.Models;
+using System.Data.SqlClient;
 
 namespace IssueTracker.UnitTest;
 
 [TestClass]
 public class IssueDataTest : BaseClass
 {
-
     [TestMethod]
-    public async Task GetAllIssue_AreSame_ReturnListIssue()
+    public async Task GetAllIssue_ReturnListIssue()
     {
-        var issueList = await IssueData.GetAllAsync();
+        var issueList = await issueData.GetAllAsync();
 
         Assert.IsTrue(issueList.Count() > 0);
     }
@@ -18,16 +18,15 @@ public class IssueDataTest : BaseClass
     [Description("Given request in db WHEN id = 0 THEN return null!")]
     public async Task GetIssueById0()
     {
-        var issue = await IssueData.GetByIdAsync(0);
-
-        Assert.IsNull(issue);
+        await Assert.ThrowsExceptionAsync<SqlException>(() => issueData.GetByIdAsync(0));
     }
 
     [TestMethod]
     [Description("Given request in db WHEN id = 1 THEN return success!")]
     public async Task GetIssueById1()
     {
-        var issue = await IssueData.GetByIdAsync(1);
+        var issue = await issueData.GetByIdAsync(1);
+
         Assert.IsNotNull(issue);
     }
 
@@ -48,7 +47,7 @@ public class IssueDataTest : BaseClass
             RoleId = 3,
             IssueTypeId = 2
         };
-        await IssueData.UpdateAsync(issue);
+        await issueData.UpdateAsync(issue);
         Assert.IsTrue(true);
     }
 
@@ -68,14 +67,6 @@ public class IssueDataTest : BaseClass
             RoleId = 3,
             IssueTypeId = 2
         };
-        try
-        {
-            await IssueData.UpdateAsync(issue);
-        }
-        catch
-        {
-            Assert.IsTrue(true);
-        }
-
+        await Assert.ThrowsExceptionAsync<SqlException>(() => issueData.UpdateAsync(issue));
     }
 }
