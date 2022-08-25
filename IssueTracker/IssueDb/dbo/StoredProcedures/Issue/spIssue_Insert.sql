@@ -12,3 +12,4 @@
 AS
 	insert into dbo.[Issue](Title, Description, Created, Updated, IssueTypeId, ProjectId, UserAssignedId, PriorityId, StatusId, RoleId)
 	values(@Title , @Description, @Created, @Updated ,@IssueTypeId, @ProjectId, @UserAssignedId , @PriorityId, @StatusId, @RoleId )
+    select CAST(SCOPE_IDENTITY() as int);

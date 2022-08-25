@@ -16,7 +16,7 @@ public class IssueValidation : AbstractValidator<IssueRequest>
         RuleFor(x => x.IssueTypeId).GreaterThan(0).WithMessage("ids are higher than 0!");
         RuleFor(x => x.PriorityId).GreaterThan(0).WithMessage("ids are higher than 0!");
         RuleFor(x => x.ProjectId).GreaterThan(0).WithMessage("ids are higher than 0!");
-        RuleFor(x => x.RoleId).GreaterThan(0).WithMessage("ids are higher than 0!");
+        RuleFor(x => (int)x.RoleId).GreaterThan(0).WithMessage("ids are higher than 0!");
         RuleFor(x => x.StatusId).GreaterThan(0).WithMessage("ids are higher than 0!");
     }
     public static bool IsValid(IssueRequest issue)

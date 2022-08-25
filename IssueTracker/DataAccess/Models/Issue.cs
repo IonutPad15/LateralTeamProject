@@ -13,7 +13,7 @@ public class Issue
     public Guid? UserAssignedId { get; set; }
     public int PriorityId { get; set; }
     public int StatusId { get; set; }
-    public int RoleId { get; set; }
+    public RolesType RoleId { get; set; }
     public bool IsDeleted { get; set; }
     public IssueType IssueType { get; set; }
     public Priority Priority { get; set; }

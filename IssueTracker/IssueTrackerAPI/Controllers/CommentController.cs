@@ -29,7 +29,7 @@ public class CommentController : ControllerBase
         _mapper = AutoMapperConfig.Config();
 
     }
-    [HttpGet("")]
+    [HttpGet]
     public async Task<IResult> GetById(int id)
     {
         var comment = await _commentData.GetByIdAsync(id);

@@ -29,24 +29,54 @@ public class TestInitialization
             string sql = "TRUNCATE TABLE dbo.[Participant]";
             using (SqlConnection ConnectionObject = new SqlConnection(conn!))
             {
+
                 ConnectionObject.Open();
                 using (SqlCommand CommandObject = new SqlCommand(sql, ConnectionObject))
                 {
                     int rows = CommandObject.ExecuteNonQuery();
                 }
-                sql = "SELECT * FROM dbo.[User]";
-                var userID = Guid.Empty;
+                sql = "DELETE FROM dbo.[User]";
                 using (SqlCommand CommandObject = new SqlCommand(sql, ConnectionObject))
                 {
-                    using (SqlDataAdapter da = new SqlDataAdapter(CommandObject))
-                    {
-                        DataTable TestDataTable = new DataTable();
-                        da.Fill(TestDataTable);
-                        var row = TestDataTable.Rows[0];
-                        userID = Guid.Parse(row["Id"].ToString()!);
-
-                    }
+                    int rows = CommandObject.ExecuteNonQuery();
                 }
+                sql = "DELETE FROM dbo.[Project]";
+                using (SqlCommand CommandObject = new SqlCommand(sql, ConnectionObject))
+                {
+                    int rows = CommandObject.ExecuteNonQuery();
+                }
+                sql = "INSERT INTO dbo.[User] VALUES(@Id,@UserName,@Email,@Password,@IsDeleted)";
+                using (SqlCommand CommandObject = new SqlCommand(sql, ConnectionObject))
+                {
+                    CommandObject.Parameters.AddWithValue("@Id", Constants.User.Id);
+                    CommandObject.Parameters.AddWithValue("@UserName", Constants.User.UserName);
+                    CommandObject.Parameters.AddWithValue("@Email", Constants.User.Email);
+                    CommandObject.Parameters.AddWithValue("@Password", Constants.User.Password);
+                    CommandObject.Parameters.AddWithValue("@IsDeleted", Constants.User.IsDeleted);
+                    CommandObject.ExecuteNonQuery();
+
+                }
+                sql = "SET IDENTITY_INSERT dbo.[Project] ON INSERT INTO dbo.[Project](Id,Title, Description, Created) VALUES (@Id, @Title, @Description, @Created)";
+                using (SqlCommand CommandObject = new SqlCommand(sql, ConnectionObject))
+                {
+                    CommandObject.Parameters.AddWithValue("@Id", 1);
+                    CommandObject.Parameters.AddWithValue("@Title", "project");
+                    CommandObject.Parameters.AddWithValue("@Description", "description");
+                    CommandObject.Parameters.AddWithValue("@Created", DateTime.Now);
+                    CommandObject.ExecuteNonQuery();
+
+                }
+                sql = "SET IDENTITY_INSERT dbo.[Project] ON INSERT INTO dbo.[Project](Id,Title, Description, Created) VALUES (@Id, @Title, @Description, @Created)";
+                using (SqlCommand CommandObject = new SqlCommand(sql, ConnectionObject))
+                {
+                    CommandObject.Parameters.AddWithValue("@Id", 2);
+                    CommandObject.Parameters.AddWithValue("@Title", "project2");
+                    CommandObject.Parameters.AddWithValue("@Description", "description2");
+                    CommandObject.Parameters.AddWithValue("@Created", DateTime.Now);
+                    CommandObject.ExecuteNonQuery();
+
+                }
+                var userID = Constants.User.Id;
                 Participant participant = new Participant();
                 if (userID != Guid.Empty)
                 {
@@ -71,6 +101,7 @@ public class TestInitialization
                     CommandObject.Parameters.AddWithValue("@RoleId", participant.RoleId);
                     CommandObject.ExecuteNonQuery();
                     participant.RoleId = (RolesType)2;
+                    participant.ProjectId = 2;
                     CommandObject.Parameters.Clear();
                     CommandObject.Parameters.AddWithValue("@UserId", participant.UserId);
                     CommandObject.Parameters.AddWithValue("@ProjectId", participant.ProjectId);
@@ -98,6 +129,16 @@ public class TestInitialization
             using (SqlConnection ConnectionObject = new SqlConnection(conn!))
             {
                 ConnectionObject.Open();
+                using (SqlCommand CommandObject = new SqlCommand(sql, ConnectionObject))
+                {
+                    int rows = CommandObject.ExecuteNonQuery();
+                }
+                sql = "DELETE FROM dbo.[User]";
+                using (SqlCommand CommandObject = new SqlCommand(sql, ConnectionObject))
+                {
+                    int rows = CommandObject.ExecuteNonQuery();
+                }
+                sql = "DELETE FROM dbo.[Project]";
                 using (SqlCommand CommandObject = new SqlCommand(sql, ConnectionObject))
                 {
                     int rows = CommandObject.ExecuteNonQuery();
