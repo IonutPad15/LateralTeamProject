@@ -11,18 +11,18 @@ namespace IssueTracker.UnitTest;
 public class TestInitialization
 {
 
-    [AssemblyInitialize]
+    [AssemblyInitialize()]
     public static void AssemblyInitialize(TestContext tc)
     {
         try
         {
             var configuration = new ConfigurationBuilder()
-            .SetBasePath(Directory.GetParent(AppContext.BaseDirectory)!.FullName)
-            .AddJsonFile("appsettings.json", optional: false)
-            .Build();
-            BaseClass.issueData = new IssueData(new SQLDataAccess(configuration));
-            BaseClass._participantData = new ParticipantData(new SQLDataAccess(configuration));
-            BaseClass.testContext = tc;
+           .SetBasePath(Directory.GetParent(AppContext.BaseDirectory)!.FullName)
+           .AddJsonFile("appsettings.json", optional: false)
+           .Build();
+            BaseClass.IssueData = new IssueData(new SQLDataAccess(configuration));
+            BaseClass.ParticipantData = new ParticipantData(new SQLDataAccess(configuration));
+            BaseClass.TestContext = tc;
 
 
             string? conn = tc.Properties["ConnectionString"]!.ToString();
@@ -83,7 +83,7 @@ public class TestInitialization
                     participant = new Participant()
                     {
                         UserId = userID,
-                        ProjectId = 2,
+                        ProjectId = 1,
                         RoleId = (RolesType)3
                     };
                 }
@@ -118,12 +118,13 @@ public class TestInitialization
 
     }
 
-    [AssemblyCleanup]
+    [AssemblyCleanup()]
     public static void AssemblyCleanup()
     {
-        TestContext tc = BaseClass.testContext;
+        TestContext tc = BaseClass.TestContext;
         try
         {
+
             string? conn = tc.Properties["ConnectionString"]!.ToString();
             string sql = "TRUNCATE TABLE dbo.[Participant]";
             using (SqlConnection ConnectionObject = new SqlConnection(conn!))
