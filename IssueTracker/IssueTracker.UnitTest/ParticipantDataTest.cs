@@ -172,8 +172,5 @@ public class ParticipantDataTest : BaseClass
             RoleId = (RolesType)4
         };
         await ParticipantData.UpdateAsync(participant);
-            RoleId = (RolesType)4
-        };
-        await ParticipantData.UpdateAsync(participant);
     }
 }
