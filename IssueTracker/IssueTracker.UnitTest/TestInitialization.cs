@@ -29,7 +29,22 @@ public class TestInitialization
             string sql = "TRUNCATE TABLE dbo.[Participant]";
             using (SqlConnection ConnectionObject = new SqlConnection(conn!))
             {
+
                 ConnectionObject.Open();
+                using (SqlCommand CommandObject = new SqlCommand(sql, ConnectionObject))
+                {
+                    int rows = CommandObject.ExecuteNonQuery();
+                }
+                sql = "DELETE FROM dbo.[User]";
+                using (SqlCommand CommandObject = new SqlCommand(sql, ConnectionObject))
+                {
+                    int rows = CommandObject.ExecuteNonQuery();
+                }
+                sql = "DELETE FROM dbo.[Project]";
+                using (SqlCommand CommandObject = new SqlCommand(sql, ConnectionObject))
+                {
+                    int rows = CommandObject.ExecuteNonQuery();
+                }
                 sql = "INSERT INTO dbo.[User] VALUES(@Id,@UserName,@Email,@Password,@IsDeleted)";
                 using (SqlCommand CommandObject = new SqlCommand(sql, ConnectionObject))
                 {

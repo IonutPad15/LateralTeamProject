@@ -9,27 +9,16 @@ public class ParticipantDataTest : BaseClass
 {
     [TestMethod()]
     [Description("Given a valid request, when GetAllAsync is called" +
-        "then it should have the same number of participants as in db")]
+        "then it has at least one participant")]
     public async Task GetAll_Test()
     {
-        string sql = "SELECT * FROM dbo.[Participant]";
-        string? conn = TestContext.Properties["ConnectionString"]!.ToString();
-        TestContext.WriteLine(conn);
-        LoadDataTable(sql, conn!);
         var participants = await ParticipantData.GetAllAsync();
         int value = participants.Count();
-        int expected = TestDataTable!.Rows.Count;
-        TestContext.WriteLine("Testing _participant.GetAllAsync, Expected Value: '{0}', " +
-            "Actual Value: '{1}', Result: '{2}'",
-            value, expected, (value == expected ? "Succes" : "Failed"));
-        if (value != expected)
-        {
-            Assert.Fail("Data Driven Tests Have Failed, Check Additional Output For More Info");
-        }
+        Assert.IsTrue(value > 0);
     }
     [TestMethod]
-    [Description("Given a valid request, when AddAsync is called" +
-        "then it should be a success")]
+    [Description("Given a valid participant object, when AddAsync is called" +
+        "then it should add a participant in the DB")]
     public async Task AddAsync_Test()
     {
         //arrange
@@ -47,8 +36,8 @@ public class ParticipantDataTest : BaseClass
         Assert.AreEqual(participantId, result!.Id);
     }
     [TestMethod]
-    [Description("Given an invalid request, when GetAllAsync is called" +
-        "then it should throw an SQLException")]
+    [Description("Given an invalid request (UserId = new Guid() and ProjectId = 0), when GetAllAsync is called" +
+        "then it should throw an SQLException (it violates the FK rule)")]
     public async Task AddAsyncFkException_Test()
     {
         Participant participant = new Participant()
@@ -60,29 +49,28 @@ public class ParticipantDataTest : BaseClass
         await Assert.ThrowsExceptionAsync<SqlException>(() => ParticipantData.AddAsync(participant));
     }
     [TestMethod]
-    [Description("Given an invalid request, when DeleteAsync is called" +
+    [Description("Given an invalid request (id <= 0), when DeleteAsync is called" +
         "then it should throw an SQLException")]
     public async Task DeleteAsync_Test_BadId()
     {
         await Assert.ThrowsExceptionAsync<SqlException>(() => ParticipantData.DeleteAsync(-1));
     }
     [TestMethod]
-    [Description("Given a valid request, when DeleteAsync is called" +
-        "then it should be a success")]
+    [Description("Given a valid request (id = 2), when DeleteAsync is called" +
+        "then delets the participant")]
     public async Task DeleteAsync_Test()
     {
         await ParticipantData.DeleteAsync(2);
     }
     [TestMethod]
-    [Description("Given a valid request, when GetByIdAsync is called" +
-        "then it should not be null")]
+    [Description("Given a valid request (id = 1), when GetByIdAsync is called, then returns that participant! ")]
     public async Task GetByIdAsync_Test()
     {
         var participant = await ParticipantData.GetByIdAsync(1);
         Assert.IsNotNull(participant);
     }
     [TestMethod]
-    [Description("Given an invalid request, when GetByIdAsync is called" +
+    [Description("Given an invalid request (id = 0), when GetByIdAsync is called" +
         "then it return a null object")]
     public async Task GetByIdAsync_Test_BadId()
     {
@@ -90,8 +78,8 @@ public class ParticipantDataTest : BaseClass
         Assert.IsNull(participant);
     }
     [TestMethod]
-    [Description("Given a valid request, when GetOwnersAndCollabsByProjectIdAsync is called" +
-        "then it should be a success")]
+    [Description("Given a valid request (projectId = 1), when GetOwnersAndCollabsByProjectIdAsync is called" +
+        "then returns a list of participants with these roles")]
     public async Task GetOwnersAndCollabsByProjectIdAsync_Test()
     {
         var participants = await ParticipantData.GetOwnersAndCollabsByProjectIdAsync(1);
@@ -99,7 +87,7 @@ public class ParticipantDataTest : BaseClass
         Assert.IsTrue(participants.Any());
     }
     [TestMethod]
-    [Description("Given an invalid request, when GetOwnersAndCollabsByProjectIdAsync is called" +
+    [Description("Given an invalid request (projectId = 0), when GetOwnersAndCollabsByProjectIdAsync is called" +
         "then it should be an empty list")]
     public async Task GetOwnersAndCollabsByProjectIdAsync_Test_BadRequest()
     {
@@ -107,7 +95,7 @@ public class ParticipantDataTest : BaseClass
         Assert.IsTrue(!participants.Any());
     }
     [TestMethod]
-    [Description("Given a valid request, when GetOwnerByProjectIdAsync is called" +
+    [Description("Given a valid request (projectId = 1), when GetOwnerByProjectIdAsync is called" +
         "then it should be a single Participant object")]
     public async Task GetOwnerByProjectIdAsync_Test()
     {
@@ -115,7 +103,7 @@ public class ParticipantDataTest : BaseClass
         Assert.IsTrue(participants.Count() == 1);
     }
     [TestMethod]
-    [Description("Given an invalid request, when GetOwnerByProjectIdAsync is called" +
+    [Description("Given an invalid request (projectId = 0), when GetOwnerByProjectIdAsync is called" +
         "then it should be an empty list or too many elements ")]
     public async Task GetOwnerByProjectIdAsync_Test_BadRequest()
     {
@@ -124,7 +112,7 @@ public class ParticipantDataTest : BaseClass
     }
     [TestMethod]
     [Description("Given a valid request, when UpdateAsync is called" +
-        "then it should be a success")]
+        "then it update the role of that participant")]
     public async Task UpdateAsync_Test()
     {
         string? conn = TestContext.Properties["ConnectionString"]!.ToString();
@@ -149,9 +137,9 @@ public class ParticipantDataTest : BaseClass
     }
     [TestMethod]
     [ExpectedException(typeof(SqlException))]
-    [Description("Given an invalid Id, when UpdateAsync is called" +
+    [Description("Given an invalid RoleId (-1), when UpdateAsync is called" +
         "then it should throw an SqlException")]
-    public async Task UpdateAsync_Test_BadId()
+    public async Task UpdateAsync_Test_BadRoleId()
     {
         string? conn = TestContext.Properties["ConnectionString"]!.ToString();
         string sql = "SELECT * FROM dbo.[Participant] WHERE IsDeleted = 0";
@@ -168,9 +156,9 @@ public class ParticipantDataTest : BaseClass
     }
     [TestMethod]
     [ExpectedException(typeof(SqlException))]
-    [Description("Given an invalid RoleId, when UpdateAsync is called" +
+    [Description("Given an invalid Id (-1), when UpdateAsync is called" +
         "then it should throw an SqlException")]
-    public async Task UpdateAsync_Test_BadRoleId()
+    public async Task UpdateAsync_Test_BadId()
     {
         string? conn = TestContext.Properties["ConnectionString"]!.ToString();
         string sql = "SELECT * FROM dbo.[Participant] WHERE IsDeleted = 0";
