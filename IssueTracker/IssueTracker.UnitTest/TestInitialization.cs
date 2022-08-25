@@ -39,6 +39,11 @@ public class TestInitialization
                 {
                     int rows = CommandObject.ExecuteNonQuery();
                 }
+                sql = "DELETE FROM dbo.[Issue]";
+                using (SqlCommand CommandObject = new SqlCommand(sql, ConnectionObject))
+                {
+                    int rows = CommandObject.ExecuteNonQuery();
+                }
                 sql = "DELETE FROM dbo.[Project]";
                 using (SqlCommand CommandObject = new SqlCommand(sql, ConnectionObject))
                 {
@@ -63,7 +68,6 @@ public class TestInitialization
                     CommandObject.Parameters.AddWithValue("@Description", "description");
                     CommandObject.Parameters.AddWithValue("@Created", DateTime.Now);
                     CommandObject.ExecuteNonQuery();
-
                 }
                 sql = "SET IDENTITY_INSERT dbo.[Project] ON INSERT INTO dbo.[Project](Id,Title, Description, Created) VALUES (@Id, @Title, @Description, @Created)";
                 using (SqlCommand CommandObject = new SqlCommand(sql, ConnectionObject))
@@ -72,6 +76,25 @@ public class TestInitialization
                     CommandObject.Parameters.AddWithValue("@Title", "project2");
                     CommandObject.Parameters.AddWithValue("@Description", "description2");
                     CommandObject.Parameters.AddWithValue("@Created", DateTime.Now);
+                    CommandObject.ExecuteNonQuery();
+                }
+                sql = "SET IDENTITY_INSERT dbo.[Issue] ON INSERT INTO dbo.[Issue] (Id, Title, Description, "
+                    + "Created, Updated ,IssueTypeId, ProjectId, UserAssignedId , PriorityId, StatusId, RoleId, IsDeleted)"
+                    + "VALUES (@Id, @Title, @Description, @Created, @Updated ,@IssueTypeId, @ProjectId, @UserAssignedId , @PriorityId, @StatusId, @RoleId, @IsDeleted)";
+                using (SqlCommand CommandObject = new SqlCommand(sql, ConnectionObject))
+                {
+                    CommandObject.Parameters.AddWithValue("@Id", 1);
+                    CommandObject.Parameters.AddWithValue("@Title", "issue1");
+                    CommandObject.Parameters.AddWithValue("@Description", "description1");
+                    CommandObject.Parameters.AddWithValue("@Created", DateTime.Now);
+                    CommandObject.Parameters.AddWithValue("@Updated", DateTime.Now);
+                    CommandObject.Parameters.AddWithValue("@IssueTypeId", 1);
+                    CommandObject.Parameters.AddWithValue("@ProjectId", 1);
+                    CommandObject.Parameters.AddWithValue("UserAssignedId", Constants.User.Id);
+                    CommandObject.Parameters.AddWithValue("@PriorityId", 1);
+                    CommandObject.Parameters.AddWithValue("@StatusId", 1);
+                    CommandObject.Parameters.AddWithValue("@RoleId", 1);
+                    CommandObject.Parameters.AddWithValue("@IsDeleted", false);
                     CommandObject.ExecuteNonQuery();
 
                 }
@@ -134,6 +157,11 @@ public class TestInitialization
                     int rows = CommandObject.ExecuteNonQuery();
                 }
                 sql = "DELETE FROM dbo.[User]";
+                using (SqlCommand CommandObject = new SqlCommand(sql, ConnectionObject))
+                {
+                    int rows = CommandObject.ExecuteNonQuery();
+                }
+                sql = "DELETE FROM dbo.[Issue]";
                 using (SqlCommand CommandObject = new SqlCommand(sql, ConnectionObject))
                 {
                     int rows = CommandObject.ExecuteNonQuery();
