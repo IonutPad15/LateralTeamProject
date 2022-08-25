@@ -1,16 +1,14 @@
-﻿using System.Data;
+﻿using DataAccess.Data.IData;
+using System.Data;
 using System.Data.SqlClient;
-using DataAccess.Data.IData;
 
 namespace IssueTracker.UnitTest;
-
 public abstract class BaseClass
 {
-    public static IIssueData issueData;
-    public static TestContext testContext;
+    public static IIssueData IssueData = null!;
+    public static TestContext TestContext { get; set; } = null!;
     public static DataTable? TestDataTable { get; set; }
-    public static IParticipantData _participantData;
-
+    public static IParticipantData ParticipantData = null!;
     public static DataTable? LoadDataTable(string sql, string connection)
     {
         TestDataTable = null;
@@ -30,9 +28,9 @@ public abstract class BaseClass
                 ConnectionObject.Close();
             }
         }
-        catch
+        catch (Exception)
         {
-            testContext.WriteLine("Error in LoadDataTable() method.");
+            TestContext.WriteLine("Error in LoadDataTable() method.");
         }
         return TestDataTable;
     }

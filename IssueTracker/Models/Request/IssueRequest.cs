@@ -1,7 +1,9 @@
-﻿namespace Models.Request;
+﻿using Models.Response;
+
+namespace Models.Request;
 public class IssueRequest
 {
-    public IssueRequest(int id, int projectId, string title, string description, int issueTypeId, Guid userAssignedId, int priorityId, int statusId, int roleId)
+    public IssueRequest(int id, int projectId, string title, string description, int issueTypeId, Guid userAssignedId, int priorityId, int statusId, RoleType roleId)
     {
         Id = id;
         ProjectId = projectId;
@@ -22,5 +24,5 @@ public class IssueRequest
     public Guid UserAssignedId { get; set; }
     public int PriorityId { get; set; }
     public int StatusId { get; set; }
-    public int RoleId { get; set; }
+    public RoleType RoleId { get; set; }
 }

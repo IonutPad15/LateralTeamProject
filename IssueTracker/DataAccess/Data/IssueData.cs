@@ -11,11 +11,11 @@ public class IssueData : IIssueData
     {
         _db = db;
     }
-    public async Task AddAsync(Issue entity)
+    public async Task<int> AddAsync(Issue entity)
     {
         entity.Created = DateTime.UtcNow;
         entity.Updated = entity.Created;
-        await _db.SaveDataAsync("dbo.spIssue_Insert", new
+        var result = await _db.SaveDataAndGetIdAsync<dynamic, int>("dbo.spIssue_Insert", new
         {
             Title = entity.Title,
             IssueTypeId = entity.IssueTypeId,
@@ -28,6 +28,7 @@ public class IssueData : IIssueData
             UserAssignedId = entity.UserAssignedId,
             PriorityId = entity.PriorityId
         });
+        return result;
     }
     public async Task<IEnumerable<Issue>> GetAllAsync()
     {

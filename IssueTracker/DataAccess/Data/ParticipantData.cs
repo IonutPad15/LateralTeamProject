@@ -12,9 +12,12 @@ public class ParticipantData : IParticipantData
         _db = db;
     }
 
-    public async Task AddAsync(Participant participant) =>
-        await _db.SaveDataAsync("dbo.spParticipant_Insert",
+    public async Task<int> AddAsync(Participant participant)
+    {
+        var result = await _db.SaveDataAndGetIdAsync<dynamic, int>("dbo.spParticipant_Insert",
             new { participant.UserId, participant.ProjectId, participant.RoleId });
+        return result;
+    }
 
     public async Task<IEnumerable<Participant>> GetAllAsync()
     {

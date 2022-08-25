@@ -9,11 +9,10 @@ public class ParticipantDataTest : BaseClass
 {
     [TestMethod()]
     [Description("Given a valid request, when GetAllAsync is called" +
-        "then it should be a success")]
+        "then it should have the same number of participants as in db")]
     public async Task GetAll_Test()
     {
         string sql = "SELECT * FROM dbo.[Participant]";
-
         string? conn = TestContext.Properties["ConnectionString"]!.ToString();
         TestContext.WriteLine(conn);
         LoadDataTable(sql, conn!);
@@ -33,35 +32,21 @@ public class ParticipantDataTest : BaseClass
         "then it should be a success")]
     public async Task AddAsync_Test()
     {
-        string? conn = TestContext.Properties["ConnectionString"]!.ToString();
-        string sql = "SELECT * FROM dbo.[User]";
-        var userID = Guid.Empty;
-        using (SqlConnection ConnectionObject = new SqlConnection(conn!))
-        {
-            ConnectionObject.Open();
-            using (SqlCommand CommandObject = new SqlCommand(sql, ConnectionObject))
-            {
-                using (SqlDataAdapter da = new SqlDataAdapter(CommandObject))
-                {
-                    DataTable TestDataTable = new DataTable();
-                    da.Fill(TestDataTable);
-                    var row = TestDataTable.Rows[0];
-                    userID = Guid.Parse(row["Id"].ToString()!);
-
-                }
-            }
-            ConnectionObject.Close();
-        }
+        //arrange
+        var userID = Constants.User.Id;
         Participant participant = new Participant()
         {
-            ProjectId = 1,
+            ProjectId = 2,
             RoleId = (RolesType)4,
             UserId = userID
         };
-        await ParticipantData.AddAsync(participant);
+        var participantId = await ParticipantData.AddAsync(participant);
+        //act
+        var result = await ParticipantData.GetByIdAsync(participantId);
+        //assert
+        Assert.AreEqual(participantId, result!.Id);
     }
     [TestMethod]
-    [ExpectedException(typeof(SqlException))]
     [Description("Given an invalid request, when GetAllAsync is called" +
         "then it should throw an SQLException")]
     public async Task AddAsyncFkException_Test()
@@ -72,16 +57,14 @@ public class ParticipantDataTest : BaseClass
             RoleId = (RolesType)1,
             UserId = new Guid()
         };
-        await ParticipantData.AddAsync(participant);
-
+        await Assert.ThrowsExceptionAsync<SqlException>(() => ParticipantData.AddAsync(participant));
     }
     [TestMethod]
-    [ExpectedException(typeof(SqlException))]
     [Description("Given an invalid request, when DeleteAsync is called" +
         "then it should throw an SQLException")]
     public async Task DeleteAsync_Test_BadId()
     {
-        await ParticipantData.DeleteAsync(-1);
+        await Assert.ThrowsExceptionAsync<SqlException>(() => ParticipantData.DeleteAsync(-1));
     }
     [TestMethod]
     [Description("Given a valid request, when DeleteAsync is called" +
@@ -92,7 +75,7 @@ public class ParticipantDataTest : BaseClass
     }
     [TestMethod]
     [Description("Given a valid request, when GetByIdAsync is called" +
-        "then a participant is returned")]
+        "then it should not be null")]
     public async Task GetByIdAsync_Test()
     {
         var participant = await ParticipantData.GetByIdAsync(1);
@@ -100,7 +83,7 @@ public class ParticipantDataTest : BaseClass
     }
     [TestMethod]
     [Description("Given an invalid request, when GetByIdAsync is called" +
-        "then it should throw an SQLException")]
+        "then it return a null object")]
     public async Task GetByIdAsync_Test_BadId()
     {
         var participant = await ParticipantData.GetByIdAsync(0);
@@ -155,7 +138,7 @@ public class ParticipantDataTest : BaseClass
                 Id = row.Field<int>("Id"),
                 UserId = row.Field<Guid>("UserId"),
                 ProjectId = row.Field<int>("ProjectId"),
-                RoleId = (RolesType)2
+                RoleId = (RolesType)1
             };
             await ParticipantData.UpdateAsync(participant);
         }

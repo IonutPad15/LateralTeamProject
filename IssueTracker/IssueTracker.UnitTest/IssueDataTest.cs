@@ -9,7 +9,7 @@ public class IssueDataTest : BaseClass
     [TestMethod]
     public async Task GetAllIssue_ReturnListIssue()
     {
-        var issueList = await issueData.GetAllAsync();
+        var issueList = await IssueData.GetAllAsync();
 
         Assert.IsTrue(issueList.Count() > 0);
     }
@@ -18,14 +18,14 @@ public class IssueDataTest : BaseClass
     [Description("Given request in db WHEN id = 0 THEN return null!")]
     public async Task GetIssueById0()
     {
-        await Assert.ThrowsExceptionAsync<SqlException>(() => issueData.GetByIdAsync(0));
+        await Assert.ThrowsExceptionAsync<SqlException>(() => IssueData.GetByIdAsync(0));
     }
 
     [TestMethod]
     [Description("Given request in db WHEN id = 1 THEN return success!")]
     public async Task GetIssueById1()
     {
-        var issue = await issueData.GetByIdAsync(1);
+        var issue = await IssueData.GetByIdAsync(1);
 
         Assert.IsNotNull(issue);
     }
@@ -44,10 +44,10 @@ public class IssueDataTest : BaseClass
             Updated = DateTime.UtcNow,
             Title = "test",
             ProjectId = 2,
-            RoleId = 3,
+            RoleId = (RolesType)3,
             IssueTypeId = 2
         };
-        await issueData.UpdateAsync(issue);
+        await IssueData.UpdateAsync(issue);
         Assert.IsTrue(true);
     }
 
@@ -64,9 +64,9 @@ public class IssueDataTest : BaseClass
             UserAssignedId = Guid.NewGuid(),
             Updated = DateTime.UtcNow,
             ProjectId = 2,
-            RoleId = 3,
+            RoleId = (RolesType)3,
             IssueTypeId = 2
         };
-        await Assert.ThrowsExceptionAsync<SqlException>(() => issueData.UpdateAsync(issue));
+        await Assert.ThrowsExceptionAsync<SqlException>(() => IssueData.UpdateAsync(issue));
     }
 }
