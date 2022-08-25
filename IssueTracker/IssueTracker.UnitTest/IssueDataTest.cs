@@ -9,7 +9,7 @@ public class IssueDataTest : BaseClass
     [TestMethod]
     public async Task GetAllIssue_ReturnListIssue()
     {
-        var issueList = await issueData.GetAllAsync();
+        var issueList = await IssueData.GetAllAsync();
 
         Assert.IsTrue(issueList.Count() > 0);
     }
@@ -47,7 +47,7 @@ public class IssueDataTest : BaseClass
             RoleId = (RolesType)3,
             IssueTypeId = 2
         };
-        await issueData.UpdateAsync(issue);
+        await IssueData.UpdateAsync(issue);
         Assert.IsTrue(true);
     }
 
