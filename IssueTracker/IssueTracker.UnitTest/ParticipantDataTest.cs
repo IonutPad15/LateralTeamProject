@@ -155,7 +155,7 @@ public class ParticipantDataTest : BaseClass
                 Id = row.Field<int>("Id"),
                 UserId = row.Field<Guid>("UserId"),
                 ProjectId = row.Field<int>("ProjectId"),
-                RoleId = (RolesType)4
+                RoleId = (RolesType)2
             };
             await ParticipantData.UpdateAsync(participant);
         }
