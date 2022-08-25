@@ -34,16 +34,17 @@ public class TestInitialization
                 {
                     int rows = CommandObject.ExecuteNonQuery();
                 }
-                sql = "DELETE FROM dbo.[User]";
-                using (SqlCommand CommandObject = new SqlCommand(sql, ConnectionObject))
-                {
-                    int rows = CommandObject.ExecuteNonQuery();
-                }
                 sql = "DELETE FROM dbo.[Issue]";
                 using (SqlCommand CommandObject = new SqlCommand(sql, ConnectionObject))
                 {
                     int rows = CommandObject.ExecuteNonQuery();
                 }
+                sql = "DELETE FROM dbo.[User]";
+                using (SqlCommand CommandObject = new SqlCommand(sql, ConnectionObject))
+                {
+                    int rows = CommandObject.ExecuteNonQuery();
+                }
+                
                 sql = "DELETE FROM dbo.[Project]";
                 using (SqlCommand CommandObject = new SqlCommand(sql, ConnectionObject))
                 {
@@ -156,12 +157,12 @@ public class TestInitialization
                 {
                     int rows = CommandObject.ExecuteNonQuery();
                 }
-                sql = "DELETE FROM dbo.[User]";
+                sql = "DELETE FROM dbo.[Issue]";
                 using (SqlCommand CommandObject = new SqlCommand(sql, ConnectionObject))
                 {
                     int rows = CommandObject.ExecuteNonQuery();
                 }
-                sql = "DELETE FROM dbo.[Issue]";
+                sql = "DELETE FROM dbo.[User]";
                 using (SqlCommand CommandObject = new SqlCommand(sql, ConnectionObject))
                 {
                     int rows = CommandObject.ExecuteNonQuery();
