@@ -92,7 +92,7 @@ public class ParticipantDataTest : BaseClass
     }
     [TestMethod]
     [Description("Given a valid request, when GetByIdAsync is called" +
-        "then it should not be null")]
+        "then a participant is returned")]
     public async Task GetByIdAsync_Test()
     {
         var participant = await ParticipantData.GetByIdAsync(1);
