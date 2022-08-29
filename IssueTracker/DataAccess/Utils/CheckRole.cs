@@ -27,6 +27,5 @@ public class CheckRole
         var result = results?.FirstOrDefault(x => x.UserId == userid);
         if (result == null) return false;
         return true;
-
     }
 }

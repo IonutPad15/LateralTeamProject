@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using DataAccess.Models;
+using IssueTracker.FileSystem.Data;
 using Models.Request;
 using Models.Response;
 
@@ -27,6 +28,7 @@ public class AutoMapperConfig
             cfg.CreateMap<ProjectRequest, Project>();
             cfg.CreateMap<RolesType, RoleType>();
             cfg.CreateMap<RoleType, RolesType>();
+            cfg.CreateMap<MetaData, MetaDataResponse>();
         });
         Mapper mapper = new Mapper(config);
         return mapper;
