@@ -1,4 +1,4 @@
-﻿using DataAccess.Data;
+﻿using DataAccess.Repository;
 using DataAccess.DbAccess;
 using DataAccess.Models;
 using Microsoft.Extensions.Configuration;
@@ -19,8 +19,8 @@ public class TestInitialization
            .SetBasePath(Directory.GetParent(AppContext.BaseDirectory)!.FullName)
            .AddJsonFile("appsettings.json", optional: false)
            .Build();
-            BaseClass.IssueData = new IssueData(new SQLDataAccess(configuration));
-            BaseClass.ParticipantData = new ParticipantData(new SQLDataAccess(configuration));
+            BaseClass.IssueData = new IssueRepository(new SQLDataAccess(configuration));
+            BaseClass.ParticipantData = new ParticipantRepository(new SQLDataAccess(configuration));
             BaseClass.TestContext = tc;
 
 
@@ -44,7 +44,7 @@ public class TestInitialization
                 {
                     int rows = CommandObject.ExecuteNonQuery();
                 }
-                
+
                 sql = "DELETE FROM dbo.[Project]";
                 using (SqlCommand CommandObject = new SqlCommand(sql, ConnectionObject))
                 {

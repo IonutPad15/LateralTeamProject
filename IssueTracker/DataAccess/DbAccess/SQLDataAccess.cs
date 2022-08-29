@@ -50,6 +50,25 @@ public class SQLDataAccess : ISQLDataAccess
         }
         return participants;
     }
+    public async Task<IEnumerable<Comment>> LoadCommentAsync<TParameter>(string storedProcedure, TParameter parameter, string connectionId = "Default")
+    {
+        List<Comment> comments = new List<Comment>();
+        using (IDbConnection connection = new SqlConnection(_config.GetConnectionString(connectionId)))
+        {
+            var results = await connection.QueryMultipleAsync
+                (storedProcedure, parameter, commandType: CommandType.StoredProcedure);
+            comments = results.Read<Comment>().ToList();
+            var files = results.Read<Models.File>();
+            List<Models.File> tempfiles = new List<Models.File>();
+            foreach (var comment in comments)
+            {
+                tempfiles = files.Where(x => x.FileCommentId == comment.Id).ToList();
+                comment.Attachements = tempfiles;
+            }
+        }
+        var result = comments.AsEnumerable();
+        return result;
+    }
     public async Task<IEnumerable<TFirst>> LoadDataAsync<TFirst, TParameter>(
         string storedProcedure,
         TParameter parameter,
