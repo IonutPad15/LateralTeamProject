@@ -8,14 +8,27 @@ namespace IssueTrackerAPI.Controllers;
 public class FileController : ControllerBase
 {
     private readonly IMetaData _repository;
-    public FileController(IMetaData repository)    {
+    private readonly IBolbData _bolbData;
+    public FileController(IMetaData repository, IBolbData bolbData)
+    {
         _repository = repository;
+        _bolbData = bolbData;
+    }
+
+    [HttpGet("getFile")]
+    public IActionResult GetFileBlob(string name)
+    {
+        var sasLink = _bolbData.Get(name);
+        if (sasLink == null) throw new ArgumentException("sasLink is null!");
+        return Ok(sasLink); //TODO: nu ramane asa, o sa revin azi peste tot ce am implementat pentru a continua
     }
 
     [HttpPost]
     public async Task<IResult> PostFile([FromForm] IFormFile formFile)
     {
-        var blobFileName = $"{Guid.NewGuid()}{Path.GetExtension(formFile.FileName)}"; ///de salvat in blob
+        var bolbFileName = $"{Guid.NewGuid()}{Path.GetExtension(formFile.FileName)}";
+        var file = formFile.OpenReadStream();
+        _bolbData.Upload(file, bolbFileName);
         var fileName = formFile.FileName;//de salvat in azure table
         var group = "Mihai";
         var fileSize = formFile.Length / 1000;
