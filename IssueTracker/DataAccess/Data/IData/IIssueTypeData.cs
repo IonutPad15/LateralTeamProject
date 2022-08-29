@@ -1,10 +1,9 @@
 ﻿using DataAccess.Models;
 
-namespace DataAccess.Data.IData
+namespace DataAccess.Data.IData;
+
+public interface IIssueTypeData
 {
-    public interface IIssueTypeData
-    {
-        Task<IEnumerable<IssueType>> GetAllAsync();
-        Task<IssueType?> GetByIdAsync(int id);
-    }
+    Task<IEnumerable<IssueType>> GetAllAsync();
+    Task<IssueType?> GetByIdAsync(int id);
 }

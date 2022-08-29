@@ -1,19 +1,16 @@
 ﻿using Dapper;
 using System.Data;
 
-
-namespace DataAccess.Utils
+namespace DataAccess.Utils;
+public class MySqlGuidTypeHandler : SqlMapper.TypeHandler<Guid>
 {
-    public class MySqlGuidTypeHandler : SqlMapper.TypeHandler<Guid>
+    public override void SetValue(IDbDataParameter parameter, Guid guid)
     {
-        public override void SetValue(IDbDataParameter parameter, Guid guid)
-        {
-            parameter.Value = guid.ToString();
-        }
+        parameter.Value = guid.ToString();
+    }
 
-        public override Guid Parse(object value)
-        {
-            return new Guid((string)value);
-        }
+    public override Guid Parse(object value)
+    {
+        return new Guid((string)value);
     }
 }

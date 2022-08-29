@@ -1,12 +1,10 @@
-﻿namespace Models.Response
+﻿namespace Models.Response;
+public class StatusResponse
 {
-    public class StatusResponse
+    public StatusResponse()
     {
-        public StatusResponse()
-        {
-            Type = String.Empty;
-        }
-        public int Id { get; set; }
-        public string Type { get; set; }
+        Type = String.Empty;
     }
+    public int Id { get; set; }
+    public string Type { get; set; }
 }

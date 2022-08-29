@@ -1,19 +1,16 @@
-﻿
-using Models.Response;
+﻿using Models.Response;
 
-namespace Models.Request
+namespace Models.Request;
+public class ParticipantRequest
 {
-    public class ParticipantRequest
+    public ParticipantRequest(Guid userId, int projectId, RoleType roleId)
     {
-        public ParticipantRequest(Guid userId, int projectId, RoleType roleId)
-        {
-            UserId = userId;
-            ProjectId = projectId;
-            RoleId = roleId;
-        }
-
-        public Guid UserId { get; set; }
-        public int ProjectId { get; set; }
-        public RoleType RoleId { get; set; }
+        UserId = userId;
+        ProjectId = projectId;
+        RoleId = roleId;
     }
+
+    public Guid UserId { get; set; }
+    public int ProjectId { get; set; }
+    public RoleType RoleId { get; set; }
 }

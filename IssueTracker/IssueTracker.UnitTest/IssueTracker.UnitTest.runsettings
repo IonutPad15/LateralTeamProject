@@ -1,0 +1,10 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<RunSettings>
+	<MSTest>
+		<EnableBaseClassTestMethodsFromOtherAssemblies>false</EnableBaseClassTestMethodsFromOtherAssemblies>
+		<MapNotRunnableToFailed>true</MapNotRunnableToFailed>
+	</MSTest>
+	<TestRunParameters>
+		<Parameter name='ConnectionString' value ='Data Source=(local)\SQLEXPRESS;Initial Catalog=IssueTrackerTest;Integrated Security=True'/>
+	</TestRunParameters>
+</RunSettings>

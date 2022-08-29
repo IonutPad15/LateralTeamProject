@@ -1,11 +1,10 @@
-﻿namespace IssueTrackerAPI.Utils
+﻿namespace IssueTrackerAPI.Utils;
+
+public class RandomMaker
 {
-    public class RandomMaker
+    private static readonly Random Random = new Random();
+    public static int Next(int value)
     {
-        private static Random _random = new Random();
-        public static int Next(int value)
-        {
-            return _random.Next(value);
-        }
+        return Random.Next(value);
     }
 }

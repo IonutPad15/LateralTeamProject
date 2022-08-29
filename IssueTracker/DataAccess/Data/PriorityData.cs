@@ -2,20 +2,19 @@
 using DataAccess.DbAccess;
 using DataAccess.Models;
 
-namespace DataAccess.Data
+namespace DataAccess.Data;
+
+public class PriorityData : IPriorityData
 {
-    public class PriorityData : IPriorityData
+    private readonly ISQLDataAccess _db;
+    public PriorityData(ISQLDataAccess db)
     {
-        private readonly ISQLDataAccess _db;
-        public PriorityData(ISQLDataAccess db)
-        {
-            _db = db;
-        }
-
-        public async Task<IEnumerable<Priority>> GetAllAsync() =>
-            await _db.LoadDataAsync<Priority>("dbo.spPriority_GetAll");
-
-        public async Task<Priority?> GetByIdAsync(int id) =>
-            (await _db.LoadDataAsync<Priority, dynamic>("dbo.spPriority_Get", new { Id = id })).FirstOrDefault();
+        _db = db;
     }
+
+    public async Task<IEnumerable<Priority>> GetAllAsync() =>
+        await _db.LoadDataAsync<Priority>("dbo.spPriority_GetAll");
+
+    public async Task<Priority?> GetByIdAsync(int id) =>
+        (await _db.LoadDataAsync<Priority, dynamic>("dbo.spPriority_Get", new { Id = id })).FirstOrDefault();
 }
