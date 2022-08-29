@@ -1,6 +1,7 @@
 ﻿
 using IssueTracker.FileSystem.Data.IData;
 using Microsoft.Azure.Cosmos.Table;
+using Microsoft.Extensions.Configuration;
 using Models.Request;
 using Models.Response;
 
@@ -9,7 +10,7 @@ namespace IssueTracker.FileSystem.Data;
 public class MetaData : IMetaData
 {
     private readonly CloudTable _metaDataTable;
-    public MetaData()
+    public MetaData(IConfiguration config)
     {
         var storageAccount = CloudStorageAccount.Parse("AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;DefaultEndpointsProtocol=http;BlobEndpoint=http://127.0.0.1:10000/devstoreaccount1;QueueEndpoint=http://127.0.0.1:10001/devstoreaccount1;TableEndpoint=http://127.0.0.1:10002/devstoreaccount1;");
         var tableClient = storageAccount.CreateCloudTableClient();
