@@ -1,5 +1,5 @@
 ﻿
-namespace FileSystem.Data.IData;
+namespace IssueTracker.FileSystem;
 public interface IBolbData
 {
     String Get(string name);

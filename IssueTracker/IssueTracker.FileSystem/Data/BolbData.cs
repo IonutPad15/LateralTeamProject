@@ -1,10 +1,9 @@
 ﻿using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Specialized;
 using Azure.Storage.Sas;
-using FileSystem.Data.IData;
 using Microsoft.Extensions.Configuration;
 
-namespace FileSystem.Data;
+namespace IssueTracker.FileSystem;
 public class BolbData : BaseClass, IBolbData
 {
     public BolbData(IConfiguration config) : base(config)

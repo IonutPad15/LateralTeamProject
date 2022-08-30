@@ -1,5 +1,4 @@
-﻿
-namespace FileSystem.Models;
+﻿namespace IssueTracker.FileSystem.Models;
 public class MetaDataResp
 {
     public MetaDataResp(string id, string group, string name, string type, double syze)
