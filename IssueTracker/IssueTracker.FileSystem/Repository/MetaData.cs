@@ -1,5 +1,4 @@
 ﻿using Microsoft.Azure.Cosmos.Table;
-using Microsoft.Extensions.Configuration;
 using IssueTracker.FileSystem.Models;
 
 namespace IssueTracker.FileSystem;
@@ -7,12 +6,9 @@ namespace IssueTracker.FileSystem;
 public class MetaData : IMetaDataProvider
 {
     private readonly CloudTable _metaDataTable;
-    private readonly IConfiguration _config;
-    public MetaData(IConfiguration config)
+    public MetaData(IMetaDataConfiguration config)
     {
-        _config = config;
-        var conn = _config.GetValue<string>("ConnectionStrings:Account");
-        var storageAccount = CloudStorageAccount.Parse(conn);
+        var storageAccount = CloudStorageAccount.Parse(config.ConnectionString);
         var tableClient = storageAccount.CreateCloudTableClient();
         _metaDataTable = tableClient.GetTableReference("MetaData");
     }
@@ -28,6 +24,11 @@ public class MetaData : IMetaDataProvider
     public async Task CreateAsync(MetaDataReq entity)
     {
         MetaDataEntity metaData = new MetaDataEntity();
+        if (string.IsNullOrEmpty(entity.Group) || string.IsNullOrEmpty(entity.Id) ||
+            string.IsNullOrEmpty(entity.Name) || string.IsNullOrEmpty(entity.Type)
+            || entity.SizeKb <= 0)
+            throw new ArgumentException();
+
         metaData.PartitionKey = entity.Group;
         metaData.RowKey = entity.Id;
         metaData.Name = entity.Name;

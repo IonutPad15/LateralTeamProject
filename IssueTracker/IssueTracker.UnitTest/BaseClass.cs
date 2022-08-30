@@ -1,4 +1,4 @@
-﻿using DataAccess.Data.IData;
+﻿using DataAccess.Repository;
 using System.Data;
 using System.Data.SqlClient;
 

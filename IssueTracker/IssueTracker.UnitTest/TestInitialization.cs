@@ -1,4 +1,4 @@
-﻿using DataAccess.Data;
+﻿using DataAccess.Repository;
 using DataAccess.DbAccess;
 using DataAccess.Models;
 using Microsoft.Extensions.Configuration;
