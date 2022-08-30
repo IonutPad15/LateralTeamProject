@@ -22,7 +22,7 @@ builder.Services.AddSingleton<IProjectData, ProjectData>();
 builder.Services.AddSingleton<IIssueData, IssueData>();
 builder.Services.AddSingleton<IParticipantData, ParticipantData>();
 builder.Services.AddSingleton<ICommentData, CommentData>();
-builder.Services.AddSingleton<IMetaData, MetaData>();
+builder.Services.AddSingleton<IMetaDataProvider, MetaData>();
 builder.Services.AddSingleton<IBolbData, BolbData>();
 
 
