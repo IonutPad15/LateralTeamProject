@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using DataAccess.Models;
+using DataAccess.Repository;
 using IssueTracker.FileSystem;
 using IssueTracker.FileSystem.Models;
 using IssueTrackerAPI.Utils;
@@ -13,8 +15,10 @@ public class FileController : ControllerBase
     private readonly IMetaDataProvider _repository;
     private readonly IBolbData _bolbData;
     private readonly Mapper _mapper;
-    public FileController(IConfiguration config)
+    private readonly IFileData _fileData;
+    public FileController(IConfiguration config, IFileData fileData)
     {
+        _fileData = fileData;
         IConfigurationFactory dataFactory = new ConfigurationFactory(config);
         IMetaDataConfiguration metaDataConfig = (IMetaDataConfiguration)dataFactory.Create<IMetaDataConfiguration>();
         IBolbConfiguration bolbConfig = (IBolbConfiguration)dataFactory.Create<IBolbConfiguration>();
@@ -32,12 +36,12 @@ public class FileController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IResult> PostFile([FromForm] IFormFile formFile)
+    public async Task<IResult> PostFile([FromForm] IFormFile formFile, [FromForm] int? issueId, [FromForm] int? commentId)
     {
         var fileId = Guid.NewGuid();
         var bolbFileName = $"{fileId}{Path.GetExtension(formFile.FileName)}";
         var file = formFile.OpenReadStream();
-        _bolbData.Upload(file, bolbFileName);
+        //_bolbData.Upload(file, bolbFileName);
         var fileName = formFile.FileName;
         var group = "Mihai";
         var fileSize = formFile.Length / 1000;
@@ -47,6 +51,11 @@ public class FileController : ControllerBase
         try
         {
             await _repository.CreateAsync(metaDataReq);
+            FileModel fileModel = new FileModel(fileId.ToString());
+            fileModel.CommentId = commentId;
+            fileModel.IssueId = issueId;
+            await _fileData.AddAsync(fileModel);
+
             return Results.Ok(fileName);
         }
         catch (ArgumentException ex)
