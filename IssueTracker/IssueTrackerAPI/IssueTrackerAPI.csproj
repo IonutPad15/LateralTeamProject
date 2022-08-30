@@ -14,7 +14,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DataAccess\DataAccess.csproj" />
-    <ProjectReference Include="..\IssueTracker.FileSystem\IssueTracker.FileSystem.csproj" />
+    <ProjectReference Include="..\IssueTracker.FileSystem\FileSystem.csproj" />
     <ProjectReference Include="..\Models\Models.csproj" />
     <ProjectReference Include="..\Validation\Validation.csproj" />
   </ItemGroup>

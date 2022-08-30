@@ -1,12 +1,12 @@
-﻿using Models.Request;
+﻿using FileSystem.Models;
 using Models.Response;
 
-namespace IssueTracker.FileSystem.Data.IData;
+namespace FileSystem.Data.IData;
 
 public interface IMetaData
 {
-    IEnumerable<MetaDataResponse> GetAll();
-    Task CreateOrUpdateAsync(MetaDataRequest entity);
+    IEnumerable<MetaDataResp> GetAll();
+    Task CreateAsync(MetaDataReq entity);
     Task<bool> DeleteAsync(string id, string group);
     Task<MetaDataResponse?> GetAsync(string rowKey, string partitionKey);
 }

@@ -1,6 +1,5 @@
-﻿using Azure.Storage.Blobs;
-
-namespace IssueTracker.FileSystem.Data.IData;
+﻿
+namespace FileSystem.Data.IData;
 public interface IBolbData
 {
     String Get(string name);

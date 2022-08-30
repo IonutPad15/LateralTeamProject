@@ -1,33 +1,37 @@
-﻿
-using IssueTracker.FileSystem.Data.IData;
+﻿using FileSystem.Data.IData;
 using Microsoft.Azure.Cosmos.Table;
 using Microsoft.Extensions.Configuration;
-using Models.Request;
+using FileSystem.Models;
 using Models.Response;
 
-namespace IssueTracker.FileSystem.Data;
+namespace FileSystem.Data;
 
 public class MetaData : IMetaData
 {
     private readonly CloudTable _metaDataTable;
+    private readonly IConfiguration _config;
     public MetaData(IConfiguration config)
     {
-        var storageAccount = CloudStorageAccount.Parse("AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;DefaultEndpointsProtocol=http;BlobEndpoint=http://127.0.0.1:10000/devstoreaccount1;QueueEndpoint=http://127.0.0.1:10001/devstoreaccount1;TableEndpoint=http://127.0.0.1:10002/devstoreaccount1;");
+        _config = config;
+        var conn = _config.GetValue<string>("ConnectionStrings:Account");
+        var storageAccount = CloudStorageAccount.Parse(conn);
         var tableClient = storageAccount.CreateCloudTableClient();
         _metaDataTable = tableClient.GetTableReference("MetaData");
     }
-    public IEnumerable<MetaDataResponse> GetAll()
+    public IEnumerable<MetaDataResp> GetAll()
     {
         var query = new TableQuery<MetaDataEntity>();
         var entities = _metaDataTable.ExecuteQuery(query);
-        var models = entities.Select(x => new MetaDataResponse(x.RowKey, x.PartitionKey, x.Name, x.Type, x.SizeKb));
-        return models;
+        var models = entities.Select(x => new MetaDataResp(x.RowKey, x.PartitionKey, x.Name, x.Type, x.SizeKb));
+        if (models.Any())
+            return models;
+        return Enumerable.Empty<MetaDataResp>();
     }
-    public async Task CreateOrUpdateAsync(MetaDataRequest entity)
+    public async Task CreateAsync(MetaDataReq entity)
     {
         MetaDataEntity metaData = new MetaDataEntity();
         metaData.PartitionKey = entity.Group;
-        metaData.RowKey = Guid.NewGuid().ToString();
+        metaData.RowKey = entity.Id;
         metaData.Name = entity.Name;
         metaData.Type = entity.Type;
         metaData.SizeKb = entity.SizeKb;
@@ -47,9 +51,9 @@ public class MetaData : IMetaData
         }
         return false;
     }
-    public async Task<MetaDataResponse?> GetAsync(string rowKey, string partitionKey)
+    public async Task<MetaDataResponse?> GetAsync(string id, string group)
     {
-        var operation = TableOperation.Retrieve<MetaDataEntity>(partitionKey, rowKey);
+        var operation = TableOperation.Retrieve<MetaDataEntity>(group, id);
         var result = await _metaDataTable.ExecuteAsync(operation);
         var x = result.Result as MetaDataEntity;
         if (x != null)

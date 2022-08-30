@@ -1,8 +1,8 @@
 using DataAccess.Data;
 using DataAccess.Data.IData;
 using DataAccess.DbAccess;
-using IssueTracker.FileSystem.Data.IData;
-using IssueTracker.FileSystem.Data;
+using FileSystem.Data.IData;
+using FileSystem.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
