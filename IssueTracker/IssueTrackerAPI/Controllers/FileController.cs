@@ -10,10 +10,10 @@ namespace IssueTrackerAPI.Controllers;
 [ApiController]
 public class FileController : ControllerBase
 {
-    private readonly IMetaData _repository;
+    private readonly IMetaDataProvider _repository;
     private readonly IBolbData _bolbData;
     private readonly Mapper _mapper;
-    public FileController(IMetaData repository, IBolbData bolbData)
+    public FileController(IMetaDataProvider repository, IBolbData bolbData)
     {
         _repository = repository;
         _bolbData = bolbData;

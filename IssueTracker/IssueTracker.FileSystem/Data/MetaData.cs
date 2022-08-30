@@ -6,7 +6,7 @@ using Models.Response;
 
 namespace FileSystem.Data;
 
-public class MetaData : IMetaData
+public class MetaData : IMetaDataProvider
 {
     private readonly CloudTable _metaDataTable;
     private readonly IConfiguration _config;
