@@ -1,9 +1,8 @@
 ﻿
-
-namespace Models.Request;
-public class MetaDataRequest
+namespace FileSystem.Models;
+public class MetaDataResp
 {
-    public MetaDataRequest(string id, string group, string name, string type, double syze)
+    public MetaDataResp(string id, string group, string name, string type, double syze)
     {
         Id = id;
         Group = group;

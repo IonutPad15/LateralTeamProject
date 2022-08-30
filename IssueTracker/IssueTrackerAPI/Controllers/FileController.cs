@@ -1,4 +1,7 @@
-﻿using IssueTracker.FileSystem.Data.IData;
+﻿using AutoMapper;
+using FileSystem.Data.IData;
+using FileSystem.Models;
+using IssueTrackerAPI.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Models.Request;
 
@@ -9,10 +12,12 @@ public class FileController : ControllerBase
 {
     private readonly IMetaData _repository;
     private readonly IBolbData _bolbData;
+    private readonly Mapper _mapper;
     public FileController(IMetaData repository, IBolbData bolbData)
     {
         _repository = repository;
         _bolbData = bolbData;
+        _mapper = AutoMapperConfig.Config();
     }
 
     [HttpGet("getFile")]
@@ -26,15 +31,17 @@ public class FileController : ControllerBase
     [HttpPost]
     public async Task<IResult> PostFile([FromForm] IFormFile formFile)
     {
-        var bolbFileName = $"{Guid.NewGuid()}{Path.GetExtension(formFile.FileName)}";
+        var fileId = Guid.NewGuid();
+        var bolbFileName = $"{fileId}{Path.GetExtension(formFile.FileName)}";
         var file = formFile.OpenReadStream();
-        _bolbData.Upload(file, bolbFileName);
-        var fileName = formFile.FileName;//de salvat in azure table
+        //_bolbData.Upload(file, bolbFileName);
+        var fileName = formFile.FileName;
         var group = "Mihai";
         var fileSize = formFile.Length / 1000;
         var fileType = formFile.ContentType;
-        var metaDataRequest = new MetaDataRequest(group, fileName, fileType, fileSize);
-        await _repository.CreateOrUpdateAsync(metaDataRequest);
+        var metaDataRequest = new MetaDataRequest(fileId.ToString(), group, fileName, fileType, fileSize);
+        var metaDataReq = _mapper.Map<MetaDataReq>(metaDataRequest);
+        await _repository.CreateAsync(metaDataReq);
         return Results.Ok(fileName);
     }
     [HttpGet]

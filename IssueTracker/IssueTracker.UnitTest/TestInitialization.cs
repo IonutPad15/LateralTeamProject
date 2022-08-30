@@ -44,7 +44,7 @@ public class TestInitialization
                 {
                     int rows = CommandObject.ExecuteNonQuery();
                 }
-                
+
                 sql = "DELETE FROM dbo.[Project]";
                 using (SqlCommand CommandObject = new SqlCommand(sql, ConnectionObject))
                 {
