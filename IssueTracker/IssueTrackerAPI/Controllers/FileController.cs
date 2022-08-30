@@ -13,11 +13,13 @@ public class FileController : ControllerBase
     private readonly IMetaDataProvider _repository;
     private readonly IBolbData _bolbData;
     private readonly Mapper _mapper;
-    public FileController(IBolbData bolbData, IConfiguration config)
+    public FileController(IConfiguration config)
     {
-        IDataFactory dataFactory = new MetaDataFactory(config);
-        _repository = dataFactory.CreateMetaData();
-        _bolbData = bolbData;
+        IConfigurationFactory dataFactory = new ConfigurationFactory(config);
+        IMetaDataConfiguration metaDataConfig = (IMetaDataConfiguration)dataFactory.Create<IMetaDataConfiguration>();
+        IBolbConfiguration bolbConfig = (IBolbConfiguration)dataFactory.Create<IBolbConfiguration>();
+        _repository = new MetaData(metaDataConfig);
+        _bolbData = new BolbData(bolbConfig);
         _mapper = AutoMapperConfig.Config();
     }
 
@@ -35,15 +37,23 @@ public class FileController : ControllerBase
         var fileId = Guid.NewGuid();
         var bolbFileName = $"{fileId}{Path.GetExtension(formFile.FileName)}";
         var file = formFile.OpenReadStream();
-        //_bolbData.Upload(file, bolbFileName);
+        _bolbData.Upload(file, bolbFileName);
         var fileName = formFile.FileName;
         var group = "Mihai";
         var fileSize = formFile.Length / 1000;
         var fileType = formFile.ContentType;
         var metaDataRequest = new MetaDataRequest(fileId.ToString(), group, fileName, fileType, fileSize);
         var metaDataReq = _mapper.Map<MetaDataReq>(metaDataRequest);
-        await _repository.CreateAsync(metaDataReq);
-        return Results.Ok(fileName);
+        try
+        {
+            await _repository.CreateAsync(metaDataReq);
+            return Results.Ok(fileName);
+        }
+        catch (ArgumentException ex)
+        {
+            return Results.BadRequest(ex.Message);
+        }
+
     }
     [HttpGet]
     public IResult GetAll()

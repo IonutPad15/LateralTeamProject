@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using DataAccess.Data.IData;
+using DataAccess.Repository;
 using DataAccess.Models;
 using FluentValidation.Results;
 using IssueTrackerAPI.Utils;

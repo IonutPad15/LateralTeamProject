@@ -1,17 +1,9 @@
 ﻿namespace IssueTracker.FileSystem.Models;
 public class MetaDataReq
 {
-    public MetaDataReq(string id, string group, string name, string type, double syze)
-    {
-        Id = id;
-        Group = group;
-        Name = name;
-        Type = type;
-        SizeKb = syze;
-    }
-    public string Id { get; set; }
-    public string Group { get; set; }
-    public string Name { get; set; }
-    public string Type { get; set; }
+    public string Id { get; set; } = string.Empty;
+    public string Group { get; set; } = string.Empty;
+    public string Name { get; set; } = string.Empty;
+    public string Type { get; set; } = string.Empty;
     public double SizeKb { get; set; }
 }

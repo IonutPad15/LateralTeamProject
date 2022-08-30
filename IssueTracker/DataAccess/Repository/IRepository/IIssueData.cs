@@ -1,6 +1,6 @@
 ﻿using DataAccess.Models;
 
-namespace DataAccess.Data.IData;
+namespace DataAccess.Repository;
 
 public interface IIssueData
 {

@@ -1,19 +1,21 @@
 ﻿using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Specialized;
 using Azure.Storage.Sas;
-using Microsoft.Extensions.Configuration;
+
 
 namespace IssueTracker.FileSystem;
-public class BolbData : BaseClass, IBolbData
+public class BolbData : IBolbData
 {
-    public BolbData(IConfiguration config) : base(config)
+    private readonly IBolbConfiguration _config;
+    public BolbData(IBolbConfiguration config)
     {
+        _config = config;
     }
 
     public String Get(string name)
     {
-        BlobServiceClient blobServiceClient = new BlobServiceClient(ConnectionString);
-        string containerName = Container;
+        BlobServiceClient blobServiceClient = new BlobServiceClient(_config.ConnectionString);
+        string containerName = _config.Container;
         BlobContainerClient containerClient = blobServiceClient.GetBlobContainerClient(containerName);
         BlobClient x = containerClient.GetBlobClient(name);
         if (x == null) throw new ArgumentException("Don't exist or was delete this file!");
@@ -24,7 +26,7 @@ public class BolbData : BaseClass, IBolbData
     {
         if (file != null)
         {
-            var containerClient = new BlobContainerClient(ConnectionString, Container);
+            var containerClient = new BlobContainerClient(_config.ConnectionString, _config.Container);
             try
             {
                 var blobClient = containerClient.GetBlobClient(name);

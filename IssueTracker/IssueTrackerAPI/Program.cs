@@ -1,7 +1,5 @@
-using DataAccess.Data;
-using DataAccess.Data.IData;
+using DataAccess.Repository;
 using DataAccess.DbAccess;
-using IssueTracker.FileSystem;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -21,8 +19,6 @@ builder.Services.AddSingleton<IProjectData, ProjectData>();
 builder.Services.AddSingleton<IIssueData, IssueData>();
 builder.Services.AddSingleton<IParticipantData, ParticipantData>();
 builder.Services.AddSingleton<ICommentData, CommentData>();
-builder.Services.AddSingleton<IMetaDataProvider, MetaData>();
-builder.Services.AddSingleton<IBolbData, BolbData>();
 
 
 builder.Services.AddAuthentication(options =>

@@ -1,7 +1,7 @@
 ﻿using DataAccess.Models;
 using Microsoft.AspNetCore.Mvc;
 using DataAccess.Utils;
-using DataAccess.Data.IData;
+using DataAccess.Repository;
 using Models.Request;
 using AutoMapper;
 using Validation;

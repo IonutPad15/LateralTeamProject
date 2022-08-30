@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using DataAccess.Data.IData;
+using DataAccess.Repository;
 using IssueTrackerAPI.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Models.Response;

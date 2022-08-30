@@ -1,8 +1,7 @@
-﻿using DataAccess.Data.IData;
-using DataAccess.DbAccess;
+﻿using DataAccess.DbAccess;
 using DataAccess.Models;
 
-namespace DataAccess.Data;
+namespace DataAccess.Repository;
 
 public class IssueData : IIssueData
 {

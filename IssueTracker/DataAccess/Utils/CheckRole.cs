@@ -1,4 +1,4 @@
-﻿using DataAccess.Data.IData;
+﻿using DataAccess.Repository;
 
 namespace DataAccess.Utils;
 
