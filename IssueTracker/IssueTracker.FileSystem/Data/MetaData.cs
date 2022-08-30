@@ -1,10 +1,8 @@
-﻿using FileSystem.Data.IData;
-using Microsoft.Azure.Cosmos.Table;
+﻿using Microsoft.Azure.Cosmos.Table;
 using Microsoft.Extensions.Configuration;
-using FileSystem.Models;
-using Models.Response;
+using IssueTracker.FileSystem.Models;
 
-namespace FileSystem.Data;
+namespace IssueTracker.FileSystem;
 
 public class MetaData : IMetaDataProvider
 {
@@ -51,14 +49,14 @@ public class MetaData : IMetaDataProvider
         }
         return false;
     }
-    public async Task<MetaDataResponse?> GetAsync(string id, string group)
+    public async Task<MetaDataResp?> GetAsync(string id, string group)
     {
         var operation = TableOperation.Retrieve<MetaDataEntity>(group, id);
         var result = await _metaDataTable.ExecuteAsync(operation);
         var x = result.Result as MetaDataEntity;
         if (x != null)
         {
-            var entity = new MetaDataResponse(x.RowKey, x.PartitionKey, x.Name, x.Type, x.SizeKb);
+            var entity = new MetaDataResp(x.RowKey, x.PartitionKey, x.Name, x.Type, x.SizeKb);
             return entity;
         }
         return null;

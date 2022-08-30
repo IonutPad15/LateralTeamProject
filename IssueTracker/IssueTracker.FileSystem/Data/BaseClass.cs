@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 
-namespace FileSystem.Data;
+namespace IssueTracker.FileSystem;
 public class BaseClass
 {
     protected string ConnectionString { get; set; }

@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 
-namespace FileSystem.Data.IData;
+namespace IssueTracker.FileSystem;
 public interface IBolbConfiguration
 {
     IBolbConfiguration Create(IConfiguration configuration);

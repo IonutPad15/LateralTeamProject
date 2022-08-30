@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using FileSystem.Data.IData;
-using FileSystem.Models;
+using IssueTracker.FileSystem;
+using IssueTracker.FileSystem.Models;
 using IssueTrackerAPI.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Models.Request;
@@ -13,9 +13,10 @@ public class FileController : ControllerBase
     private readonly IMetaDataProvider _repository;
     private readonly IBolbData _bolbData;
     private readonly Mapper _mapper;
-    public FileController(IMetaDataProvider repository, IBolbData bolbData)
+    public FileController(IBolbData bolbData, IConfiguration config)
     {
-        _repository = repository;
+        IDataFactory dataFactory = new MetaDataFactory(config);
+        _repository = dataFactory.CreateMetaData();
         _bolbData = bolbData;
         _mapper = AutoMapperConfig.Config();
     }

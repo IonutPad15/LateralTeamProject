@@ -1,6 +1,4 @@
-﻿
-
-namespace FileSystem.Models;
+﻿namespace IssueTracker.FileSystem.Models;
 public class MetaDataReq
 {
     public MetaDataReq(string id, string group, string name, string type, double syze)

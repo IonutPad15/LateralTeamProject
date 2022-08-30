@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using DataAccess.Models;
-using FileSystem.Data;
-using FileSystem.Models;
+using IssueTracker.FileSystem.Models;
 using Models.Request;
 using Models.Response;
 
