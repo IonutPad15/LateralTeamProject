@@ -1,7 +1,5 @@
 ﻿using Azure.Storage.Blobs;
-using Azure.Storage.Blobs.Specialized;
 using Azure.Storage.Sas;
-
 
 namespace IssueTracker.FileSystem;
 public class BolbData : IBolbData
@@ -16,10 +14,11 @@ public class BolbData : IBolbData
     {
         BlobServiceClient blobServiceClient = new BlobServiceClient(_config.ConnectionString);
         string containerName = _config.Container;
+
         BlobContainerClient containerClient = blobServiceClient.GetBlobContainerClient(containerName);
         BlobClient x = containerClient.GetBlobClient(name);
         if (x == null) throw new ArgumentException("Don't exist or was delete this file!");
-        return GetServiceSasUriForBlob(x).ToString(); //TODO: aici o sa imi livreze link-ul dupa verificarea sas
+        return GetBlobSasUri(x).ToString(); //TODO: aici o sa imi livreze link-ul dupa verificarea sas
     }
 
     public void Upload(Stream file, string name)
@@ -41,35 +40,21 @@ public class BolbData : IBolbData
         throw new ArgumentException("You don't have files!");
     }
 
-    private static Uri GetServiceSasUriForBlob(BlobClient blobClient,
-     string storedPolicyName = "") //TODO: am de verificat sas.
+    private static string GetBlobSasUri(BlobClient blobClient)
     {
-        if (blobClient.CanGenerateSasUri)
+        BlobSasBuilder sasBuilder = new BlobSasBuilder()
         {
-            BlobSasBuilder sasBuilder = new BlobSasBuilder()
-            {
-                BlobContainerName = blobClient.GetParentBlobContainerClient().Name,
-                BlobName = blobClient.Name,
-                Resource = "b"
-            };
+            BlobContainerName = blobClient.BlobContainerName,
+            BlobName = blobClient.Name,
+            Resource = "b",
+            StartsOn = DateTime.UtcNow.AddDays(-1),
+            ExpiresOn = DateTime.UtcNow.AddDays(1),
+        };
 
-            if (storedPolicyName == "")
-            {
-                sasBuilder.ExpiresOn = DateTimeOffset.UtcNow.AddHours(1);
-                sasBuilder.SetPermissions(BlobSasPermissions.Read |
-                    BlobSasPermissions.Write);
-            }
-            else
-            {
-                sasBuilder.Identifier = storedPolicyName;
-            }
+        sasBuilder.SetPermissions(BlobSasPermissions.Read);
 
-            Uri sasUri = blobClient.GenerateSasUri(sasBuilder);
-            Console.WriteLine("SAS URI for blob is: {0}", sasUri);
-            Console.WriteLine();
-
-            return sasUri;
-        }
-        throw new ArgumentException("BlobContainerClient must be authorized with Shared Key credentials to create a service SAS.");
+        //TODO: move AccountName and AccountKey into configuration
+        var sas = sasBuilder.ToSasQueryParameters(new Azure.Storage.StorageSharedKeyCredential("devstoreaccount1", "Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==")).ToString();
+        return $"{blobClient.Uri}?{sas}";
     }
 }
