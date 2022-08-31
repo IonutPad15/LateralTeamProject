@@ -1,11 +1,13 @@
 ﻿using AutoMapper;
 using DataAccess.Models;
 using DataAccess.Repository;
+using FluentValidation.Results;
 using IssueTracker.FileSystem;
 using IssueTracker.FileSystem.Models;
 using IssueTrackerAPI.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Models.Request;
+using Validation;
 
 namespace IssueTrackerAPI.Controllers;
 [Route("api/[controller]")]
@@ -38,22 +40,26 @@ public class FileController : ControllerBase
     [HttpPost]
     public async Task<IResult> PostFile([FromForm] IFormFile formFile, [FromForm] int? issueId, [FromForm] int? commentId)
     {
+        if (issueId == null && commentId == null) return Results.BadRequest("can't both be null");
+        if (issueId <= 0 || commentId <= 0) return Results.BadRequest("ids are greater than 0");
         var fileId = Guid.NewGuid();
         var bolbFileName = $"{fileId}{Path.GetExtension(formFile.FileName)}";
         var file = formFile.OpenReadStream();
-        //_bolbData.Upload(file, bolbFileName);
+        _bolbData.Upload(file, bolbFileName);
         var fileName = formFile.FileName;
         var group = "Mihai";
-        var fileSize = formFile.Length / 1000;
+        var fileSize = formFile.Length / 1024;
         var fileType = formFile.ContentType;
         var metaDataRequest = new MetaDataRequest(fileId.ToString(), group, fileName, fileType, fileSize);
         var metaDataReq = _mapper.Map<MetaDataReq>(metaDataRequest);
         try
         {
             await _repository.CreateAsync(metaDataReq);
-            FileModel fileModel = new FileModel(fileId.ToString());
-            fileModel.CommentId = commentId;
-            fileModel.IssueId = issueId;
+            FileModel fileModel = new FileModel();
+            fileModel.FileId = fileId.ToString();
+            fileModel.GroupId = group;
+            fileModel.FileCommentId = commentId;
+            fileModel.FileIssueId = issueId;
             await _fileData.AddAsync(fileModel);
 
             return Results.Ok(fileName);
@@ -77,9 +83,17 @@ public class FileController : ControllerBase
         return Results.Ok(result);
     }
     [HttpDelete]
-    public async Task<IResult> Delete([FromBody] string id, [FromQuery] string group)
+    public async Task<IResult> Delete([FromBody] FileDeleteRequest fileDelete)
     {
-        var result = await _repository.DeleteAsync(id, group);
+        var validator = new FileDeleteRequestValidation();
+        ValidationResult results = validator.Validate(fileDelete);
+        if (!results.IsValid)
+        {
+            List<ValidationFailure> failures = results.Errors;
+            return Results.BadRequest(failures);
+        }
+        await _fileData.DeleteAsync(fileDelete.FileId);
+        var result = await _repository.DeleteAsync(fileDelete.FileId, fileDelete.GroupId);
         if (result == true)
         {
             return Results.Ok();

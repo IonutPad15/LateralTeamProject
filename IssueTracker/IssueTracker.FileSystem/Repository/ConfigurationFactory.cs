@@ -21,7 +21,7 @@ public class ConfigurationFactory : IConfigurationFactory
         {
             var connstring = _config.GetValue<string>("ConnectionStrings:Account");
             var container = _config.GetValue<string>("ConnectionStrings:Container");
-            return new BlobConfiguration(connstring, container);
+            return new BlobConfiguration(container, connstring);
         }
         throw new InvalidOperationException();
     }

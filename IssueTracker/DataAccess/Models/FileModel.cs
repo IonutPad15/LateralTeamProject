@@ -1,13 +1,10 @@
 ﻿namespace DataAccess.Models;
 public class FileModel
 {
-    public FileModel(string fileId)
-    {
-        FileId = fileId;
-    }
-    public int Id { get; set; }
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     public string FileId { get; set; }
-    public int? IssueId { get; set; }
-    public int? CommentId { get; set; }
-    public bool IsDeleted { get; set; }
+    public string GroupId { get; set; }
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+    public int? FileIssueId { get; set; }
+    public int? FileCommentId { get; set; }
 }

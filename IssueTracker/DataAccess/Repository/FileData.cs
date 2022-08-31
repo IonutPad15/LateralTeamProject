@@ -2,20 +2,21 @@
 using DataAccess.Models;
 
 namespace DataAccess.Repository;
-public class FileData: IFileData
+public class FileData : IFileData
 {
     private readonly ISQLDataAccess _db;
     public FileData(ISQLDataAccess db)
     {
         _db = db;
     }
-    public async Task<int> AddAsync(FileModel entity)
+    public async Task<string> AddAsync(FileModel entity)
     {
-        var result = await _db.SaveDataAndGetIdAsync<dynamic, int>("dbo.spFile_Insert", new
+        var result = await _db.SaveDataAndGetIdAsync<dynamic, string>("dbo.spFile_Insert", new
         {
             FileId = entity.FileId,
-            IssueId = entity.IssueId,
-            CommentId = entity.CommentId
+            GroupId = entity.GroupId,
+            FileIssueId = entity.FileIssueId,
+            FileCommentId = entity.FileCommentId
         });
         return result;
     }

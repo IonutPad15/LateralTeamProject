@@ -26,11 +26,13 @@ public class CommentData : ICommentData
     }
     public async Task<Comment?> GetByIdAsync(int id)
     {
-        return (await _db.LoadDataAsync<Comment, object>("dbo.spComment_Get", new { Id = id })).FirstOrDefault();
+        //return (await _db.LoadDataAsync<Comment, object>("dbo.spComment_Get", new { Id = id })).FirstOrDefault();
+        return (await _db.LoadCommentDataAsync<object>("spComment_Get", new { Id = id })).FirstOrDefault();
     }
     public async Task<IEnumerable<Comment>> GetAllByUserIdAsync(Guid id)
     {
-        return (await _db.LoadDataAsync<Comment, object>("dbo.spComment_GetAllByUserId", new { UserId = id }));
+        //return (await _db.LoadDataAsync<Comment, object>("dbo.spComment_GetAllByUserId", new { UserId = id }));
+        return (await _db.LoadCommentDataAsync<object>("dbo.spComment_GetAllByUserId", new { UserId = id }));
     }
 
     public async Task<IEnumerable<Comment?>> GetAllByIssueIdAsync(int id)

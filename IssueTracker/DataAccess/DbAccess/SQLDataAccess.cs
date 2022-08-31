@@ -47,6 +47,27 @@ public class SQLDataAccess : ISQLDataAccess
         }
         return participants;
     }
+    public async Task<IEnumerable<Comment>> LoadCommentDataAsync<TParameter>(string storedProcedure, TParameter parameter, string connectionId = "Default")
+    {
+        var lookup = new Dictionary<int, Comment>();
+        List<Comment> comments = new List<Comment>();
+        using (IDbConnection connection = new SqlConnection(_config.GetConnectionString(connectionId)))
+        {
+            await connection.QueryAsync<Comment, FileModel, Comment>
+                (storedProcedure,
+                map: (first, second) =>
+                {
+                    Comment? comment;
+                    if (!lookup.TryGetValue(first.Id, out comment))
+                        lookup.Add(first.Id, comment = first);
+                    comment.MetaDatas.Add(second);
+                    comments.Add(first);
+                    return comment;
+                }, parameter, commandType: CommandType.StoredProcedure, splitOn: "FileId");
+        }
+        var result = lookup.Values;
+        return result;
+    }
     public async Task<IEnumerable<TFirst>> LoadDataAsync<TFirst, TParameter>(
         string storedProcedure,
         TParameter parameter,
