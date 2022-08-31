@@ -131,6 +131,7 @@
     <Build Include="dbo\Tables\File.sql" />
     <Build Include="dbo\StoredProcedures\File\spFile_Delete.sql" />
     <Build Include="dbo\StoredProcedures\File\spFile_Insert.sql" />
+    <Build Include="dbo\StoredProcedures\File\spFile_GetByFileId.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Script.PostDeployment.sql" />

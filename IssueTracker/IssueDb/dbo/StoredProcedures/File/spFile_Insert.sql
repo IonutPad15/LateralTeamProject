@@ -1,9 +1,12 @@
 ﻿CREATE PROCEDURE [dbo].[spFile_Insert]
 	@FileId VARCHAR(36),
-    @IssueId INT,
-    @CommentId INT
+    @GroupId NVARCHAR(350),
+    @FileIssueId INT,
+    @FileCommentId INT
 AS
-	insert into dbo.[File] (FileId, IssueId, CommentId)
-	values (@FileId, @IssueId, @CommentId)
-    select CAST(SCOPE_IDENTITY() as int);
+	insert into dbo.[File] (FileId,GroupId, FileIssueId, FileCommentId)
+	values (@FileId, @GroupId, @FileIssueId, @FileCommentId)
+    select FileId
+    from dbo.[File]
+    where @FileId = FileId
 RETURN 0

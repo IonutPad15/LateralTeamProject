@@ -34,6 +34,7 @@ public class BolbData : IBolbData
             {
                 var blobClient = containerClient.GetBlobClient(name);
                 blobClient.Upload(file);
+                return;
             }
             catch (Exception ex)
             {

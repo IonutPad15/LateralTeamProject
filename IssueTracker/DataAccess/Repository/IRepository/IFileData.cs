@@ -3,6 +3,6 @@
 namespace DataAccess.Repository;
 public interface IFileData
 {
-    Task<int> AddAsync(FileModel entity);
+    Task<string> AddAsync(FileModel entity);
     Task DeleteAsync(string fileId);
 }

@@ -30,6 +30,7 @@ public class AutoMapperConfig
             cfg.CreateMap<RoleType, RolesType>();
             cfg.CreateMap<MetaDataRequest, MetaDataReq>();
             cfg.CreateMap<MetaDataResp, MetaDataResponse>();
+            cfg.CreateMap<FileModel, FileResponse>();
         });
         Mapper mapper = new Mapper(config);
         return mapper;
