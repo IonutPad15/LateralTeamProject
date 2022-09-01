@@ -1,11 +1,11 @@
-﻿CREATE PROCEDURE [dbo].[spFile_Get]
+﻿CREATE PROCEDURE [dbo].[spFile_Delete]
 	@FileId VARCHAR(36)
 AS
 begin
 	IF EXISTS(SELECT * FROM dbo.[File] WHERE FileId = @FileId)
 	begin
 		update dbo.[File]
-		set IsDeleted = 1 /*TRUE*/
+		set FileIsDeleted = 1 /*TRUE*/
 		where FileId = @FileId
 	end
 	ELSE

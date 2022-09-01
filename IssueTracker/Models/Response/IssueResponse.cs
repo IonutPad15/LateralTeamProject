@@ -1,7 +1,7 @@
 ﻿namespace Models.Response;
 public class IssueResponse
 {
-    public IssueResponse(int id, string title, string description, DateTime created, DateTime updated, IssueTypeResponse issueType, PriorityResponse priority, StatusResponse status, RoleResponse role, ProjectResponse project)
+    public IssueResponse(int id, string title, string description, DateTime created, DateTime updated, IssueTypeResponse issueType, PriorityResponse priority, StatusResponse status, RoleResponse role, ProjectResponse project, IEnumerable<FileResponse> metaDatas)
     {
         Id = id;
         Title = title;
@@ -13,6 +13,7 @@ public class IssueResponse
         Status = status;
         Role = role;
         Project = project;
+        MetaDatas = metaDatas;
     }
 
     public int Id { get; set; }
@@ -25,5 +26,6 @@ public class IssueResponse
     public StatusResponse Status { get; set; }
     public RoleResponse Role { get; set; }
     public ProjectResponse Project { get; set; }
+    public IEnumerable<FileResponse> MetaDatas { get; set; }
 }
 

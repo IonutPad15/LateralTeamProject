@@ -3,10 +3,10 @@ using DataAccess.Models;
 
 namespace DataAccess.Repository;
 
-public class CommentData : ICommentData
+public class CommentRepository : ICommentRepository
 {
     private readonly ISQLDataAccess _db;
-    public CommentData(ISQLDataAccess db)
+    public CommentRepository(ISQLDataAccess db)
     {
         _db = db;
     }
@@ -26,16 +26,16 @@ public class CommentData : ICommentData
     }
     public async Task<Comment?> GetByIdAsync(int id)
     {
-        return (await _db.LoadDataAsync<Comment, object>("dbo.spComment_Get", new { Id = id })).FirstOrDefault();
+        return (await _db.LoadCommentDataAsync<object>("spComment_Get", new { Id = id })).FirstOrDefault();
     }
     public async Task<IEnumerable<Comment>> GetAllByUserIdAsync(Guid id)
     {
-        return (await _db.LoadDataAsync<Comment, object>("dbo.spComment_GetAllByUserId", new { UserId = id }));
+        return (await _db.LoadCommentDataAsync<object>("dbo.spComment_GetAllByUserId", new { UserId = id }));
     }
 
     public async Task<IEnumerable<Comment?>> GetAllByIssueIdAsync(int id)
     {
-        var comments = (await _db.LoadDataAsync<Comment, object>("dbo.spComment_GetAllByIssueId", new { IssueId = id })).ToList();
+        var comments = (await _db.LoadCommentDataAsync<object>("dbo.spComment_GetAllByIssueId", new { IssueId = id })).ToList();
         var comm = comments.Where(c => c.CommentId == null).ToList();
         for (int i = 0; i < comm.Count; ++i)
         {
@@ -47,7 +47,7 @@ public class CommentData : ICommentData
     }
     public async Task<IEnumerable<Comment?>> GetAllByCommentIdAsync(int id)
     {
-        return (await _db.LoadDataAsync<Comment, object>("dbo.spComment_GetAllByCommentId", new { CommentId = id }));
+        return (await _db.LoadCommentDataAsync<object>("dbo.spComment_GetAllByCommentId", new { CommentId = id }));
     }
 
     public async Task UpdateAsync(Comment comment)

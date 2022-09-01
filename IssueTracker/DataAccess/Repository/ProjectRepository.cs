@@ -3,10 +3,10 @@ using DataAccess.Models;
 
 namespace DataAccess.Repository;
 
-public class ProjectData : IProjectData
+public class ProjectRepository : IProjectRepository
 {
     private readonly ISQLDataAccess _db;
-    public ProjectData(ISQLDataAccess db)
+    public ProjectRepository(ISQLDataAccess db)
     {
         _db = db;
     }

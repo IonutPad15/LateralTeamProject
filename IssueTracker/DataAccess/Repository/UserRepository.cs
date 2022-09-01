@@ -2,10 +2,10 @@
 using DataAccess.Models;
 namespace DataAccess.Repository;
 
-public class UserData : IUserData
+public class UserRepository : IUserRepository
 {
     private readonly ISQLDataAccess _db;
-    public UserData(ISQLDataAccess db)
+    public UserRepository(ISQLDataAccess db)
     {
         _db = db;
     }

@@ -1,10 +1,10 @@
 ﻿CREATE TABLE [dbo].[File]
 (
-    [Id] INT NOT NULL PRIMARY KEY IDENTITY,
-	[FileId] VARCHAR(36) NOT NULL,
-    [IssueId] INT,
-    [CommentId] INT,
-    [IsDeleted] BIT DEFAULT (CONVERT([bit],(0))) NOT NULL,
-    FOREIGN KEY (IssueId) REFERENCES [dbo].[Issue](Id),
-	FOREIGN KEY (CommentId) REFERENCES [dbo].[Comment](Id)
+	[FileId] VARCHAR(36) NOT NULL PRIMARY KEY,
+    [Extension] NVARCHAR(350) NOT NULL,
+    [FileIssueId] INT,
+    [FileCommentId] INT,
+    [FileIsDeleted] BIT DEFAULT (CONVERT([bit],(0))) NOT NULL,
+    FOREIGN KEY (FileIssueId) REFERENCES [dbo].[Issue](Id),
+	FOREIGN KEY (FileCommentId) REFERENCES [dbo].[Comment](Id)
 )

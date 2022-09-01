@@ -4,8 +4,8 @@ namespace IssueTracker.FileSystem;
 
 public interface IMetaDataProvider
 {
-    IEnumerable<MetaDataResp> GetAll();
-    Task CreateAsync(MetaDataReq entity);
+    IEnumerable<MetaDataResponse> GetAll();
+    Task CreateAsync(MetaDataRequest entity);
     Task<bool> DeleteAsync(string id, string group);
-    Task<MetaDataResp?> GetAsync(string id, string group);
+    Task<MetaDataResponse?> GetAsync(string id, string group);
 }

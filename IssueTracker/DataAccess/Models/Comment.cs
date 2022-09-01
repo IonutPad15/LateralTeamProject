@@ -15,4 +15,6 @@ public class Comment
     public bool IsDeleted { get; set; }
     public User? User { get; set; }
     public IEnumerable<Comment> Replies { get; set; } = Enumerable.Empty<Comment>();
+    //public List<FileModel> MetaDatas { get; set; } = new List<FileModel>();//I had to use List
+    public IEnumerable<Models.File> MetaDatas { get; set; } = Enumerable.Empty<Models.File>();
 }

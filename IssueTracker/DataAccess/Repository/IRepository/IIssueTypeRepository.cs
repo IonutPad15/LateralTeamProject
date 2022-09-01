@@ -2,7 +2,7 @@
 
 namespace DataAccess.Repository;
 
-public interface IIssueTypeData
+public interface IIssueTypeRepository
 {
     Task<IEnumerable<IssueType>> GetAllAsync();
     Task<IssueType?> GetByIdAsync(int id);
