@@ -28,9 +28,9 @@ public class FileController : ControllerBase
     }
 
     [HttpGet("getFile")]
-    public IActionResult GetFileBlob(string name)
+    public IActionResult GetFileBlob(string fileName)
     {
-        var sasLink = _bolbData.Get(name);
+        var sasLink = _bolbData.Get(fileName);
         if (sasLink == null) throw new ArgumentException("sasLink is null!");
         return Ok(sasLink); //TODO: nu ramane asa, o sa revin azi peste tot ce am implementat pentru a continua
     }
