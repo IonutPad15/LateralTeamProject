@@ -3,7 +3,7 @@
 namespace Models.Request;
 public class FileRequest
 {
-    public FileRequest(IFormFile formFile, int? issueId, int? commentId)
+    public FileRequest(IFormFile formFile, int issueId, int? commentId)
     {
         FormFile = formFile;
         IssueId = issueId;
@@ -11,6 +11,6 @@ public class FileRequest
     }
 
     public IFormFile FormFile { get; set; }
-    public int? IssueId { get; set; }
+    public int IssueId { get; set; }
     public int? CommentId { get; set; }
 }

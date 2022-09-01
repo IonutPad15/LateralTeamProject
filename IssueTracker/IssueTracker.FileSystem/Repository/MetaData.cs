@@ -6,7 +6,7 @@ namespace IssueTracker.FileSystem;
 public class MetaData : IMetaDataProvider
 {
     private readonly CloudTable _metaDataTable;
-    public MetaData(IMetaDataConfiguration config)
+    internal MetaData(IMetaDataConfiguration config)
     {
         var storageAccount = CloudStorageAccount.Parse(config.ConnectionString);
         var tableClient = storageAccount.CreateCloudTableClient();
@@ -15,14 +15,14 @@ public class MetaData : IMetaDataProvider
     public IEnumerable<MetaDataResponse> GetAll()
     {
         var query = new TableQuery<MetaDataEntity>().Where(TableQuery.
-            GenerateFilterConditionForBool(nameof(MetaDataEntity.IsDeleted),QueryComparisons.Equal,false));
+            GenerateFilterConditionForBool(nameof(MetaDataEntity.IsDeleted), QueryComparisons.Equal, false));
         var entities = _metaDataTable.ExecuteQuery(query);
         var models = entities.Select(x => new MetaDataResponse(x.RowKey, x.PartitionKey, x.Name, x.Type, x.SizeKb));
         if (models.Any())
             return models;
         return Enumerable.Empty<MetaDataResponse>();
     }
-    public async Task CreateAsync(MetaDataRequest entity)
+    public async Task CreateAsync(FileModel entity)
     {
         MetaDataEntity metaData = new MetaDataEntity();
         if (string.IsNullOrEmpty(entity.Group) || string.IsNullOrEmpty(entity.Id) ||

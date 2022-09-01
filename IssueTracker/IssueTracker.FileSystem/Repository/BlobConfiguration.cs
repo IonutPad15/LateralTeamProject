@@ -2,11 +2,14 @@
 public class BlobConfiguration : IBolbConfiguration
 {
     public string Container { get; }
-
     public string ConnectionString { get; }
-    public BlobConfiguration(string connstring, string container)
+    public string AccountName { get; }
+    public string AccountKey { get; }
+    public BlobConfiguration(string container, string connstring, string accountName, string accountKey)
     {
         Container = container;
         ConnectionString = connstring;
+        AccountName = accountName;
+        AccountKey = accountKey;
     }
 }
