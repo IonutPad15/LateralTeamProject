@@ -14,12 +14,12 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddSingleton<ISQLDataAccess, SQLDataAccess>();
-builder.Services.AddSingleton<IUserData, UserData>();
-builder.Services.AddSingleton<IProjectData, ProjectData>();
-builder.Services.AddSingleton<IIssueData, IssueData>();
-builder.Services.AddSingleton<IParticipantData, ParticipantData>();
-builder.Services.AddSingleton<ICommentData, CommentData>();
-builder.Services.AddSingleton<IFileData, FileData>();
+builder.Services.AddSingleton<IUserRepository, UserRepository>();
+builder.Services.AddSingleton<IProjectRepository, ProjectRepository>();
+builder.Services.AddSingleton<IIssueRepository, IssueRepository>();
+builder.Services.AddSingleton<IParticipantRepository, ParticipantRepository>();
+builder.Services.AddSingleton<ICommentRepository, CommentRepository>();
+builder.Services.AddSingleton<IFileRepository, FileRepository>();
 
 
 builder.Services.AddAuthentication(options =>
@@ -40,10 +40,10 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-builder.Services.AddSingleton<IRoleData, RoleData>();
-builder.Services.AddSingleton<IIssueTypeData, IssueTypeData>();
-builder.Services.AddSingleton<IPriorityData, PriorityData>();
-builder.Services.AddSingleton<IStatusData, StatusData>();
+builder.Services.AddSingleton<IRoleRepository, RoleRepository>();
+builder.Services.AddSingleton<IIssueTypeRepository, IssueTypeRepository>();
+builder.Services.AddSingleton<IPriorityRepository, PriorityRepository>();
+builder.Services.AddSingleton<IStatusRepository, StatusRepository>();
 
 var app = builder.Build();
 

@@ -3,10 +3,10 @@ using DataAccess.Models;
 
 namespace DataAccess.Repository;
 
-public class RoleData : IRoleData
+public class RoleRepository : IRoleRepository
 {
     private readonly ISQLDataAccess _db;
-    public RoleData(ISQLDataAccess db)
+    public RoleRepository(ISQLDataAccess db)
     {
         _db = db;
     }

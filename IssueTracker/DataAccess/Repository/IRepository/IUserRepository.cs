@@ -2,7 +2,7 @@
 
 namespace DataAccess.Repository;
 
-public interface IUserData
+public interface IUserRepository
 {
     Task<User?> GetUserByIdAsync(Guid id);
     Task<IEnumerable<User>> GetUsersAsync();

@@ -1,5 +1,5 @@
 ﻿namespace IssueTracker.FileSystem.Models;
-public class MetaDataReq
+public class MetaDataRequest
 {
     public string Id { get; set; } = string.Empty;
     public string Group { get; set; } = string.Empty;

@@ -28,9 +28,10 @@ public class AutoMapperConfig
             cfg.CreateMap<ProjectRequest, Project>();
             cfg.CreateMap<RolesType, RoleType>();
             cfg.CreateMap<RoleType, RolesType>();
-            cfg.CreateMap<MetaDataRequest, MetaDataReq>();
-            cfg.CreateMap<MetaDataResp, MetaDataResponse>();
-            cfg.CreateMap<FileModel, FileResponse>();
+            cfg.CreateMap<Models.Request.MetaDataRequest, IssueTracker.FileSystem.Models.MetaDataRequest>();
+            cfg.CreateMap<IssueTracker.FileSystem.Models.MetaDataResponse, Models.Response.MetaDataResponse>();
+            cfg.CreateMap<Models.Response.MetaDataResponse, IssueTracker.FileSystem.Models.MetaDataResponse>();
+            cfg.CreateMap<DataAccess.Models.File, FileResponse>();
         });
         Mapper mapper = new Mapper(config);
         return mapper;

@@ -1,7 +1,7 @@
 ﻿CREATE TABLE [dbo].[File]
 (
 	[FileId] VARCHAR(36) NOT NULL PRIMARY KEY,
-    [GroupId] NVARCHAR(350) NOT NULL,
+    [Extension] NVARCHAR(350) NOT NULL,
     [FileIssueId] INT,
     [FileCommentId] INT,
     [FileIsDeleted] BIT DEFAULT (CONVERT([bit],(0))) NOT NULL,

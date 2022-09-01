@@ -19,10 +19,10 @@ namespace IssueTrackerAPI.Controllers;
 [ApiController]
 public class CommentController : ControllerBase
 {
-    private readonly ICommentData _commentData;
-    private readonly IUserData _userData;
+    private readonly ICommentRepository _commentData;
+    private readonly IUserRepository _userData;
     private readonly Mapper _mapper;
-    public CommentController(ICommentData commentData, IUserData userData)
+    public CommentController(ICommentRepository commentData, IUserRepository userData)
     {
         _userData = userData;
         _commentData = commentData;
@@ -58,7 +58,7 @@ public class CommentController : ControllerBase
     {
         var comment = await _commentData.GetAllByUserIdAsync(id);
         if (comment.Count() == 0) return Results.NotFound("Couldn't find any comments");
-        var commentsResponse = _mapper.Map<IEnumerable<CommentResponse>>(comment);
+        IEnumerable<CommentResponse> commentsResponse = _mapper.Map<IEnumerable<CommentResponse>>(comment);
         return Results.Ok(commentsResponse);
     }
     [HttpPost]

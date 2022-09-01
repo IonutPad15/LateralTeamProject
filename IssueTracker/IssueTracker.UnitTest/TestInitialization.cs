@@ -19,8 +19,8 @@ public class TestInitialization
            .SetBasePath(Directory.GetParent(AppContext.BaseDirectory)!.FullName)
            .AddJsonFile("appsettings.json", optional: false)
            .Build();
-            BaseClass.IssueData = new IssueData(new SQLDataAccess(configuration));
-            BaseClass.ParticipantData = new ParticipantData(new SQLDataAccess(configuration));
+            BaseClass.IssueData = new IssueRepository(new SQLDataAccess(configuration));
+            BaseClass.ParticipantData = new ParticipantRepository(new SQLDataAccess(configuration));
             BaseClass.TestContext = tc;
 
 

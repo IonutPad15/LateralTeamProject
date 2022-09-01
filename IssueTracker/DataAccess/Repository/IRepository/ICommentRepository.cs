@@ -2,7 +2,7 @@
 
 namespace DataAccess.Repository;
 
-public interface ICommentData
+public interface ICommentRepository
 {
     Task AddAsync(Comment comment);
     Task DeleteAsync(int id);

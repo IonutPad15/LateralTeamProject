@@ -52,23 +52,21 @@ public class SQLDataAccess : ISQLDataAccess
     }
     public async Task<IEnumerable<Comment>> LoadCommentDataAsync<TParameter>(string storedProcedure, TParameter parameter, string connectionId = "Default")
     {
-        var lookup = new Dictionary<int, Comment>();
         List<Comment> comments = new List<Comment>();
         using (IDbConnection connection = new SqlConnection(_config.GetConnectionString(connectionId)))
         {
-            await connection.QueryAsync<Comment, FileModel, Comment>
-                (storedProcedure,
-                map: (first, second) =>
-                {
-                    Comment? comment;
-                    if (!lookup.TryGetValue(first.Id, out comment))
-                        lookup.Add(first.Id, comment = first);
-                    comment.MetaDatas.Add(second);
-                    comments.Add(first);
-                    return comment;
-                }, parameter, commandType: CommandType.StoredProcedure, splitOn: "FileId");
+            var results = await connection.QueryMultipleAsync
+                (storedProcedure, parameter, commandType: CommandType.StoredProcedure);
+            comments = results.Read<Comment>().ToList();
+            var files = results.Read<Models.File>();
+            List<Models.File> tempfiles = new List<Models.File>();
+            for (int i = 0; i < comments.Count(); ++i)
+            {
+                tempfiles = files.Where(x => x.FileCommentId == comments[i].Id).ToList();
+                comments[i].MetaDatas = tempfiles;
+            }
         }
-        var result = lookup.Values;
+        var result = comments.AsEnumerable();
         return result;
     }
     public async Task<IEnumerable<TFirst>> LoadDataAsync<TFirst, TParameter>(

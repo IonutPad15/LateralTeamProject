@@ -2,7 +2,7 @@
 
 namespace DataAccess.Repository;
 
-public interface IStatusData
+public interface IStatusRepository
 {
     Task<IEnumerable<Status>> GetAllAsync();
     Task<Status?> GetByIdAsync(int id);
