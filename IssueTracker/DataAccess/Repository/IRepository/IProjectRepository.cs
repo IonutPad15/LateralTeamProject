@@ -2,7 +2,7 @@
 
 namespace DataAccess.Repository;
 
-public interface IProjectData
+public interface IProjectRepository
 {
     Task<int> AddAsync(Project project);
     Task<IEnumerable<Project>> GetAllAsync();

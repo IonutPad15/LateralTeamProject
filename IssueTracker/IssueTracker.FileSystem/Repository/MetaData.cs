@@ -12,17 +12,17 @@ public class MetaData : IMetaDataProvider
         var tableClient = storageAccount.CreateCloudTableClient();
         _metaDataTable = tableClient.GetTableReference("MetaData");
     }
-    public IEnumerable<MetaDataResp> GetAll()
+    public IEnumerable<MetaDataResponse> GetAll()
     {
         var query = new TableQuery<MetaDataEntity>().Where(TableQuery.
             GenerateFilterConditionForBool(nameof(MetaDataEntity.IsDeleted),QueryComparisons.Equal,false));
         var entities = _metaDataTable.ExecuteQuery(query);
-        var models = entities.Select(x => new MetaDataResp(x.RowKey, x.PartitionKey, x.Name, x.Type, x.SizeKb));
+        var models = entities.Select(x => new MetaDataResponse(x.RowKey, x.PartitionKey, x.Name, x.Type, x.SizeKb));
         if (models.Any())
             return models;
-        return Enumerable.Empty<MetaDataResp>();
+        return Enumerable.Empty<MetaDataResponse>();
     }
-    public async Task CreateAsync(MetaDataReq entity)
+    public async Task CreateAsync(MetaDataRequest entity)
     {
         MetaDataEntity metaData = new MetaDataEntity();
         if (string.IsNullOrEmpty(entity.Group) || string.IsNullOrEmpty(entity.Id) ||
@@ -52,14 +52,14 @@ public class MetaData : IMetaDataProvider
         }
         return false;
     }
-    public async Task<MetaDataResp?> GetAsync(string id, string group)
+    public async Task<MetaDataResponse?> GetAsync(string id, string group)
     {
         var operation = TableOperation.Retrieve<MetaDataEntity>(group, id);
         var result = await _metaDataTable.ExecuteAsync(operation);
         var x = result.Result as MetaDataEntity;
         if (x != null && x.IsDeleted == false)
         {
-            var entity = new MetaDataResp(x.RowKey, x.PartitionKey, x.Name, x.Type, x.SizeKb);
+            var entity = new MetaDataResponse(x.RowKey, x.PartitionKey, x.Name, x.Type, x.SizeKb);
             return entity;
         }
         return null;

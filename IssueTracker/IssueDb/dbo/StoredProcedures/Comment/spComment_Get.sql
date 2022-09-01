@@ -3,7 +3,18 @@
 AS
 begin
 	select *
+    into #comm_temp
 	from dbo.[Comment]
-    left join [File] on [File].FileCommentId = @Id AND [File].FileIsDeleted = 0
-	where [Comment].IsDeleted = 0/*FALSE*/ AND [Comment].Id = @Id; 
+	where [Comment].IsDeleted = 0/*FALSE*/ AND [Comment].Id = @Id;
+
+    SELECT *
+    INTO #file
+	FROM dbo.[File]
+	WHERE [File].FileCommentId = @Id AND [File].FileIsDeleted = 0
+
+    SELECT *
+    FROM #comm_temp
+
+    SELECT *
+    FROM #file
 end	

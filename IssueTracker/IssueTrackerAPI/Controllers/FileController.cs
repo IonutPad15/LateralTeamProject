@@ -17,8 +17,8 @@ public class FileController : ControllerBase
     private readonly IMetaDataProvider _repository;
     private readonly IBolbData _bolbData;
     private readonly Mapper _mapper;
-    private readonly IFileData _fileData;
-    public FileController(IConfiguration config, IFileData fileData)
+    private readonly IFileRepository _fileData;
+    public FileController(IConfiguration config, IFileRepository fileData)
     {
         _fileData = fileData;
         IConfigurationFactory dataFactory = new ConfigurationFactory(config);
@@ -40,8 +40,14 @@ public class FileController : ControllerBase
     [HttpPost]
     public async Task<IResult> PostFile([FromForm] IFormFile formFile, [FromForm] int? issueId, [FromForm] int? commentId)
     {
-        if (issueId == null && commentId == null) return Results.BadRequest("can't both be null");
-        if (issueId <= 0 || commentId <= 0) return Results.BadRequest("ids are greater than 0");
+        FileRequest fileRequest = new FileRequest(formFile, issueId, commentId);
+        var validator = new FileRequestValidation();
+        ValidationResult results = validator.Validate(fileRequest);
+        if (!results.IsValid)
+        {
+            List<ValidationFailure> failures = results.Errors;
+            return Results.BadRequest(failures);
+        }
         var fileId = Guid.NewGuid();
         var bolbFileName = $"{fileId}{Path.GetExtension(formFile.FileName)}";
         var file = formFile.OpenReadStream();
@@ -50,14 +56,14 @@ public class FileController : ControllerBase
         var group = "Mihai";
         var fileSize = formFile.Length / 1024;
         var fileType = formFile.ContentType;
-        var metaDataRequest = new MetaDataRequest(fileId.ToString(), group, fileName, fileType, fileSize);
-        var metaDataReq = _mapper.Map<MetaDataReq>(metaDataRequest);
+        var metaDataRequest = new Models.Request.MetaDataRequest(fileId.ToString(), group, fileName, fileType, fileSize);
+        var metaDataReq = _mapper.Map<IssueTracker.FileSystem.Models.MetaDataRequest>(metaDataRequest);
         try
         {
             await _repository.CreateAsync(metaDataReq);
-            FileModel fileModel = new FileModel();
+            var fileModel = new DataAccess.Models.File();
             fileModel.FileId = fileId.ToString();
-            fileModel.GroupId = group;
+            fileModel.Extension = group;
             fileModel.FileCommentId = commentId;
             fileModel.FileIssueId = issueId;
             await _fileData.AddAsync(fileModel);

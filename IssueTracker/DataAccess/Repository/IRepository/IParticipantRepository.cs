@@ -2,7 +2,7 @@
 
 namespace DataAccess.Repository;
 
-public interface IParticipantData
+public interface IParticipantRepository
 {
     Task<int> AddAsync(Participant participant);
     Task DeleteAsync(int id);

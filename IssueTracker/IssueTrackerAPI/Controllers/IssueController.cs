@@ -17,10 +17,10 @@ namespace IssueTrackerAPI.Controllers;
 [ApiController]
 public class IssueController : ControllerBase
 {
-    private readonly IIssueData _issue;
-    private readonly IParticipantData _participant;
+    private readonly IIssueRepository _issue;
+    private readonly IParticipantRepository _participant;
     private readonly Mapper _mapper;
-    public IssueController(IIssueData issue, IParticipantData participant)
+    public IssueController(IIssueRepository issue, IParticipantRepository participant)
     {
         _participant = participant;
         _issue = issue;

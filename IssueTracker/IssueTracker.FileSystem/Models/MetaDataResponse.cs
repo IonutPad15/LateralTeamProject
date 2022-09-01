@@ -1,7 +1,7 @@
 ﻿namespace IssueTracker.FileSystem.Models;
-public class MetaDataResp
+public class MetaDataResponse
 {
-    public MetaDataResp(string id, string group, string name, string type, double syze)
+    public MetaDataResponse(string id, string group, string name, string type, double syze)
     {
         Id = id;
         Group = group;

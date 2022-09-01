@@ -10,12 +10,12 @@ namespace IssueTrackerAPI.Controllers;
 [ApiController]
 public class ConstantsController : ControllerBase
 {
-    private readonly IRoleData _role;
-    private readonly IIssueTypeData _iType;
-    private readonly IPriorityData _priority;
-    private readonly IStatusData _status;
+    private readonly IRoleRepository _role;
+    private readonly IIssueTypeRepository _iType;
+    private readonly IPriorityRepository _priority;
+    private readonly IStatusRepository _status;
     private readonly Mapper _mapper;
-    public ConstantsController(IRoleData role, IIssueTypeData iType, IPriorityData priority, IStatusData status)
+    public ConstantsController(IRoleRepository role, IIssueTypeRepository iType, IPriorityRepository priority, IStatusRepository status)
     {
         _role = role;
         _iType = iType;

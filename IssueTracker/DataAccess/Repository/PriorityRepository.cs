@@ -3,10 +3,10 @@ using DataAccess.Models;
 
 namespace DataAccess.Repository;
 
-public class PriorityData : IPriorityData
+public class PriorityRepository : IPriorityRepository
 {
     private readonly ISQLDataAccess _db;
-    public PriorityData(ISQLDataAccess db)
+    public PriorityRepository(ISQLDataAccess db)
     {
         _db = db;
     }

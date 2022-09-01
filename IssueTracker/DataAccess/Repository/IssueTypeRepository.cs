@@ -3,10 +3,10 @@ using DataAccess.Models;
 
 namespace DataAccess.Repository;
 
-public class IssueTypeData : IIssueTypeData
+public class IssueTypeRepository : IIssueTypeRepository
 {
     private readonly ISQLDataAccess _db;
-    public IssueTypeData(ISQLDataAccess db)
+    public IssueTypeRepository(ISQLDataAccess db)
     {
         _db = db;
     }
