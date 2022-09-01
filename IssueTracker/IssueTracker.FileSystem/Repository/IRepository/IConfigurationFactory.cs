@@ -1,5 +1,5 @@
 ﻿namespace IssueTracker.FileSystem;
-public interface IConfigurationFactory
+internal interface IConfigurationFactory
 {
     IConfigurationBase Create<T>() where T : IConfigurationBase;
 }

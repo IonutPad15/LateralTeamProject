@@ -1,13 +1,15 @@
 ﻿
 namespace IssueTracker.FileSystem;
-public interface IBolbConfiguration : IConfigurationBase
+internal interface IBolbConfiguration : IConfigurationBase
 {
     string Container { get; }
+    string AccountName { get; }
+    string AccountKey { get; }
 }
-public interface IConfigurationBase
+internal interface IConfigurationBase
 {
     string ConnectionString { get; }
 }
-public interface IMetaDataConfiguration : IConfigurationBase
+internal interface IMetaDataConfiguration : IConfigurationBase
 {
 }
