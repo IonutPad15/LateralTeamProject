@@ -1,28 +1,32 @@
 ﻿using Azure.Storage.Blobs;
 using Azure.Storage.Sas;
+using IssueTracker.FileSystem.Models;
 
 namespace IssueTracker.FileSystem;
-public class BolbData : IBolbData
+internal class BolbData : IBolbData
 {
-    private readonly IBolbConfiguration _config;
-    internal BolbData(IBolbConfiguration config)
+    private readonly IBolbConfigurationFactory _config;
+    private BlobServiceClient BlobServiceClient { get; set; }
+    private BlobContainerClient ContainerClient { get; set; }
+    internal BolbData(IBolbConfigurationFactory config)
     {
         _config = config;
+        BlobServiceClient = new BlobServiceClient(_config.ConnectionString);
+        ContainerClient = BlobServiceClient.GetBlobContainerClient(_config.Container);
     }
 
-    public async Task<IEnumerable<Models.FileModel>> GetFilesAsync(IEnumerable<Models.FileModel> files)
+    public Task<IEnumerable<Models.FileModel>> GetFilesAsync(IEnumerable<Models.FileModel> files)
     {
-        BlobServiceClient blobServiceClient = new BlobServiceClient(_config.ConnectionString);
-        BlobContainerClient containerClient = blobServiceClient.GetBlobContainerClient(_config.Container);
-        var fileResult = new List<Models.FileModel>();
+        var fileResult = new List<FileModel>();
 
         foreach (var file in files)
         {
             var fileAtachment = new Models.FileModel();
-            fileAtachment.Name = file.Name;
-            if (file.Name == null || file.Name == string.Empty)
-                throw new ArgumentException("Invalid name file!");
-            BlobClient information = containerClient.GetBlobClient(file.Name);
+            if (file.Id == null || file.Id == string.Empty)
+                throw new ArgumentException("Invalid file id!");
+            fileAtachment.Id = file.Id;
+            fileAtachment.Extension = file.Extension;
+            BlobClient information = ContainerClient.GetBlobClient(file.Id + file.Extension);
             if (information == null)
                 throw new ArgumentException("Don't exist or was delete this file!");
             fileAtachment.Link = GetBlobSasUri(information).ToString();
@@ -30,7 +34,7 @@ public class BolbData : IBolbData
                 throw new ArgumentException($"Sas Invalid for {file.Name}!");
             fileResult.Add(fileAtachment);
         }
-        return fileResult;
+        return Task.FromResult<IEnumerable<FileModel>>(fileResult);
     }
 
     public async Task UploadFileAsync(Models.FileModel file)
@@ -38,9 +42,8 @@ public class BolbData : IBolbData
         if (file == null)
             throw new ArgumentException("You don't have files!");
 
-        var containerClient = new BlobContainerClient(_config.ConnectionString, _config.Container);
-        await containerClient.CreateIfNotExistsAsync();
-        var blobClient = containerClient.GetBlobClient(file.Name);
+        await ContainerClient.CreateIfNotExistsAsync();
+        var blobClient = ContainerClient.GetBlobClient(file.Name);
         blobClient.Upload(file.Content);
     }
 

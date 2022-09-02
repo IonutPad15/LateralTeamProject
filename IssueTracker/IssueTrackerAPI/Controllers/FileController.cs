@@ -24,15 +24,6 @@ public class FileController : ControllerBase
         _mapper = AutoMapperConfig.Config();
     }
 
-    //[HttpGet("getFiles")]
-    //public async Task<IActionResult> GetFilesBlobAsync(IEnumerable<FileRequest> fileName)
-    //{
-    //    var fileAttachment = _mapper.Map<IEnumerable<IssueTracker.FileSystem.Models.FileModel>>(fileName);
-    //    var sasLink = await _bolbData.GetFilesAsync(fileAttachment);
-    //    if (sasLink == null) throw new ArgumentException("sasLink is null!");
-    //    return Ok(sasLink);
-    //}
-
     [HttpPost]
     public async Task<IResult> PostFile([FromForm] IFormFile formFile, [FromForm] int issueId, [FromForm] int? commentId)
     {
@@ -58,34 +49,38 @@ public class FileController : ControllerBase
         await _fileData.AddAsync(fileModel);
         return Results.Ok();
     }
-    //[HttpGet]
-    //public IResult GetAll()
-    //{
-    //    var entities = _repository.GetAll();
-    //    return Results.Ok(entities);
-    //}
-    //[HttpGet("getone")]
-    //public async Task<IResult> Get([FromQuery] string id, [FromQuery] string group)
-    //{
-    //    var result = await _repository.GetAsync(id, group);
-    //    return Results.Ok(result);
-    //}
-    //[HttpDelete]
-    //public async Task<IResult> Delete([FromBody] FileDeleteRequest fileDelete)
-    //{
-    //    var validator = new FileDeleteRequestValidation();
-    //    ValidationResult results = validator.Validate(fileDelete);
-    //    if (!results.IsValid)
-    //    {
-    //        List<ValidationFailure> failures = results.Errors;
-    //        return Results.BadRequest(failures);
-    //    }
-    //    await _fileData.DeleteAsync(fileDelete.FileId);
-    //    var result = await _repository.DeleteAsync(fileDelete.FileId, fileDelete.GroupId);
-    //    if (result == true)
-    //    {
-    //        return Results.Ok();
-    //    }
-    //    return Results.BadRequest();
-    //}
+
+    [HttpGet("getFiles")]
+    public async Task<IActionResult> GetFiles(IEnumerable<FileGetRequest> fileName)
+    {
+        var fileAttachment = _mapper.Map<IEnumerable<FileModel>>(fileName);
+        var response = await _fileProvider.GetAsync(fileAttachment);
+        if (response == null) throw new ArgumentException("Result is null!");
+        return Ok(response);
+    }
+
+    [HttpGet("getone")]
+    public async Task<IActionResult> GetFile(FileGetRequest fileName)
+    {
+        var fileAttachment = _mapper.Map<IEnumerable<FileModel>>(fileName);
+        var response = await _fileProvider.GetAsync(fileAttachment);
+        if (response == null) throw new ArgumentException("Result is null!");
+        return Ok(response.FirstOrDefault());
+    }
+
+    [HttpDelete]
+    public async Task<IResult> Delete([FromBody] FileDeleteRequest fileDelete)
+    {
+        var validator = new FileDeleteRequestValidation();
+        ValidationResult results = validator.Validate(fileDelete);
+        if (!results.IsValid)
+        {
+            List<ValidationFailure> failures = results.Errors;
+            return Results.BadRequest(failures);
+        }
+        await _fileData.DeleteAsync(fileDelete.FileId);
+        var file = _mapper.Map<FileModel>(fileDelete);
+        await _fileProvider.DeleteAsync(file);
+        return Results.Ok();
+    }
 }

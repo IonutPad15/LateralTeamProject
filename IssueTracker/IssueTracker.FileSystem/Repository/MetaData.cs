@@ -12,15 +12,21 @@ public class MetaData : IMetaDataProvider
         var tableClient = storageAccount.CreateCloudTableClient();
         _metaDataTable = tableClient.GetTableReference("MetaData");
     }
-    public IEnumerable<MetaDataResponse> GetAll()
+    public IEnumerable<IssueTracker.FileSystem.Models.FileModel> GetAll(IEnumerable<FileModel> files)
     {
         var query = new TableQuery<MetaDataEntity>().Where(TableQuery.
             GenerateFilterConditionForBool(nameof(MetaDataEntity.IsDeleted), QueryComparisons.Equal, false));
         var entities = _metaDataTable.ExecuteQuery(query);
-        var models = entities.Select(x => new MetaDataResponse(x.RowKey, x.PartitionKey, x.Name, x.Type, x.SizeKb));
-        if (models.Any())
-            return models;
-        return Enumerable.Empty<MetaDataResponse>();
+        List<FileModel> result = new List<FileModel>();
+        foreach (var file in files)
+        {
+            var models = entities.Where(x => x.RowKey == file.Id).Select(x => new IssueTracker.FileSystem.Models.FileModel(x.RowKey, x.PartitionKey, x.Name, x.Type, x.SizeKb)).FirstOrDefault();
+            if (models == null) throw new ArgumentException("I can't find it!");
+            result.Add(models);
+        }
+        if (result.Any())
+            return result;
+        return Enumerable.Empty<IssueTracker.FileSystem.Models.FileModel>();
     }
     public async Task CreateAsync(FileModel entity)
     {

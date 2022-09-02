@@ -17,7 +17,7 @@ internal class ConfigurationFactory : IConfigurationFactory
             return new MetaDataConfiguration(connstring);
 
         }
-        if (typeof(T) == typeof(IBolbConfiguration))
+        if (typeof(T) == typeof(IBolbConfigurationFactory))
         {
             var connstring = _config.GetValue<string>("ConnectionStrings:Account");
             var container = _config.GetValue<string>("ConnectionStrings:Container");

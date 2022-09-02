@@ -1,5 +1,5 @@
 ﻿namespace IssueTracker.FileSystem;
-public class BlobConfiguration : IBolbConfiguration
+public class BlobConfiguration : IBolbConfigurationFactory
 {
     public string Container { get; }
     public string ConnectionString { get; }
