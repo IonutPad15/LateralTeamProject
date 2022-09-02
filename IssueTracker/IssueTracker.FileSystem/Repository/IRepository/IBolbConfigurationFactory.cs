@@ -1,6 +1,6 @@
 ﻿
 namespace IssueTracker.FileSystem;
-internal interface IBolbConfiguration : IConfigurationBase
+internal interface IBolbConfigurationFactory : IConfigurationBase
 {
     string Container { get; }
     string AccountName { get; }

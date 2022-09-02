@@ -12,19 +12,34 @@ public class FileProvider : IFileProvider
     {
         IConfigurationFactory dataFactory = new ConfigurationFactory(config);
         IMetaDataConfiguration metaDataConfig = (IMetaDataConfiguration)dataFactory.Create<IMetaDataConfiguration>();
-        IBolbConfiguration bolbConfig = (IBolbConfiguration)dataFactory.Create<IBolbConfiguration>();
+        IBolbConfigurationFactory bolbConfig = (IBolbConfigurationFactory)dataFactory.Create<IBolbConfigurationFactory>();
         _metadata = metadata;
         _bolb = bolb;
     }
 
-    public Task GetAsync()
+    public async Task DeleteAsync(FileModel file)
     {
-        throw new NotImplementedException();
+        await _metadata.DeleteAsync(file.Id, file.Group);
     }
 
-    public Task DeleteAsync(FileModel file)
+    public async Task<IEnumerable<FileModel>> GetAsync(IEnumerable<FileModel> files)
     {
-        throw new NotImplementedException();
+        var entities = _metadata.GetAll(files);
+        if (!entities.Any()) throw new ArgumentException("Detail file is null!");
+        var bolb = await _bolb.GetFilesAsync(files);
+        if (!entities.Any()) throw new ArgumentException("File is null!");
+        foreach (var entity in entities)
+        {
+            var link = bolb.Where(b => b.Id == entity.Id).FirstOrDefault()?.Link;
+            if (link == null || link == String.Empty)
+                throw new ArgumentException("Link null or empty");
+            entity.Link = link;
+            var extension = bolb.Where(b => b.Id == entity.Id).FirstOrDefault()?.Extension;
+            if (extension == null || extension == String.Empty)
+                throw new ArgumentException("Extension null or empty");
+            entity.Extension = extension;
+        }
+        return entities;
     }
 
     public async Task UploadAsync(FileModel file)

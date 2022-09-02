@@ -35,6 +35,9 @@ public class AutoMapperConfig
             cfg.CreateMap<FileModel, FileRequest>();
             cfg.CreateMap<FileModel, FileResponse>();
             cfg.CreateMap<DataAccess.Models.File, FileModel>();
+            cfg.CreateMap<FileDeleteRequest, FileModel>().
+            ForMember(f => f.Id, f => f.MapFrom(x => x.FileId)).
+            ForMember(f => f.Group, f => f.MapFrom(x => x.GroupId));
         });
         Mapper mapper = new Mapper(config);
         return mapper;
