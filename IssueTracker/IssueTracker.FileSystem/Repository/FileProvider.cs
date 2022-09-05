@@ -10,9 +10,9 @@ internal class FileProvider : IFileProvider
     public FileProvider(IConfiguration config)
     {
         IConfigurationFactory cf = new ConfigurationFactory(config);
-        var metaDataConfig = (IMetaDataConfiguration)cf.Create<IMetaDataConfiguration>();
+        var metaDataConfig = cf.Create<IMetaDataConfiguration>();
         _metadata = new MetaData(metaDataConfig);
-        var blobConfig = (IBolbConfigurationFactory)cf.Create<IBolbConfigurationFactory>();
+        var blobConfig = cf.Create<IBolbConfigurationFactory>();
         _bolb = new BolbData(blobConfig);
     }
 
