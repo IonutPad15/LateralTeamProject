@@ -2,36 +2,18 @@
 using Microsoft.Extensions.Configuration;
 
 namespace IssueTracker.FileSystem.Repository;
-public class FileProvider : IFileProvider
+internal class FileProvider : IFileProvider
 {
     private readonly IMetaDataProvider _metadata;
     private readonly IBolbData _bolb;
 
-    public static FileProvider GetFileProvider(IConfiguration config)
-    {
-        IConfigurationFactory cf = new ConfigurationFactory(config);
-        var metaDataConfig = (IMetaDataConfiguration)cf.Create<IMetaDataConfiguration>();
-        IMetaDataProvider metaDataProvider = new MetaData(metaDataConfig);
-        var blobConfig = (IBolbConfigurationFactory)cf.Create<IBolbConfigurationFactory>();
-        IBolbData blobData = new BolbData(blobConfig);
-        FileProvider fileProvider = new FileProvider(config, metaDataProvider, blobData);
-        return fileProvider;
-    }
     public FileProvider(IConfiguration config)
     {
         IConfigurationFactory cf = new ConfigurationFactory(config);
-        var metaDataConfig = (IMetaDataConfiguration)cf.Create<IMetaDataConfiguration>();
+        var metaDataConfig = cf.Create<IMetaDataConfiguration>();
         _metadata = new MetaData(metaDataConfig);
-        var blobConfig = (IBolbConfigurationFactory)cf.Create<IBolbConfigurationFactory>();
+        var blobConfig = cf.Create<IBolbConfigurationFactory>();
         _bolb = new BolbData(blobConfig);
-    }
-    internal FileProvider(IConfiguration config, IMetaDataProvider metadata, IBolbData bolb)
-    {
-        IConfigurationFactory dataFactory = new ConfigurationFactory(config);
-        IMetaDataConfiguration metaDataConfig = (IMetaDataConfiguration)dataFactory.Create<IMetaDataConfiguration>();
-        IBolbConfigurationFactory bolbConfig = (IBolbConfigurationFactory)dataFactory.Create<IBolbConfigurationFactory>();
-        _metadata = metadata;
-        _bolb = bolb;
     }
 
     public async Task DeleteAsync(Models.File file)

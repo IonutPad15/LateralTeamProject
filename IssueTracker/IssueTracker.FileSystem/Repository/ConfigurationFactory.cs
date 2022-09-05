@@ -8,13 +8,12 @@ internal class ConfigurationFactory : IConfigurationFactory
     {
         _config = config;
     }
-    public IConfigurationBase Create<T>() where T : IConfigurationBase
+    public T Create<T>() where T : IConfigurationBase
     {
-
         if (typeof(T) == typeof(IMetaDataConfiguration))
         {
             var connstring = _config.GetValue<string>("ConnectionStrings:Account");
-            return new MetaDataConfiguration(connstring);
+            return (T)(new MetaDataConfiguration(connstring) as IMetaDataConfiguration);
 
         }
         if (typeof(T) == typeof(IBolbConfigurationFactory))
@@ -23,7 +22,7 @@ internal class ConfigurationFactory : IConfigurationFactory
             var container = _config.GetValue<string>("ConnectionStrings:Container");
             var accountName = _config.GetValue<string>("ConnectionStrings:AccountName");
             var accountKey = _config.GetValue<string>("ConnectionStrings:AccountKey");
-            return new BlobConfiguration(container, connstring, accountName, accountKey);
+            return (T)(new BlobConfiguration(container, connstring, accountName, accountKey) as IBolbConfigurationFactory);
         }
         throw new InvalidOperationException();
     }
