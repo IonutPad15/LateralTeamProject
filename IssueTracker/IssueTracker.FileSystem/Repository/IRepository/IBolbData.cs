@@ -1,7 +1,7 @@
 ﻿namespace IssueTracker.FileSystem;
 internal interface IBolbData
 {
-    Task<IEnumerable<Models.FileModel>> GetFilesAsync(IEnumerable<Models.FileModel> files);
-    Task UploadFileAsync(Models.FileModel file);
+    Task<IEnumerable<Models.File>> GetFilesAsync(IEnumerable<Models.File> files);
+    Task UploadFileAsync(Models.File file);
     Task<Stream> DownloadFileAsync(string link);
 }
