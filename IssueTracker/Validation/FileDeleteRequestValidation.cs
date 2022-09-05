@@ -12,9 +12,9 @@ public class FileDeleteRequestValidation : AbstractValidator<FileDeleteRequest>
     }
     private bool BeGuid(string fileId)
     {
-        Guid.TryParse(fileId, out var id);
-        if (Guid.Empty.Equals(id)) return false;
-        return true;
+        if (Guid.TryParse(fileId, out var id))
+            return true;
+        return false;
     }
 
 }

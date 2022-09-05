@@ -2,7 +2,7 @@
 public class CommentResponse
 {
     public CommentResponse(int id, Guid? userId, string author, string body,
-        DateTime created, DateTime updated, List<CommentResponse> replies, IEnumerable<FileResponse> metaDatas)
+        DateTime created, DateTime updated, List<CommentResponse> replies, IEnumerable<FileResponse> attachements)
     {
         Id = id;
         UserId = userId;
@@ -11,7 +11,7 @@ public class CommentResponse
         Created = created;
         Updated = updated;
         Replies = replies;
-        MetaDatas = metaDatas;
+        Attachements = attachements;
     }
 
     public int Id { get; set; }
@@ -23,6 +23,6 @@ public class CommentResponse
     public DateTime Created { get; set; }
     public DateTime Updated { get; set; }
     public List<CommentResponse> Replies { get; set; }
-    public IEnumerable<FileResponse> MetaDatas { get; set; }
+    public IEnumerable<FileResponse> Attachements { get; set; }
 
 }

@@ -1,9 +1,7 @@
-﻿using IssueTracker.FileSystem.Models;
-
-namespace IssueTracker.FileSystem.Repository.IRepository;
+﻿namespace IssueTracker.FileSystem.Repository.IRepository;
 public interface IFileProvider
 {
-    Task UploadAsync(FileModel file);
-    Task<IEnumerable<IssueTracker.FileSystem.Models.FileModel>> GetAsync(IEnumerable<IssueTracker.FileSystem.Models.FileModel> files);
-    Task DeleteAsync(FileModel file);
+    Task UploadAsync(Models.File file);
+    Task<IEnumerable<IssueTracker.FileSystem.Models.File>> GetAsync(IEnumerable<IssueTracker.FileSystem.Models.File> files);
+    Task DeleteAsync(Models.File file);
 }
