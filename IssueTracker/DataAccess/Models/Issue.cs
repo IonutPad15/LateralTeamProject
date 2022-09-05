@@ -21,6 +21,6 @@ public class Issue
     public Role Role { get; set; }
     public Project Project { get; set; }
     public User User { get; set; }
-    public List<File> MetaDatas { get; set; } = new List<File>();
+    public IEnumerable<Models.File> Attachements { get; set; } = Enumerable.Empty<Models.File>();
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 }

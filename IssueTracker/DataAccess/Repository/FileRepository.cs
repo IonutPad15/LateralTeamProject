@@ -24,4 +24,10 @@ public class FileRepository : IFileRepository
     {
         await _db.SaveDataAsync("dbo.spFile_Delete", new { FileId = fileId });
     }
+
+    public async Task<IEnumerable<Models.File>> GetByIssueIdAsync(int issueId)
+    {
+        var result = await _db.LoadDataAsync<Models.File, dynamic>("spFile_GetByIssueId", new { IssueId = issueId });
+        return result;
+    }
 }
