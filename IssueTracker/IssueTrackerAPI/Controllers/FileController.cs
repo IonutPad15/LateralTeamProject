@@ -48,14 +48,13 @@ public class FileController : ControllerBase
             SizeKb = formFile.Length / 1024,
             Type = formFile.ContentType
         };
-        await _fileProvider.UploadAsync(file);
-        //var fileModel = _mapper.Map<File>(file);
         var fileModel = new File();
         fileModel.Extension = file.Extension;
         fileModel.FileId = file.Id;
         fileModel.FileIssueId = issueId;
         fileModel.FileCommentId = commentId;
         await _fileData.AddAsync(fileModel);
+        await _fileProvider.UploadAsync(file);
         return Results.Ok();
     }
 

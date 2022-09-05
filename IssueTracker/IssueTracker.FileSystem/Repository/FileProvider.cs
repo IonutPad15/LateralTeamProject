@@ -63,7 +63,6 @@ public class FileProvider : IFileProvider
     {
         if (file == null)
             throw new ArgumentException("File is null!");
-        file.Id = Guid.NewGuid().ToString();
         await _bolb.UploadFileAsync(file);
         await _metadata.CreateAsync(file);
     }
