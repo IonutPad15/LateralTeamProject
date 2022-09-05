@@ -1,46 +1,53 @@
 ﻿using Azure.Storage.Blobs;
 using Azure.Storage.Sas;
+using IssueTracker.FileSystem.Models;
 
 namespace IssueTracker.FileSystem;
-public class BolbData : IBolbData
+internal class BolbData : IBolbData
 {
-    private readonly IBolbConfiguration _config;
-    public BolbData(IBolbConfiguration config)
+    private readonly IBolbConfigurationFactory _config;
+    private BlobServiceClient BlobServiceClient { get; set; }
+    private BlobContainerClient ContainerClient { get; set; }
+    internal BolbData(IBolbConfigurationFactory config)
     {
         _config = config;
+        BlobServiceClient = new BlobServiceClient(_config.ConnectionString);
+        ContainerClient = BlobServiceClient.GetBlobContainerClient(_config.Container);
     }
 
-    public String Get(string name)
+    public Task<IEnumerable<Models.FileModel>> GetFilesAsync(IEnumerable<Models.FileModel> files)
     {
-        BlobServiceClient blobServiceClient = new BlobServiceClient(_config.ConnectionString);
-        string containerName = _config.Container;
+        var fileResult = new List<FileModel>();
 
-        BlobContainerClient containerClient = blobServiceClient.GetBlobContainerClient(containerName);
-        BlobClient x = containerClient.GetBlobClient(name);
-        if (x == null) throw new ArgumentException("Don't exist or was delete this file!");
-        return GetBlobSasUri(x).ToString(); //TODO: aici o sa imi livreze link-ul dupa verificarea sas
-    }
-
-    public void Upload(Stream file, string name)
-    {
-        if (file != null)
+        foreach (var file in files)
         {
-            var containerClient = new BlobContainerClient(_config.ConnectionString, _config.Container);
-            try
-            {
-                var blobClient = containerClient.GetBlobClient(name);
-                blobClient.Upload(file);
-                return;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
+            var fileAtachment = new Models.FileModel();
+            if (file.Id == null || file.Id == string.Empty)
+                throw new ArgumentException("Invalid file id!");
+            fileAtachment.Id = file.Id;
+            fileAtachment.Extension = file.Extension;
+            BlobClient information = ContainerClient.GetBlobClient(file.Id + file.Extension);
+            if (information == null)
+                throw new ArgumentException("Don't exist or was delete this file!");
+            fileAtachment.Link = GetBlobSasUri(information).ToString();
+            if (fileAtachment.Link == null)
+                throw new ArgumentException($"Sas Invalid for {file.Name}!");
+            fileResult.Add(fileAtachment);
         }
-        throw new ArgumentException("You don't have files!");
+        return Task.FromResult<IEnumerable<FileModel>>(fileResult);
     }
 
-    private static string GetBlobSasUri(BlobClient blobClient)
+    public async Task UploadFileAsync(Models.FileModel file)
+    {
+        if (file == null)
+            throw new ArgumentException("You don't have files!");
+
+        await ContainerClient.CreateIfNotExistsAsync();
+        var blobClient = ContainerClient.GetBlobClient(file.Name);
+        blobClient.Upload(file.Content);
+    }
+
+    private string GetBlobSasUri(BlobClient blobClient)
     {
         BlobSasBuilder sasBuilder = new BlobSasBuilder()
         {
@@ -50,11 +57,21 @@ public class BolbData : IBolbData
             StartsOn = DateTime.UtcNow.AddDays(-1),
             ExpiresOn = DateTime.UtcNow.AddDays(1),
         };
-
         sasBuilder.SetPermissions(BlobSasPermissions.Read);
-
-        //TODO: move AccountName and AccountKey into configuration
-        var sas = sasBuilder.ToSasQueryParameters(new Azure.Storage.StorageSharedKeyCredential("devstoreaccount1", "Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==")).ToString();
+        var sas = sasBuilder.ToSasQueryParameters(new Azure.Storage.StorageSharedKeyCredential(_config.AccountName, _config.AccountKey)).ToString();
         return $"{blobClient.Uri}?{sas}";
+    }
+
+    public async Task<Stream> DownloadFileAsync(string link)
+    {
+        Uri sasUri = new Uri(link);
+        BlobClient blobClient = new BlobClient(sasUri, null);
+        if (blobClient == null)
+            throw new ArgumentException("This file can't be find!");
+        var memoryStream = new MemoryStream();
+        await blobClient.DownloadToAsync(memoryStream);
+        if (memoryStream.Length <= 0)
+            throw new ArgumentException("This file can't be downloading!");
+        return memoryStream;
     }
 }

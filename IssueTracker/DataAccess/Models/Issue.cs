@@ -22,7 +22,5 @@ public class Issue
     public Project Project { get; set; }
     public User User { get; set; }
     public List<File> MetaDatas { get; set; } = new List<File>();
-    //TODO: add List<FileModel> and read it from db with join
-
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 }

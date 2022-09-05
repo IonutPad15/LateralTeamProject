@@ -1,44 +1,31 @@
 ﻿using AutoMapper;
-using DataAccess.Models;
 using DataAccess.Repository;
 using FluentValidation.Results;
-using IssueTracker.FileSystem;
 using IssueTracker.FileSystem.Models;
+using IssueTracker.FileSystem.Repository.IRepository;
 using IssueTrackerAPI.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Models.Request;
 using Validation;
+using File = DataAccess.Models.File;
 
 namespace IssueTrackerAPI.Controllers;
 [Route("api/[controller]")]
 [ApiController]
 public class FileController : ControllerBase
 {
-    private readonly IMetaDataProvider _repository;
-    private readonly IBolbData _bolbData;
+    private readonly IFileProvider _fileProvider;
     private readonly Mapper _mapper;
     private readonly IFileRepository _fileData;
-    public FileController(IConfiguration config, IFileRepository fileData)
+    public FileController(IFileRepository fileData, IFileProvider fileProvider)
     {
+        _fileProvider = fileProvider;
         _fileData = fileData;
-        IConfigurationFactory dataFactory = new ConfigurationFactory(config);
-        IMetaDataConfiguration metaDataConfig = (IMetaDataConfiguration)dataFactory.Create<IMetaDataConfiguration>();
-        IBolbConfiguration bolbConfig = (IBolbConfiguration)dataFactory.Create<IBolbConfiguration>();
-        _repository = new MetaData(metaDataConfig);
-        _bolbData = new BolbData(bolbConfig);
         _mapper = AutoMapperConfig.Config();
     }
 
-    [HttpGet("getFile")]
-    public IActionResult GetFileBlob(string name)
-    {
-        var sasLink = _bolbData.Get(name);
-        if (sasLink == null) throw new ArgumentException("sasLink is null!");
-        return Ok(sasLink); //TODO: nu ramane asa, o sa revin azi peste tot ce am implementat pentru a continua
-    }
-
     [HttpPost]
-    public async Task<IResult> PostFile([FromForm] IFormFile formFile, [FromForm] int? issueId, [FromForm] int? commentId)
+    public async Task<IResult> PostFile([FromForm] IFormFile formFile, [FromForm] int issueId, [FromForm] int? commentId)
     {
         FileRequest fileRequest = new FileRequest(formFile, issueId, commentId);
         var validator = new FileRequestValidation();
@@ -48,46 +35,39 @@ public class FileController : ControllerBase
             List<ValidationFailure> failures = results.Errors;
             return Results.BadRequest(failures);
         }
-        var fileId = Guid.NewGuid();
-        var bolbFileName = $"{fileId}{Path.GetExtension(formFile.FileName)}";
-        var file = formFile.OpenReadStream();
-        _bolbData.Upload(file, bolbFileName);
-        var fileName = formFile.FileName;
-        var group = "Mihai";
-        var fileSize = formFile.Length / 1024;
-        var fileType = formFile.ContentType;
-        var metaDataRequest = new Models.Request.MetaDataRequest(fileId.ToString(), group, fileName, fileType, fileSize);
-        var metaDataReq = _mapper.Map<IssueTracker.FileSystem.Models.MetaDataRequest>(metaDataRequest);
-        try
+        var file = new FileModel
         {
-            await _repository.CreateAsync(metaDataReq);
-            var fileModel = new DataAccess.Models.File();
-            fileModel.FileId = fileId.ToString();
-            fileModel.Extension = group;
-            fileModel.FileCommentId = commentId;
-            fileModel.FileIssueId = issueId;
-            await _fileData.AddAsync(fileModel);
-
-            return Results.Ok(fileName);
-        }
-        catch (ArgumentException ex)
-        {
-            return Results.BadRequest(ex.Message);
-        }
-
+            Name = formFile.FileName,
+            Extension = Path.GetExtension(formFile.FileName),
+            Content = formFile.OpenReadStream(),
+            Group = "Mihai",
+            SizeKb = formFile.Length / 1024,
+            Type = formFile.ContentType
+        };
+        await _fileProvider.UploadAsync(file);
+        var fileModel = _mapper.Map<File>(file);
+        await _fileData.AddAsync(fileModel);
+        return Results.Ok();
     }
-    [HttpGet]
-    public IResult GetAll()
+
+    [HttpGet("getFiles")]
+    public async Task<IActionResult> GetFiles(IEnumerable<FileGetRequest> fileName)
     {
-        var entities = _repository.GetAll();
-        return Results.Ok(entities);
+        var fileAttachment = _mapper.Map<IEnumerable<FileModel>>(fileName);
+        var response = await _fileProvider.GetAsync(fileAttachment);
+        if (response == null) throw new ArgumentException("Result is null!");
+        return Ok(response);
     }
+
     [HttpGet("getone")]
-    public async Task<IResult> Get([FromQuery] string id, [FromQuery] string group)
+    public async Task<IActionResult> GetFile(FileGetRequest fileName)
     {
-        var result = await _repository.GetAsync(id, group);
-        return Results.Ok(result);
+        var fileAttachment = _mapper.Map<IEnumerable<FileModel>>(fileName);
+        var response = await _fileProvider.GetAsync(fileAttachment);
+        if (response == null) throw new ArgumentException("Result is null!");
+        return Ok(response.FirstOrDefault());
     }
+
     [HttpDelete]
     public async Task<IResult> Delete([FromBody] FileDeleteRequest fileDelete)
     {
@@ -99,11 +79,8 @@ public class FileController : ControllerBase
             return Results.BadRequest(failures);
         }
         await _fileData.DeleteAsync(fileDelete.FileId);
-        var result = await _repository.DeleteAsync(fileDelete.FileId, fileDelete.GroupId);
-        if (result == true)
-        {
-            return Results.Ok();
-        }
-        return Results.BadRequest();
+        var file = _mapper.Map<FileModel>(fileDelete);
+        await _fileProvider.DeleteAsync(file);
+        return Results.Ok();
     }
 }

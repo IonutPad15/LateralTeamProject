@@ -1,10 +1,10 @@
 ﻿using Microsoft.Extensions.Configuration;
 
 namespace IssueTracker.FileSystem;
-public class ConfigurationFactory : IConfigurationFactory
+internal class ConfigurationFactory : IConfigurationFactory
 {
     private readonly IConfiguration _config;
-    public ConfigurationFactory(IConfiguration config)
+    internal ConfigurationFactory(IConfiguration config)
     {
         _config = config;
     }
@@ -17,11 +17,13 @@ public class ConfigurationFactory : IConfigurationFactory
             return new MetaDataConfiguration(connstring);
 
         }
-        if (typeof(T) == typeof(IBolbConfiguration))
+        if (typeof(T) == typeof(IBolbConfigurationFactory))
         {
             var connstring = _config.GetValue<string>("ConnectionStrings:Account");
             var container = _config.GetValue<string>("ConnectionStrings:Container");
-            return new BlobConfiguration(container, connstring);
+            var accountName = _config.GetValue<string>("ConnectionStrings:AccountName");
+            var accountKey = _config.GetValue<string>("ConnectionStrings:AccountKey");
+            return new BlobConfiguration(container, connstring, accountName, accountKey);
         }
         throw new InvalidOperationException();
     }
