@@ -1,4 +1,4 @@
-﻿using IssueTracker.FileSystem.Models;
+﻿using File = IssueTracker.FileSystem.Models.File;
 
 namespace IssueTracker.UnitTest.FileSystem;
 [TestClass]
@@ -9,14 +9,14 @@ public class FileProviderTest : BaseClass
     [ExpectedException(typeof(ArgumentException))]
     public void GetFiles_IdWrong()
     {
-        List<FileModel> filesModels = new List<FileModel>();
-        var fileModel = new FileModel
+        List<File> filesModels = new List<File>();
+        var fileModel = new File
         {
             Id = Guid.NewGuid().ToString(),
             Extension = ".png"
         };
         filesModels.Add(fileModel);
-        IEnumerable<FileModel> files = filesModels;
+        IEnumerable<File> files = filesModels;
         FileProviderData.GetAsync(files);
     }
 
@@ -24,14 +24,14 @@ public class FileProviderTest : BaseClass
     [Description("Test Get method with id good and extension good, i expected result")]
     public void GetFiles_IdGood()
     {
-        List<FileModel> filesModels = new List<FileModel>();
-        var fileModel = new FileModel
+        List<File> filesModels = new List<File>();
+        var fileModel = new File
         {
             Id = "f8ae9dc3-b990-4d08-bbba-c3b3fd6e18ae",
             Extension = ".png"
         };
         filesModels.Add(fileModel);
-        IEnumerable<FileModel> files = filesModels;
+        IEnumerable<File> files = filesModels;
         var result = FileProviderData.GetAsync(files);
         Assert.IsNotNull(result);
     }
@@ -41,14 +41,14 @@ public class FileProviderTest : BaseClass
     [ExpectedException(typeof(ArgumentException))]
     public void GetFiles_ExtensionWrong()
     {
-        List<FileModel> filesModels = new List<FileModel>();
-        var fileModel = new FileModel
+        List<File> filesModels = new List<File>();
+        var fileModel = new File
         {
             Id = "f8ae9dc3-b990-4d08-bbba-c3b3fd6e18ae",
             Extension = ".sasd"
         };
         filesModels.Add(fileModel);
-        IEnumerable<FileModel> files = filesModels;
+        IEnumerable<File> files = filesModels;
         FileProviderData.GetAsync(files);
     }
 
@@ -57,8 +57,8 @@ public class FileProviderTest : BaseClass
     [ExpectedException(typeof(ArgumentException))]
     public void GetFiles_ObjectNull()
     {
-        List<FileModel> filesModels = new List<FileModel>();
-        IEnumerable<FileModel> files = filesModels;
+        List<File> filesModels = new List<File>();
+        IEnumerable<File> files = filesModels;
         FileProviderData.GetAsync(files);
     }
 }

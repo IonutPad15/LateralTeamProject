@@ -1,5 +1,4 @@
-﻿using IssueTracker.FileSystem.Models;
-using IssueTracker.FileSystem.Repository.IRepository;
+﻿using IssueTracker.FileSystem.Repository.IRepository;
 using Microsoft.Extensions.Configuration;
 
 namespace IssueTracker.FileSystem.Repository;
