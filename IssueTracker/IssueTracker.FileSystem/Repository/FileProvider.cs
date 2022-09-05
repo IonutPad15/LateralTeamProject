@@ -1,12 +1,12 @@
-﻿using IssueTracker.FileSystem.Models;
-using IssueTracker.FileSystem.Repository.IRepository;
+﻿using IssueTracker.FileSystem.Repository.IRepository;
 using Microsoft.Extensions.Configuration;
 
 namespace IssueTracker.FileSystem.Repository;
-public class FileProvider : IFileProvider
+internal class FileProvider : IFileProvider
 {
     private readonly IMetaDataProvider _metadata;
     private readonly IBolbData _bolb;
+
     public FileProvider(IConfiguration config)
     {
         IConfigurationFactory cf = new ConfigurationFactory(config);
