@@ -50,7 +50,7 @@ public class SQLDataAccess : ISQLDataAccess
         }
         return participants;
     }
-    public async Task<IEnumerable<Comment>> LoadCommentDataAsync<TParameter>(string storedProcedure, TParameter parameter, string connectionId = "Default")
+    public async Task<IEnumerable<Comment>> LoadCommentAsync<TParameter>(string storedProcedure, TParameter parameter, string connectionId = "Default")
     {
         List<Comment> comments = new List<Comment>();
         using (IDbConnection connection = new SqlConnection(_config.GetConnectionString(connectionId)))
@@ -60,10 +60,10 @@ public class SQLDataAccess : ISQLDataAccess
             comments = results.Read<Comment>().ToList();
             var files = results.Read<Models.File>();
             List<Models.File> tempfiles = new List<Models.File>();
-            for (int i = 0; i < comments.Count(); ++i)
+            foreach (var comment in comments)
             {
-                tempfiles = files.Where(x => x.FileCommentId == comments[i].Id).ToList();
-                comments[i].MetaDatas = tempfiles;
+                tempfiles = files.Where(x => x.FileCommentId == comment.Id).ToList();
+                comment.Attachements = tempfiles;
             }
         }
         var result = comments.AsEnumerable();

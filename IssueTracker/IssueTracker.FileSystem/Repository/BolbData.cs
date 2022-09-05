@@ -1,9 +1,9 @@
 ﻿using Azure.Storage.Blobs;
 using Azure.Storage.Sas;
-using IssueTracker.FileSystem.Models;
+
 
 namespace IssueTracker.FileSystem;
-internal class BolbData : IBolbData
+public class BolbData : IBolbData
 {
     private readonly IBolbConfigurationFactory _config;
     private BlobServiceClient BlobServiceClient { get; set; }
@@ -15,13 +15,13 @@ internal class BolbData : IBolbData
         ContainerClient = BlobServiceClient.GetBlobContainerClient(_config.Container);
     }
 
-    public Task<IEnumerable<Models.FileModel>> GetFilesAsync(IEnumerable<Models.FileModel> files)
+    public Task<IEnumerable<Models.File>> GetFilesAsync(IEnumerable<Models.File> files)
     {
-        var fileResult = new List<FileModel>();
+        var fileResult = new List<Models.File>();
 
         foreach (var file in files)
         {
-            var fileAtachment = new Models.FileModel();
+            var fileAtachment = new Models.File();
             if (file.Id == null || file.Id == string.Empty)
                 throw new ArgumentException("Invalid file id!");
             fileAtachment.Id = file.Id;
@@ -34,16 +34,16 @@ internal class BolbData : IBolbData
                 throw new ArgumentException($"Sas Invalid for {file.Name}!");
             fileResult.Add(fileAtachment);
         }
-        return Task.FromResult<IEnumerable<FileModel>>(fileResult);
+        return Task.FromResult<IEnumerable<Models.File>>(fileResult);
     }
 
-    public async Task UploadFileAsync(Models.FileModel file)
+    public async Task UploadFileAsync(Models.File file)
     {
         if (file == null)
             throw new ArgumentException("You don't have files!");
 
         await ContainerClient.CreateIfNotExistsAsync();
-        var blobClient = ContainerClient.GetBlobClient(file.Name);
+        var blobClient = ContainerClient.GetBlobClient(file.BlobName);
         blobClient.Upload(file.Content);
     }
 
