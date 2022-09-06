@@ -1,8 +1,6 @@
-﻿
-namespace Models.Response;
+﻿namespace Models.Response;
 public class FileResponse
 {
-
     public string FileId { get; set; } = string.Empty;
     public string Extension { get; set; } = string.Empty;
     public int? IssueId { get; set; }

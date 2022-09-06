@@ -43,7 +43,8 @@ internal class FileProvider : IFileProvider
 
     public async Task UploadAsync(Models.File file)
     {
-        file.Id = Guid.NewGuid().ToString();
+        if (file == null)
+            throw new ArgumentException("File is null!");
         await _bolb.UploadFileAsync(file);
         await _metadata.CreateAsync(file);
     }

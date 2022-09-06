@@ -1,4 +1,5 @@
 ﻿using DataAccess.Repository;
+using IssueTracker.FileSystem.Repository.IRepository;
 using System.Data;
 using System.Data.SqlClient;
 
@@ -9,6 +10,8 @@ public abstract class BaseClass
     public static TestContext TestContext { get; set; } = null!;
     public static DataTable? TestDataTable { get; set; }
     public static IParticipantRepository ParticipantData = null!;
+    public static IFileProvider FileProviderData = null!;
+
     public static DataTable? LoadDataTable(string sql, string connection)
     {
         TestDataTable = null;
