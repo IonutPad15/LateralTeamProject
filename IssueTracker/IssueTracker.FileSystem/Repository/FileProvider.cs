@@ -1,7 +1,6 @@
-﻿using IssueTracker.FileSystem.Repository.IRepository;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 
-namespace IssueTracker.FileSystem.Repository;
+namespace IssueTracker.FileSystem;
 internal class FileProvider : IFileProvider
 {
     private readonly IMetaDataProvider _metadata;
