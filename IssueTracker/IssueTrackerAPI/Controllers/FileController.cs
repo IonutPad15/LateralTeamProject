@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using DataAccess.Repository;
 using FluentValidation.Results;
-using IssueTracker.FileSystem.Repository.IRepository;
+using IssueTracker.FileSystem;
 using IssueTrackerAPI.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Models.Request;

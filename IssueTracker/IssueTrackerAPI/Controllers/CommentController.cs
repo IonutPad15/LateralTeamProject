@@ -12,7 +12,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http.Headers;
 using System.Security.Claims;
 using Validation;
-using IssueTracker.FileSystem.Repository.IRepository;
+using IssueTracker.FileSystem;
 
 namespace IssueTrackerAPI.Controllers;
 
@@ -49,7 +49,7 @@ public class CommentController : ControllerBase
         commentsResponse = await GetAttachements(comments!, commentsResponse);
         return Results.Ok(commentsResponse);
     }
-    private async Task<IEnumerable<CommentResponse>> GetAttachements(IEnumerable<Comment> comments,IEnumerable<CommentResponse> commentsResponse)
+    private async Task<IEnumerable<CommentResponse>> GetAttachements(IEnumerable<Comment> comments, IEnumerable<CommentResponse> commentsResponse)
     {
         int i = 0;
         List<Comment> commentsList = comments.ToList()!;

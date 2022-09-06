@@ -11,6 +11,7 @@ public class MetaData : IMetaDataProvider
         var storageAccount = CloudStorageAccount.Parse(config.ConnectionString);
         var tableClient = storageAccount.CreateCloudTableClient();
         _metaDataTable = tableClient.GetTableReference("MetaData");
+        _metaDataTable.CreateIfNotExists();
     }
     public IEnumerable<Models.File> GetAll(IEnumerable<Models.File> files)
     {

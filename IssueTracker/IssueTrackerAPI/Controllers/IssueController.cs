@@ -10,6 +10,7 @@ using Models.Request;
 using Models.Response;
 using System.Security.Claims;
 using Validation;
+using IssueTracker.FileSystem;
 
 namespace IssueTrackerAPI.Controllers;
 
@@ -21,10 +22,11 @@ public class IssueController : ControllerBase
     private readonly IParticipantRepository _participant;
     private readonly IFileRepository _file;
     private readonly Mapper _mapper;
-    public IssueController(IIssueRepository issue, IParticipantRepository participant, IFileRepository file)
+    public IssueController(IIssueRepository issue, IParticipantRepository participant, IFileRepository file, IFileProvider fileProvider)
     {
         _participant = participant;
         _issue = issue;
+        AutoMapperConfig.Initialize(fileProvider);
         _mapper = AutoMapperConfig.Config();
         _file = file;
     }
@@ -71,7 +73,7 @@ public class IssueController : ControllerBase
         if (issue == null)
             return NotFound("Couldn't find any issue");
         var result = _mapper.Map<IssueResponse>(issue);
-        if (result.Attachments.Count() > 0)
+        if (issue!.Attachements.Count() > 0)
             result.Attachments = await AutoMapperConfig.GetAttachements(issue!.Attachements);
         return Ok(result);
     }

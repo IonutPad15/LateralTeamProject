@@ -1,6 +1,4 @@
-﻿using IssueTracker.FileSystem.Repository;
-using IssueTracker.FileSystem.Repository.IRepository;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 
 namespace IssueTracker.FileSystem;
 
