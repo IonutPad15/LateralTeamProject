@@ -1,5 +1,7 @@
-﻿using IssueTracker.FileSystem.Models;
+﻿using System.Runtime.CompilerServices;
+using IssueTracker.FileSystem.Models;
 
+[assembly: InternalsVisibleTo("IssueTracker.UnitTest")]
 namespace IssueTracker.FileSystem;
 
 internal interface IMetaDataProvider
