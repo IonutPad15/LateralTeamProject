@@ -3,8 +3,7 @@ using DataAccess.DbAccess;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using IssueTracker.FileSystem.Repository.IRepository;
-using IssueTracker.FileSystem.Repository;
+using IssueTracker.FileSystem;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -23,7 +22,8 @@ builder.Services.AddSingleton<IIssueRepository, IssueRepository>();
 builder.Services.AddSingleton<IParticipantRepository, ParticipantRepository>();
 builder.Services.AddSingleton<ICommentRepository, CommentRepository>();
 builder.Services.AddSingleton<IFileRepository, FileRepository>();
-builder.Services.AddSingleton<IFileProvider, FileProvider>();
+builder.Services.AddFileSystemServices();
+//builder.Services.AddSingleton<IFileProvider, FileProvider>();
 
 
 builder.Services.AddAuthentication(options =>
