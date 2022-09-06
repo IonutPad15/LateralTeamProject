@@ -13,7 +13,8 @@ internal class ConfigurationFactory : IConfigurationFactory
         if (typeof(T) == typeof(IMetaDataConfiguration))
         {
             var connstring = _config.GetValue<string>("ConnectionStrings:Account");
-            return (T)(new MetaDataConfiguration(connstring) as IMetaDataConfiguration);
+            var azureTable = _config.GetValue<string>("ConnectionStrings:AzureTable");
+            return (T)(new MetaDataConfiguration(connstring, azureTable) as IMetaDataConfiguration);
 
         }
         if (typeof(T) == typeof(IBolbConfigurationFactory))
