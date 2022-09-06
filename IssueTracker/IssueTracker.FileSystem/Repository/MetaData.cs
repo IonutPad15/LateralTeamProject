@@ -49,8 +49,14 @@ public class MetaData : IMetaDataProvider
     }
     public async Task<bool> DeleteAsync(string id, string group)
     {
+        if (id == null || id == string.Empty)
+            throw new ArgumentException("Invalid Id for file");
+        if (group == null || group == string.Empty)
+            throw new ArgumentException("Invalid Group for File!");
         var operation = TableOperation.Retrieve<MetaDataEntity>(group, id);
         var result = await _metaDataTable.ExecuteAsync(operation);
+        if (result.Result == null)
+            throw new ArgumentException("I Can't find any file!");
         var x = result.Result as MetaDataEntity;
         if (x != null)
         {

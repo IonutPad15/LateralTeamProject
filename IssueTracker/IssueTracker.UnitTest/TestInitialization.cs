@@ -4,6 +4,7 @@ using DataAccess.Models;
 using Microsoft.Extensions.Configuration;
 using System.Data.SqlClient;
 using IssueTracker.FileSystem;
+using IssueTracker.FileSystem.Repository;
 
 namespace IssueTracker.UnitTest;
 
@@ -26,6 +27,7 @@ public class TestInitialization
 
             IConfigurationFactory cf = new ConfigurationFactory(configuration);
             var metadataconfig = cf.Create<IMetaDataConfiguration>();
+            BaseClass.FileProviderData = new FileProvider(configuration);
             BaseClass.s_metaDataProvider = new MetaData(metadataconfig);
 
             string? conn = tc.Properties["ConnectionString"]!.ToString();

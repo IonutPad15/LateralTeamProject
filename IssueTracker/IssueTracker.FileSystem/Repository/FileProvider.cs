@@ -19,6 +19,8 @@ internal class FileProvider : IFileProvider
 
     public async Task DeleteAsync(Models.File file)
     {
+        if (file == null)
+            throw new ArgumentException("I can't find any file!");
         await _metadata.DeleteAsync(file.Id, file.Extension);
     }
 
@@ -44,7 +46,7 @@ internal class FileProvider : IFileProvider
 
     public async Task UploadAsync(Models.File file)
     {
-        if (file == null)
+        if (file.Name == null)
             throw new ArgumentException("File is null!");
         await _bolb.UploadFileAsync(file);
         await _metadata.CreateAsync(file);
