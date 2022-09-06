@@ -12,4 +12,5 @@ internal interface IConfigurationBase
 }
 internal interface IMetaDataConfiguration : IConfigurationBase
 {
+    string AzureTable { get; }
 }
