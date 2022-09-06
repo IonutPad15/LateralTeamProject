@@ -13,8 +13,7 @@ public class ParticipantDataTest : BaseClass
     public async Task GetAll_Test()
     {
         var participants = await ParticipantData.GetAllAsync();
-        int value = participants.Count();
-        Assert.IsTrue(value > 0);
+        Assert.IsTrue(participants.Count() > 0);
     }
     [TestMethod]
     [Description("Given a valid participant object, when AddAsync is called" +
@@ -136,7 +135,6 @@ public class ParticipantDataTest : BaseClass
         }
     }
     [TestMethod]
-    [ExpectedException(typeof(SqlException))]
     [Description("Given an invalid RoleId (-1), when UpdateAsync is called" +
         "then it should throw an SqlException")]
     public async Task UpdateAsync_Test_BadRoleId()
@@ -152,10 +150,9 @@ public class ParticipantDataTest : BaseClass
             ProjectId = row.Field<int>("ProjectId"),
             RoleId = (RolesType)(-1)
         };
-        await ParticipantData.UpdateAsync(participant);
+        await Assert.ThrowsExceptionAsync<SqlException>(() => ParticipantData.UpdateAsync(participant));
     }
     [TestMethod]
-    [ExpectedException(typeof(SqlException))]
     [Description("Given an invalid Id (-1), when UpdateAsync is called" +
         "then it should throw an SqlException")]
     public async Task UpdateAsync_Test_BadId()
@@ -171,6 +168,6 @@ public class ParticipantDataTest : BaseClass
             ProjectId = row.Field<int>("ProjectId"),
             RoleId = (RolesType)4
         };
-        await ParticipantData.UpdateAsync(participant);
+        await Assert.ThrowsExceptionAsync<SqlException>(() => ParticipantData.UpdateAsync(participant));
     }
 }
