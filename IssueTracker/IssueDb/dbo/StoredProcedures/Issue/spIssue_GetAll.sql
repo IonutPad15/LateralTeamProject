@@ -10,4 +10,6 @@ begin
 	inner join IssueType on IssueType.Id = IssueTypeId
 	inner join [User] on [User].Id = UserAssignedId
 	where Issue.IsDeleted = 0
+
+    select * from [dbo].[File];
 end

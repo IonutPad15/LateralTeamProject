@@ -23,7 +23,6 @@ public class TestInitialization
             BaseClass.ParticipantData = new ParticipantRepository(new SQLDataAccess(configuration));
             BaseClass.TestContext = tc;
 
-
             string? conn = tc.Properties["ConnectionString"]!.ToString();
             string sql = "TRUNCATE TABLE dbo.[Participant]";
             using (SqlConnection ConnectionObject = new SqlConnection(conn!))

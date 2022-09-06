@@ -1,6 +1,8 @@
-﻿using IssueTracker.FileSystem.Repository.IRepository;
+﻿using System.Runtime.CompilerServices;
+using IssueTracker.FileSystem.Repository.IRepository;
 using Microsoft.Extensions.Configuration;
 
+[assembly: InternalsVisibleTo("IssueTracker.UnitTest")]
 namespace IssueTracker.FileSystem.Repository;
 internal class FileProvider : IFileProvider
 {

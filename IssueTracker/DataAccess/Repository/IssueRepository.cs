@@ -31,11 +31,11 @@ public class IssueRepository : IIssueRepository
     }
     public async Task<IEnumerable<Issue>> GetAllAsync()
     {
-        return await _db.LoadDataAsync<Issue, Project, Status, Priority, Role, IssueType, User>("dbo.spIssue_GetAll");
+        return await _db.LoadIssueAsync<dynamic>("dbo.spIssue_GetAll", new { });
     }
     public async Task<Issue?> GetByIdAsync(int id)
     {
-        return (await _db.LoadDataAsync<Issue, Project, Status, Priority, Role, IssueType, User, dynamic>("dbo.spIssue_Get", new { Id = id })).FirstOrDefault();
+        return (await _db.LoadIssueAsync<dynamic>("dbo.spIssue_Get", new { Id = id })).FirstOrDefault();
     }
     public async Task UpdateAsync(Issue entity)
     {

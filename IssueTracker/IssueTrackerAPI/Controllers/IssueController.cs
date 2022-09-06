@@ -54,7 +54,6 @@ public class IssueController : ControllerBase
         List<IssueResponse> resultList = new();
         foreach (var issue in issues!)
         {
-            issue.Attachements = await _file.GetByIssueIdAsync(issue.Id);
             resultList.Add(_mapper.Map<IssueResponse>(issue));
             foreach (var result in resultList)
             {
@@ -71,7 +70,6 @@ public class IssueController : ControllerBase
         var issue = await _issue.GetByIdAsync(id);
         if (issue == null)
             return NotFound("Couldn't find any issue");
-        issue!.Attachements = await _file.GetByIssueIdAsync(issue.Id);
         var result = _mapper.Map<IssueResponse>(issue);
         if (result.Attachments.Count() > 0)
             result.Attachments = await AutoMapperConfig.GetAttachements(issue!.Attachements);
