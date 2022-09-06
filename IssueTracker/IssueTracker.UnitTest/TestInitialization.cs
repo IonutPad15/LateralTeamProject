@@ -3,6 +3,7 @@ using DataAccess.DbAccess;
 using DataAccess.Models;
 using Microsoft.Extensions.Configuration;
 using System.Data.SqlClient;
+using IssueTracker.FileSystem;
 
 namespace IssueTracker.UnitTest;
 
@@ -23,6 +24,9 @@ public class TestInitialization
             BaseClass.ParticipantData = new ParticipantRepository(new SQLDataAccess(configuration));
             BaseClass.TestContext = tc;
 
+            IConfigurationFactory cf = new ConfigurationFactory(configuration);
+            var metadataconfig = cf.Create<IMetaDataConfiguration>();
+            BaseClass.s_metaDataProvider = new MetaData(metadataconfig);
 
             string? conn = tc.Properties["ConnectionString"]!.ToString();
             string sql = "TRUNCATE TABLE dbo.[Participant]";

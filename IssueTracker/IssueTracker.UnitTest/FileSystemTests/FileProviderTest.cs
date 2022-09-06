@@ -1,6 +1,6 @@
 ﻿using File = IssueTracker.FileSystem.Models.File;
 
-namespace IssueTracker.UnitTest.FileSystem;
+namespace IssueTracker.UnitTest;
 [TestClass]
 public class FileProviderTest : BaseClass
 {

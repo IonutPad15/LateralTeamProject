@@ -1,5 +1,5 @@
 ﻿using DataAccess.Repository;
-using IssueTracker.FileSystem.Repository.IRepository;
+using IssueTracker.FileSystem;
 using System.Data;
 using System.Data.SqlClient;
 
@@ -11,6 +11,7 @@ public abstract class BaseClass
     public static DataTable? TestDataTable { get; set; }
     public static IParticipantRepository ParticipantData = null!;
     public static IFileProvider FileProviderData = null!;
+    internal static IMetaDataProvider s_metaDataProvider = null!;
 
     public static DataTable? LoadDataTable(string sql, string connection)
     {

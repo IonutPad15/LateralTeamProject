@@ -1,5 +1,7 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using System.Runtime.CompilerServices;
+using Microsoft.Extensions.Configuration;
 
+[assembly: InternalsVisibleTo("IssueTracker.UnitTest")]
 namespace IssueTracker.FileSystem;
 internal class FileProvider : IFileProvider
 {
