@@ -1,4 +1,4 @@
-﻿using IssueTracker.FileSystem.Repository.IRepository;
+﻿using IssueTracker.FileSystem;
 using Models.Response;
 
 namespace IssueTrackerAPI.Utils;

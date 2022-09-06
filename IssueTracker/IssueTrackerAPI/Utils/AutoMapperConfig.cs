@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using DataAccess.Models;
-using IssueTracker.FileSystem.Repository.IRepository;
+using IssueTracker.FileSystem;
 using Models.Request;
 using Models.Response;
 

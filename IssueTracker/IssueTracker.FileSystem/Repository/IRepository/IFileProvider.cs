@@ -1,4 +1,4 @@
-﻿namespace IssueTracker.FileSystem.Repository.IRepository;
+﻿namespace IssueTracker.FileSystem;
 public interface IFileProvider
 {
     Task UploadAsync(Models.File file);
