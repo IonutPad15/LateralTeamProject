@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using DataAccess.Data.IData;
+using DataAccess.Repository;
 using DataAccess.Models;
 using DataAccess.Utils;
 using FluentValidation.Results;
@@ -16,10 +16,10 @@ namespace IssueTrackerAPI.Controllers;
 [ApiController]
 public class ProjectController : ControllerBase
 {
-    private readonly IProjectData _projectdb;
-    private readonly IParticipantData _participantdb;
+    private readonly IProjectRepository _projectdb;
+    private readonly IParticipantRepository _participantdb;
     private readonly Mapper _mapper;
-    public ProjectController(IProjectData projectdb, IParticipantData participantdb)
+    public ProjectController(IProjectRepository projectdb, IParticipantRepository participantdb)
     {
         _projectdb = projectdb;
         _participantdb = participantdb;
