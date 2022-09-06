@@ -4,6 +4,7 @@ using Dapper;
 using System.Data;
 using DataAccess.Utils;
 using DataAccess.Models;
+using System.Xml.Linq;
 
 namespace DataAccess.DbAccess;
 
@@ -73,12 +74,21 @@ public class SQLDataAccess : ISQLDataAccess
         {
             var results = await connection.QueryMultipleAsync
                 (storedProcedure, parameter, commandType: CommandType.StoredProcedure);
-            issueList = results.Read<Issue>().ToList();
+            issueList = results.Read<Issue, Project, Status, Priority, Role, IssueType, User, Issue>(func: (issue, project, status, priority, role, issueType, user) =>
+            {
+                issue.Status = status;
+                issue.Priority = priority;
+                issue.Project = project;
+                issue.User = user;
+                issue.Role = role;
+                issue.IssueType = issueType;
+                return issue;
+            }).ToList();
             var files = results.Read<Models.File>();
             List<Models.File> tempfiles = new List<Models.File>();
             foreach (var issue in issueList)
             {
-                tempfiles = files.Where(x => x.FileCommentId == issue.Id).ToList();
+                tempfiles = files.Where(x => x.FileIssueId == issue.Id).ToList();
                 issue.Attachements = tempfiles;
             }
         }

@@ -1,4 +1,4 @@
-﻿using IssueTracker.FileSystem.Repository.IRepository;
+﻿using System.Runtime.CompilerServices;
 using Microsoft.Extensions.Configuration;
 
 [assembly: InternalsVisibleTo("IssueTracker.UnitTest")]
