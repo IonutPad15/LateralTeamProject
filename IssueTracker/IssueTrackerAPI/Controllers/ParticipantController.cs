@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using DataAccess.Data.IData;
+using DataAccess.Repository;
 using DataAccess.Models;
 using DataAccess.Utils;
 using FluentValidation.Results;
@@ -17,9 +17,9 @@ namespace IssueTrackerAPI.Controllers;
 [ApiController]
 public class ParticipantController : ControllerBase
 {
-    private readonly IParticipantData _participantData;
+    private readonly IParticipantRepository _participantData;
     private readonly Mapper _mapper;
-    public ParticipantController(IParticipantData participantData, IRoleData roleData)
+    public ParticipantController(IParticipantRepository participantData, IRoleRepository roleData)
     {
         _participantData = participantData;
         _mapper = AutoMapperConfig.Config();
@@ -51,7 +51,7 @@ public class ParticipantController : ControllerBase
 
     }
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    public static async Task<bool> CreateOwner(int projectId, Guid userId, IParticipantData participantData)
+    public static async Task<bool> CreateOwner(int projectId, Guid userId, IParticipantRepository participantData)
     {
         if (projectId > 0)
         {

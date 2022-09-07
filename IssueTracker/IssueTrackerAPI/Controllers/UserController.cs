@@ -1,7 +1,7 @@
 ﻿using DataAccess.Models;
 using Microsoft.AspNetCore.Mvc;
 using DataAccess.Utils;
-using DataAccess.Data.IData;
+using DataAccess.Repository;
 using Models.Request;
 using AutoMapper;
 using Validation;
@@ -18,10 +18,10 @@ namespace IssueTrackerAPI.Controllers;
 [ApiController]
 public class UserController : ControllerBase
 {
-    private readonly IUserData _data;
+    private readonly IUserRepository _data;
     private readonly Mapper _mapper;
     private readonly IConfiguration _configuration;
-    public UserController(IUserData data, IConfiguration configuration)
+    public UserController(IUserRepository data, IConfiguration configuration)
     {
         _data = data;
         _mapper = AutoMapperConfig.Config();

@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using DataAccess.Data.IData;
+using DataAccess.Repository;
 using DataAccess.Models;
 using FluentValidation.Results;
 using IssueTrackerAPI.Utils;
@@ -10,6 +10,7 @@ using Models.Request;
 using Models.Response;
 using System.Security.Claims;
 using Validation;
+using IssueTracker.FileSystem;
 
 namespace IssueTrackerAPI.Controllers;
 
@@ -17,14 +18,17 @@ namespace IssueTrackerAPI.Controllers;
 [ApiController]
 public class IssueController : ControllerBase
 {
-    private readonly IIssueData _issue;
-    private readonly IParticipantData _participant;
+    private readonly IIssueRepository _issue;
+    private readonly IParticipantRepository _participant;
+    private readonly IFileRepository _file;
     private readonly Mapper _mapper;
-    public IssueController(IIssueData issue, IParticipantData participant)
+    public IssueController(IIssueRepository issue, IParticipantRepository participant, IFileRepository file, IFileProvider fileProvider)
     {
         _participant = participant;
         _issue = issue;
+        AutoMapperConfig.Initialize(fileProvider);
         _mapper = AutoMapperConfig.Config();
+        _file = file;
     }
 
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
@@ -46,17 +50,34 @@ public class IssueController : ControllerBase
     [HttpGet("getAll-Issue")]
     public async Task<IActionResult> GetAllIssue()
     {
-        var result = await _issue.GetAllAsync();
-        var listIssue = _mapper.Map<IEnumerable<IssueResponse>>(result);
-        return Ok(listIssue);
+        var issues = await _issue.GetAllAsync();
+        if (issues == null)
+            return NotFound("Couldn't find any issue");
+        List<IssueResponse> resultList = new();
+        foreach (var issue in issues!)
+        {
+            issue.Attachements = await _file.GetByIssueIdAsync(issue.Id);
+            resultList.Add(_mapper.Map<IssueResponse>(issue));
+            foreach (var result in resultList)
+            {
+                if (issue.Attachements.Count() > 0)
+                    result.Attachments = await AutoMapperConfig.GetAttachements(issue.Attachements);
+            }
+        }
+        return Ok(resultList);
     }
 
     [HttpGet("getById-Issue")]
     public async Task<IActionResult> GetByIdIssue(int id)
     {
-        var result = await _issue.GetByIdAsync(id);
-        var issue = _mapper.Map<IssueResponse>(result);
-        return Ok(issue);
+        var issue = await _issue.GetByIdAsync(id);
+        if (issue == null)
+            return NotFound("Couldn't find any issue");
+        issue!.Attachements = await _file.GetByIssueIdAsync(issue.Id);
+        var result = _mapper.Map<IssueResponse>(issue);
+        if (issue!.Attachements.Count() > 0)
+            result.Attachments = await AutoMapperConfig.GetAttachements(issue!.Attachements);
+        return Ok(result);
     }
 
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]

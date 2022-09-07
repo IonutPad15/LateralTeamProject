@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using DataAccess.Data.IData;
+using DataAccess.Repository;
 using DataAccess.Models;
 using FluentValidation.Results;
 using IssueTrackerAPI.Utils;
@@ -12,6 +12,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http.Headers;
 using System.Security.Claims;
 using Validation;
+using IssueTracker.FileSystem;
 
 namespace IssueTrackerAPI.Controllers;
 
@@ -19,13 +20,14 @@ namespace IssueTrackerAPI.Controllers;
 [ApiController]
 public class CommentController : ControllerBase
 {
-    private readonly ICommentData _commentData;
-    private readonly IUserData _userData;
+    private readonly ICommentRepository _commentData;
+    private readonly IUserRepository _userData;
     private readonly Mapper _mapper;
-    public CommentController(ICommentData commentData, IUserData userData)
+    public CommentController(ICommentRepository commentData, IUserRepository userData, IFileProvider fileProvider)
     {
         _userData = userData;
         _commentData = commentData;
+        AutoMapperConfig.Initialize(fileProvider);
         _mapper = AutoMapperConfig.Config();
 
     }
@@ -35,30 +37,55 @@ public class CommentController : ControllerBase
         var comment = await _commentData.GetByIdAsync(id);
         if (comment == null) return Results.NotFound("Couldn't find any comment");
         var commentResponse = _mapper.Map<CommentResponse>(comment);
+        commentResponse.Attachements = await AutoMapperConfig.GetAttachements(comment.Attachements);
         return Results.Ok(commentResponse);
     }
     [HttpGet("issueid")]
     public async Task<IResult> GetByIssueId(int id)
     {
-        var comment = await _commentData.GetAllByIssueIdAsync(id);
-        if (comment.Count() == 0) return Results.NotFound("Couldn't find any comments");
-        var commentsResponse = _mapper.Map<IEnumerable<CommentResponse>>(comment);
+        var comments = await _commentData.GetAllByIssueIdAsync(id);
+        if (comments == null || comments.Count() == 0) return Results.NotFound("Couldn't find any comments");
+        var commentsResponse = _mapper.Map<IEnumerable<CommentResponse>>(comments);
+        commentsResponse = await GetAttachements(comments!, commentsResponse);
         return Results.Ok(commentsResponse);
+    }
+    private async Task<IEnumerable<CommentResponse>> GetAttachements(IEnumerable<Comment> comments, IEnumerable<CommentResponse> commentsResponse)
+    {
+        int i = 0;
+        List<Comment> commentsList = comments.ToList()!;
+        foreach (var comment in commentsResponse)
+        {
+            comment.Attachements = await AutoMapperConfig.GetAttachements(commentsList[i].Attachements);
+            if (commentsList[i].Replies != null)
+            {
+                int j = 0;
+                List<Comment> replyList = commentsList[i].Replies.ToList();
+                foreach (var reply in comment.Replies)
+                {
+                    reply.Attachements = await AutoMapperConfig.GetAttachements(replyList[j].Attachements);
+                    ++j;
+                }
+            }
+            ++i;
+        }
+        return commentsResponse;
     }
     [HttpGet("replies")]
     public async Task<IResult> GetByCommentId(int id)
     {
-        var comment = await _commentData.GetAllByCommentIdAsync(id);
-        if (comment.Count() == 0) return Results.NotFound("Couldn't find any comments");
-        var commentsResponse = _mapper.Map<IEnumerable<CommentResponse>>(comment);
+        var comments = await _commentData.GetAllByCommentIdAsync(id);
+        if (comments.Count() == 0) return Results.NotFound("Couldn't find any comments");
+        var commentsResponse = _mapper.Map<IEnumerable<CommentResponse>>(comments);
+        commentsResponse = await GetAttachements(comments!, commentsResponse);
         return Results.Ok(commentsResponse);
     }
     [HttpGet("userid")]
     public async Task<IResult> GetByUserId(Guid id)
     {
-        var comment = await _commentData.GetAllByUserIdAsync(id);
-        if (comment.Count() == 0) return Results.NotFound("Couldn't find any comments");
-        var commentsResponse = _mapper.Map<IEnumerable<CommentResponse>>(comment);
+        var comments = await _commentData.GetAllByUserIdAsync(id);
+        if (comments.Count() == 0) return Results.NotFound("Couldn't find any comments");
+        IEnumerable<CommentResponse> commentsResponse = _mapper.Map<IEnumerable<CommentResponse>>(comments);
+        commentsResponse = await GetAttachements(comments!, commentsResponse);
         return Results.Ok(commentsResponse);
     }
     [HttpPost]
