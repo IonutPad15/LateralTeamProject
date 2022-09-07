@@ -1,8 +1,6 @@
 ﻿using Microsoft.Azure.Cosmos.Table;
 using IssueTracker.FileSystem.Models;
-using System.Runtime.CompilerServices;
 
-[assembly: InternalsVisibleTo("IssueTracker.UnitTest")]
 namespace IssueTracker.FileSystem;
 
 public class MetaData : IMetaDataProvider

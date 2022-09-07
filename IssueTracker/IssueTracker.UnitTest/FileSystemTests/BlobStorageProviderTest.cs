@@ -3,7 +3,7 @@
 namespace IssueTracker.UnitTest.FileSystemTests;
 
 [TestClass]
-public class BlobDataTest : BaseClass
+public class BlobStorageProviderTest : BaseClass
 {
     [TestMethod]
     [Description("Upload Method with Content null, i expected error")]
@@ -11,7 +11,7 @@ public class BlobDataTest : BaseClass
     {
         var file = new File
         {
-            BlobName = $"{IdFileTest}.txt",
+            BlobName = $"{FileObject.Id}.txt",
             Content = null
         };
 
@@ -25,7 +25,7 @@ public class BlobDataTest : BaseClass
         var file = new File
         {
             BlobName = null!,
-            Content = FileStreamTest
+            Content = FileObject.Content
         };
 
         await Assert.ThrowsExceptionAsync<ArgumentException>(() => s_blobData.UploadFileAsync(file));
@@ -38,25 +38,10 @@ public class BlobDataTest : BaseClass
         var file = new File
         {
             BlobName = String.Empty,
-            Content = FileStreamTest
+            Content = FileObject.Content
         };
 
         await Assert.ThrowsExceptionAsync<ArgumentException>(() => s_blobData.UploadFileAsync(file));
-    }
-
-    [TestMethod]
-    [Description("Upload Method with good object, i expected result")]
-    public async Task Upload_GoodObjectAsync()
-    {
-        var file = new File
-        {
-            BlobName = Guid.NewGuid().ToString(),
-            Content = FileStreamTest
-        };
-
-        await s_blobData.UploadFileAsync(file);
-
-        Assert.IsTrue(true);
     }
 
     [TestMethod]
@@ -105,7 +90,7 @@ public class BlobDataTest : BaseClass
         List<File> files = new();
         var file = new File
         {
-            Id = IdFileTest,
+            Id = FileObject.Id,
             Extension = null!
         };
         files.Add(file);
@@ -120,7 +105,7 @@ public class BlobDataTest : BaseClass
         List<File> files = new();
         var file = new File
         {
-            Id = IdFileTest,
+            Id = FileObject.Id,
             Extension = String.Empty
         };
         files.Add(file);
@@ -135,7 +120,7 @@ public class BlobDataTest : BaseClass
         List<File> files = new();
         var file = new File
         {
-            Id = IdFileTest,
+            Id = FileObject.Id,
             Extension = ".txt"
         };
         files.Add(file);

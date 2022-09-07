@@ -1,12 +1,10 @@
-﻿using System.Runtime.CompilerServices;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 
-[assembly: InternalsVisibleTo("IssueTracker.UnitTest")]
 namespace IssueTracker.FileSystem;
 internal class FileProvider : IFileProvider
 {
     private readonly IMetaDataProvider _metadata;
-    private readonly IBolbData _bolb;
+    private readonly IBolbStorageProvider _bolb;
 
     public FileProvider(IConfiguration config)
     {
@@ -14,7 +12,7 @@ internal class FileProvider : IFileProvider
         var metaDataConfig = cf.Create<IMetaDataConfiguration>();
         _metadata = new MetaData(metaDataConfig);
         var blobConfig = cf.Create<IBolbConfigurationFactory>();
-        _bolb = new BolbData(blobConfig);
+        _bolb = new BolbStorageProvider(blobConfig);
     }
 
     public async Task DeleteAsync(Models.File file)

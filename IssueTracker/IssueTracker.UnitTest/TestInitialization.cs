@@ -24,12 +24,14 @@ public class TestInitialization
             BaseClass.IssueData = new IssueRepository(new SQLDataAccess(configuration));
             BaseClass.ParticipantData = new ParticipantRepository(new SQLDataAccess(configuration));
             BaseClass.TestContext = tc;
+            BaseClass.FileObject = new File();
 
             IConfigurationFactory cf = new ConfigurationFactory(configuration);
             var blobConfig = cf.Create<IBolbConfigurationFactory>();
             var metadataconfig = cf.Create<IMetaDataConfiguration>();
-            BaseClass.s_blobData = new BolbData(blobConfig);
+            BaseClass.s_blobData = new BolbStorageProvider(blobConfig);
             BaseClass.s_metaDataProvider = new MetaData(metadataconfig);
+            BaseClass.s_fileProviderData = new FileProvider(configuration);
 
             //begin populate Blob Test
             var path = "TextForTest.txt";
@@ -37,13 +39,21 @@ public class TestInitialization
             {
                 System.IO.File.Delete(path);
             }
-            FileStream fs = System.IO.File.Create(path);
-            BaseClass.FileStreamTest = fs;
-            BaseClass.IdFileTest = Guid.NewGuid().ToString();
+            var idFileTest = Guid.NewGuid().ToString();
+            using (FileStream fs = System.IO.File.Create(path))
+            {
+                BaseClass.FileObject.Id = idFileTest;
+                BaseClass.FileObject.Name = "TextForTest";
+                BaseClass.FileObject.Content = fs;
+                BaseClass.FileObject.BlobName = $"{idFileTest}.txt";
+                BaseClass.FileObject.Extension = ".txt";
+                BaseClass.FileObject.SizeKb = 12;
+                BaseClass.FileObject.Type = "TextDocument";
+            };
             var file = new File
             {
-                BlobName = $"{BaseClass.IdFileTest}.txt",
-                Content = fs
+                BlobName = $"{BaseClass.FileObject.Id}.txt",
+                Content = BaseClass.FileObject.Content
             };
             BaseClass.s_blobData.UploadFileAsync(file);
             if (System.IO.File.Exists(path))
@@ -52,7 +62,7 @@ public class TestInitialization
             }
             //End populate Blob Test
 
-            string? conn = tc.Properties["ConnectionString"]!.ToString();
+            string? conn = configuration["ConnectionStrings.Default"].ToString();
             string sql = "TRUNCATE TABLE dbo.[Participant]";
             using (SqlConnection ConnectionObject = new SqlConnection(conn!))
             {

@@ -9,9 +9,9 @@ public class MetaDataTest : BaseClass
     public async Task CreateAsync_Test()
     {
         //arrange
-        var rowkey = Guid.NewGuid().ToString();
+        var rowkey = FileObject.Id;
         var partitionkey = ".txt";
-        string name = "fisier";
+        string name = "TextForTest";
         string type = "TextDocument";
         double sizeKb = 12;
         var file = new FileSystem.Models.File(rowkey, partitionkey, name, type, sizeKb);

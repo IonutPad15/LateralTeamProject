@@ -1,15 +1,13 @@
-﻿using System.Runtime.CompilerServices;
-using Azure.Storage.Blobs;
+﻿using Azure.Storage.Blobs;
 using Azure.Storage.Sas;
 
-[assembly: InternalsVisibleTo("IssueTracker.UnitTest")]
 namespace IssueTracker.FileSystem;
-public class BolbData : IBolbData
+public class BolbStorageProvider : IBolbStorageProvider
 {
     private readonly IBolbConfigurationFactory _config;
     private BlobServiceClient BlobServiceClient { get; set; }
     private BlobContainerClient ContainerClient { get; set; }
-    internal BolbData(IBolbConfigurationFactory config)
+    internal BolbStorageProvider(IBolbConfigurationFactory config)
     {
         _config = config;
         BlobServiceClient = new BlobServiceClient(_config.ConnectionString);

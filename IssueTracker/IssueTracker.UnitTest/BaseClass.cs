@@ -1,5 +1,6 @@
 ﻿using DataAccess.Repository;
 using IssueTracker.FileSystem;
+using File = IssueTracker.FileSystem.Models.File;
 using System.Data;
 using System.Data.SqlClient;
 
@@ -8,13 +9,12 @@ public abstract class BaseClass
 {
     public static IIssueRepository IssueData = null!;
     public static TestContext TestContext { get; set; } = null!;
-    internal static string IdFileTest { get; set; } = String.Empty;
-    internal static Stream FileStreamTest { get; set; } = null!;
+    internal static File FileObject { get; set; } = null!;
     public static DataTable? TestDataTable { get; set; }
     public static IParticipantRepository ParticipantData = null!;
     internal static IFileProvider s_fileProviderData = null!;
     internal static IMetaDataProvider s_metaDataProvider = null!;
-    internal static IBolbData s_blobData = null!;
+    internal static IBolbStorageProvider s_blobData = null!;
 
     public static DataTable? LoadDataTable(string sql, string connection)
     {

@@ -1,23 +1,88 @@
 ﻿using File = IssueTracker.FileSystem.Models.File;
 
 namespace IssueTracker.UnitTest;
+
 [TestClass]
 public class FileProviderTest : BaseClass
 {
     [TestMethod]
-    [Description("Test Get method with id wrong and extension good, i expected exception")]
-    [ExpectedException(typeof(ArgumentException))]
-    public void GetFiles_IdWrong()
+    [Description("Testing Upload Method with Id Empty, i expected error!")]
+    public async Task Upload_IdWrongAsync()
     {
-        List<File> filesModels = new List<File>();
-        var fileModel = new File
-        {
-            Id = Guid.NewGuid().ToString(),
-            Extension = ".png"
-        };
-        filesModels.Add(fileModel);
-        IEnumerable<File> files = filesModels;
-        s_fileProviderData.GetAsync(files);
+        var file = FileObject;
+        file.Id = String.Empty;
+
+        await Assert.ThrowsExceptionAsync<ArgumentException>(() => s_fileProviderData.UploadAsync(file));
+    }
+
+    [TestMethod]
+    [Description("Testing Upload Method with Id null, i expected error!")]
+    public async Task Upload_IdNullAsync()
+    {
+        var file = FileObject;
+        file.Id = null!;
+
+        await Assert.ThrowsExceptionAsync<ArgumentException>(() => s_fileProviderData.UploadAsync(file));
+    }
+
+    [TestMethod]
+    [Description("Testing Upload Method with Extension null, i expected error!")]
+    public async Task Upload_ExtensionNullAsync()
+    {
+        var file = FileObject;
+        file.Extension = null!;
+
+        await Assert.ThrowsExceptionAsync<ArgumentException>(() => s_fileProviderData.UploadAsync(file));
+    }
+
+    [TestMethod]
+    [Description("Testing Upload Method with Extension empty, i expected error!")]
+    public async Task Upload_ExtensionEmptyAsync()
+    {
+        var file = FileObject;
+        file.Extension = String.Empty;
+
+        await Assert.ThrowsExceptionAsync<ArgumentException>(() => s_fileProviderData.UploadAsync(file));
+    }
+
+    [TestMethod]
+    [Description("Testing Upload Method with Content null, i expected error!")]
+    public async Task Upload_ContentNullAsync()
+    {
+        var file = FileObject;
+        file.Content = null;
+
+        await Assert.ThrowsExceptionAsync<ArgumentException>(() => s_fileProviderData.UploadAsync(file));
+    }
+
+    [TestMethod]
+    [Description("Testing Upload Method with Size negative, i expected error!")]
+    public async Task Upload_SizeNegativeAsync()
+    {
+        var file = FileObject;
+        file.SizeKb = -21;
+
+        await Assert.ThrowsExceptionAsync<ArgumentException>(() => s_fileProviderData.UploadAsync(file));
+    }
+
+    [TestMethod]
+    [Description("Testing Upload Method with BlobName Null, i expected error!")]
+    public async Task Upload_BlobNameNullAsync()
+    {
+        var file = FileObject;
+        file.BlobName = null;
+
+        await Assert.ThrowsExceptionAsync<ArgumentException>(() => s_fileProviderData.UploadAsync(file));
+    }
+
+    [TestMethod]
+    [Description("Testing Upload Method with BlobName empty, i expected error!")]
+    public async Task Upload_BlobNameEmptyAsync()
+    {
+        var file = FileObject;
+        file.BlobName = String.Empty;
+
+        await Assert.ThrowsExceptionAsync<ArgumentException>(() => s_fileProviderData.UploadAsync(file));
     }
 
     [TestMethod]
@@ -27,7 +92,7 @@ public class FileProviderTest : BaseClass
         List<File> filesModels = new List<File>();
         var fileModel = new File
         {
-            Id = "f8ae9dc3-b990-4d08-bbba-c3b3fd6e18ae",
+            Id = FileObject.Id,
             Extension = ".png"
         };
         filesModels.Add(fileModel);
@@ -37,28 +102,11 @@ public class FileProviderTest : BaseClass
     }
 
     [TestMethod]
-    [Description("Test Get method with id good and extension wrong, i expected error")]
-    [ExpectedException(typeof(ArgumentException))]
-    public void GetFiles_ExtensionWrong()
-    {
-        List<File> filesModels = new List<File>();
-        var fileModel = new File
-        {
-            Id = "f8ae9dc3-b990-4d08-bbba-c3b3fd6e18ae",
-            Extension = ".sasd"
-        };
-        filesModels.Add(fileModel);
-        IEnumerable<File> files = filesModels;
-        s_fileProviderData.GetAsync(files);
-    }
-
-    [TestMethod]
     [Description("Test Get method with object null, i expected error")]
-    [ExpectedException(typeof(ArgumentException))]
     public void GetFiles_ObjectNull()
     {
         List<File> filesModels = new List<File>();
         IEnumerable<File> files = filesModels;
-        s_fileProviderData.GetAsync(files);
+        Assert.ThrowsExceptionAsync<ArgumentException>(() => s_fileProviderData.GetAsync(files));
     }
 }
