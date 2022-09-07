@@ -4,6 +4,7 @@ using DataAccess.Models;
 using Microsoft.Extensions.Configuration;
 using System.Data.SqlClient;
 using IssueTracker.FileSystem;
+using File = IssueTracker.FileSystem.Models.File;
 
 namespace IssueTracker.UnitTest;
 
@@ -25,8 +26,31 @@ public class TestInitialization
             BaseClass.TestContext = tc;
 
             IConfigurationFactory cf = new ConfigurationFactory(configuration);
+            var blobConfig = cf.Create<IBolbConfigurationFactory>();
             var metadataconfig = cf.Create<IMetaDataConfiguration>();
+            BaseClass.s_blobData = new BolbData(blobConfig);
             BaseClass.s_metaDataProvider = new MetaData(metadataconfig);
+
+            //begin populate Blob Test
+            var path = "TextForTest.txt";
+            if (System.IO.File.Exists(path))
+            {
+                System.IO.File.Delete(path);
+            }
+            FileStream fs = System.IO.File.Create(path);
+            BaseClass.FileStreamTest = fs;
+            BaseClass.IdFileTest = Guid.NewGuid().ToString();
+            var file = new File
+            {
+                BlobName = $"{BaseClass.IdFileTest}.txt",
+                Content = fs
+            };
+            BaseClass.s_blobData.UploadFileAsync(file);
+            if (System.IO.File.Exists(path))
+            {
+                System.IO.File.Delete(path);
+            }
+            //End populate Blob Test
 
             string? conn = tc.Properties["ConnectionString"]!.ToString();
             string sql = "TRUNCATE TABLE dbo.[Participant]";
@@ -148,10 +172,10 @@ public class TestInitialization
     [AssemblyCleanup()]
     public static void AssemblyCleanup()
     {
+
         TestContext tc = BaseClass.TestContext;
         try
         {
-
             string? conn = tc.Properties["ConnectionString"]!.ToString();
             string sql = "TRUNCATE TABLE dbo.[Participant]";
             using (SqlConnection ConnectionObject = new SqlConnection(conn!))
