@@ -66,4 +66,11 @@ public class BolbData : IBolbData
         var sas = sasBuilder.ToSasQueryParameters(new Azure.Storage.StorageSharedKeyCredential(_config.AccountName, _config.AccountKey)).ToString();
         return $"{blobClient.Uri}?{sas}";
     }
+
+    public async Task<bool> DeleteFileAsync(string name)
+    {
+        BlobClient toDelete = ContainerClient.GetBlobClient(name);
+        await toDelete.DeleteAsync();
+        return true;
+    }
 }
