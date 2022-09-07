@@ -17,9 +17,12 @@ internal class FileProvider : IFileProvider
         _bolb = new BolbData(blobConfig);
     }
 
-    public async Task DeleteAsync(Models.File file)
+    public async Task<bool> DeleteAsync(Models.File file)
     {
-        await _metadata.DeleteAsync(file.Id, file.Extension);
+        var result = await _metadata.DeleteAsync(file.Id, file.Extension);
+        if (result == false) return false;
+        result = await _bolb.DeleteFileAsync(file.Id + file.Extension);
+        return result;
     }
 
     public async Task<IEnumerable<Models.File>> GetAsync(IEnumerable<Models.File> files)

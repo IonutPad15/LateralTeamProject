@@ -74,4 +74,10 @@ public class BolbData : IBolbData
             throw new ArgumentException("This file can't be downloading!");
         return memoryStream;
     }
+    public async Task<bool> DeleteFileAsync(string name)
+    {
+        BlobClient toDelete = ContainerClient.GetBlobClient(name);
+        await toDelete.DeleteAsync();
+        return true;
+    }
 }
