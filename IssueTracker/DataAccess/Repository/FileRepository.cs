@@ -30,4 +30,11 @@ public class FileRepository : IFileRepository
         var result = await _db.LoadDataAsync<Models.File, dynamic>("spFile_GetByIssueId", new { IssueId = issueId });
         return result;
     }
+    public async Task<IEnumerable<Models.File>> GetForCleanupAsync(int days)
+    {
+        var updated = DateTime.UtcNow;
+        updated = updated.AddDays(-days);
+        var result = await _db.LoadDataAsync<Models.File, dynamic>("spFile_GetForCleanup", new { Updated = updated });
+        return result;
+    }
 }
