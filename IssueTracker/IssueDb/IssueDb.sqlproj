@@ -133,6 +133,7 @@
     <Build Include="dbo\StoredProcedures\File\spFile_Insert.sql" />
     <Build Include="dbo\StoredProcedures\File\spFile_GetByFileId.sql" />
     <Build Include="dbo\StoredProcedures\File\spFile_GetByIssueId.sql" />
+    <Build Include="dbo\StoredProcedures\File\spFile_GetForCleanup.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Script.PostDeployment.sql" />
