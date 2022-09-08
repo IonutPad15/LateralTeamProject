@@ -24,8 +24,8 @@ public class FileRepository : IFileRepository
 
     public async Task DeleteAsync(string fileId)
     {
-        DateTime upate = DateTime.UtcNow;
-        await _db.SaveDataAsync("dbo.spFile_Delete", new { FileId = fileId, Updated = upate });
+        DateTime update = DateTime.UtcNow;
+        await _db.SaveDataAsync("dbo.spFile_Delete", new { FileId = fileId, Updated = update });
     }
 
     public async Task<IEnumerable<Models.File>> GetByIssueIdAsync(int issueId)
@@ -33,10 +33,10 @@ public class FileRepository : IFileRepository
         var result = await _db.LoadDataAsync<Models.File, dynamic>("spFile_GetByIssueId", new { IssueId = issueId });
         return result;
     }
-    public async Task<IEnumerable<Models.File>> GetForCleanupAsync(int days)
+    public async Task<IEnumerable<Models.File>> GetForCleanupAsync(TimeSpan timeSpan)
     {
         var updated = DateTime.UtcNow;
-        updated = updated.AddDays(-days);
+        updated = updated.AddMilliseconds(-timeSpan.TotalMilliseconds);
         var result = await _db.LoadDataAsync<Models.File, dynamic>("spFile_GetForCleanup", new { Updated = updated });
         return result;
     }

@@ -17,13 +17,13 @@ internal class ConfigurationFactory : IConfigurationFactory
             return (T)(new MetaDataConfiguration(connstring, azureTable) as IMetaDataConfiguration);
 
         }
-        if (typeof(T) == typeof(IBolbConfigurationFactory))
+        if (typeof(T) == typeof(IBlobConfigurationFactory))
         {
             var connstring = _config.GetValue<string>("ConnectionStrings:Account");
             var container = _config.GetValue<string>("ConnectionStrings:Container");
             var accountName = _config.GetValue<string>("ConnectionStrings:AccountName");
             var accountKey = _config.GetValue<string>("ConnectionStrings:AccountKey");
-            return (T)(new BlobConfiguration(container, connstring, accountName, accountKey) as IBolbConfigurationFactory);
+            return (T)(new BlobConfiguration(container, connstring, accountName, accountKey) as IBlobConfigurationFactory);
         }
         throw new InvalidOperationException();
     }
