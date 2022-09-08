@@ -1,8 +1,6 @@
 ﻿using Microsoft.Azure.Cosmos.Table;
 using IssueTracker.FileSystem.Models;
-using System.Runtime.CompilerServices;
 
-[assembly: InternalsVisibleTo("IssueTracker.UnitTest")]
 namespace IssueTracker.FileSystem;
 
 public class MetaData : IMetaDataProvider
@@ -50,10 +48,10 @@ public class MetaData : IMetaDataProvider
     {
         var operation = TableOperation.Retrieve<MetaDataEntity>(group, id);
         var result = await _metaDataTable.ExecuteAsync(operation);
-        var x = result.Result as MetaDataEntity;
-        if (x != null)
+        var resultEntity = result.Result as MetaDataEntity;
+        if (resultEntity != null)
         {
-            operation = TableOperation.Delete(x);
+            operation = TableOperation.Delete(resultEntity);
             await _metaDataTable.ExecuteAsync(operation);
             return true;
         }
@@ -63,10 +61,10 @@ public class MetaData : IMetaDataProvider
     {
         var operation = TableOperation.Retrieve<MetaDataEntity>(group, id);
         var result = await _metaDataTable.ExecuteAsync(operation);
-        var x = result.Result as MetaDataEntity;
-        if (x != null)
+        var resultEntity = result.Result as MetaDataEntity;
+        if (resultEntity != null)
         {
-            var entity = new MetaDataResponse(x.RowKey, x.PartitionKey, x.Name, x.Type, x.SizeKb);
+            var entity = new MetaDataResponse(resultEntity.RowKey, resultEntity.PartitionKey, resultEntity.Name, resultEntity.Type, resultEntity.SizeKb);
             return entity;
         }
         return null;

@@ -27,11 +27,11 @@ public class Cleanup : IHostedService
     {
         while (s_canceled == false)
         {
-            var daysString = config.GetValue<string>("ConnectionStrings:CleanupDaysInterval");
-            int days = int.Parse(daysString);
-            int interval = (1000 * 60 * 60 * 24 * days);
+            var timeSpanString = config.GetValue<string>("ConnectionStrings:TimeSpan");
+            var timeSpan = TimeSpan.Parse(timeSpanString);
+            int interval = (int)timeSpan.TotalMilliseconds;
             await Task.Delay(interval);
-            var filesFromRepo = await _fileData.GetForCleanupAsync(days);
+            var filesFromRepo = await _fileData.GetForCleanupAsync(timeSpan);
             foreach (var file in filesFromRepo)
             {
                 var fileToDelete = new IssueTracker.FileSystem.Models.File(file.FileId, file.Extension);

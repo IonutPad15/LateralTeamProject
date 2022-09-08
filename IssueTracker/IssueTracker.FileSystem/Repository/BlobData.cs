@@ -4,12 +4,12 @@ using Azure.Storage.Sas;
 
 [assembly: InternalsVisibleTo("IssueTracker.UnitTest")]
 namespace IssueTracker.FileSystem;
-public class BolbData : IBolbData
+public class BlobData : IBlobProvider
 {
-    private readonly IBolbConfigurationFactory _config;
+    private readonly IBlobConfigurationFactory _config;
     private BlobServiceClient BlobServiceClient { get; set; }
     private BlobContainerClient ContainerClient { get; set; }
-    internal BolbData(IBolbConfigurationFactory config)
+    internal BlobData(IBlobConfigurationFactory config)
     {
         _config = config;
         BlobServiceClient = new BlobServiceClient(_config.ConnectionString);
@@ -67,7 +67,7 @@ public class BolbData : IBolbData
         return $"{blobClient.Uri}?{sas}";
     }
 
-    public async Task<bool> DeleteFileAsync(string name)
+    public async Task<bool> DeleteAsync(string name)
     {
         BlobClient toDelete = ContainerClient.GetBlobClient(name);
         await toDelete.DeleteAsync();
