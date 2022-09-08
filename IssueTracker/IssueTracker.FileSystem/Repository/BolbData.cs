@@ -49,7 +49,7 @@ public class BolbData : IBolbData
             throw new ArgumentException("Invalid Content");
         //await ContainerClient.CreateIfNotExistsAsync();
         var blobClient = ContainerClient.GetBlobClient(file.BlobName);
-        blobClient.Upload(file.Content);
+        await blobClient.UploadAsync(file.Content);
     }
 
     private string GetBlobSasUri(BlobClient blobClient)
