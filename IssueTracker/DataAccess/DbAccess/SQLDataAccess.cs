@@ -13,6 +13,9 @@ public class SQLDataAccess : ISQLDataAccess
     public SQLDataAccess(IConfiguration config)
     {
         _config = config;
+        SqlMapper.AddTypeHandler(new DateTimeOffsetHandler());
+        SqlMapper.AddTypeHandler(new GuidHandler());
+        SqlMapper.AddTypeHandler(new TimeSpanHandler());
     }
 
     public async Task<IEnumerable<TFirst>> LoadDataAsync<TFirst>(

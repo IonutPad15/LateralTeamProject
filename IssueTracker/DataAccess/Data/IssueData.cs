@@ -69,4 +69,8 @@ public class IssueData : IIssueData
     {
         await _db.SaveDataAsync("dbo.spIssue_UpdateStatus", new { Id = id, StatusId = statusId });
     }
+    public async Task<int> GetProjectId(int id)
+    {
+        return (await _db.LoadDataAsync<int, dynamic>("spIssue_GetProjectId", new { Id = id })).FirstOrDefault();
+    }
 }

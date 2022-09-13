@@ -13,5 +13,5 @@ begin
 		inner join [User] on [User].Id = UserAssignedId
 		where Issue.IsDeleted = 0 and Issue.Id = @Id;
 	else
-		THROW 5100, 'The record does not exist.', 1;
+		THROW 51000, 'The record does not exist.', 1;
 end
