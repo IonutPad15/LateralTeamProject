@@ -5,7 +5,7 @@
     @IssueId INT,
     @ReferenceType INT,
     @ReferenceId INT,
-    @Field VARCHAR(36),
+    @Field VARCHAR(1024),
     @OldValue VARCHAR (max),
     @NewValue VARCHAR (max),
     @Updated datetime2(7)
