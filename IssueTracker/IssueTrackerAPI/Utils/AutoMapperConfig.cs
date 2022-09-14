@@ -53,7 +53,7 @@ public class AutoMapperConfig
     }
     public static async Task<IEnumerable<FileResponse>> GetAttachements(IEnumerable<DataAccess.Models.File> files)
     {
-        var attachements = new Attachements(s_fileProvider!);
+        var attachements = new AttachementsHelper(s_fileProvider!);
         List<FileResponse> results = new List<FileResponse>();
         foreach (var file in files)
         {

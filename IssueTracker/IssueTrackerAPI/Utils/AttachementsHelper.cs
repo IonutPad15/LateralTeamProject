@@ -3,10 +3,10 @@ using Models.Response;
 
 namespace IssueTrackerAPI.Utils;
 
-public class Attachements
+public class AttachementsHelper
 {
     private readonly IFileProvider _fileProvider;
-    public Attachements(IFileProvider fileProvider)
+    public AttachementsHelper(IFileProvider fileProvider)
     {
         _fileProvider = fileProvider;
     }
