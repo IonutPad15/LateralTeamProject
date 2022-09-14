@@ -1,19 +1,17 @@
-﻿using System.Runtime.CompilerServices;
-using Azure.Storage.Blobs;
+﻿using Azure.Storage.Blobs;
 using Azure.Storage.Sas;
 
-[assembly: InternalsVisibleTo("IssueTracker.UnitTest")]
 namespace IssueTracker.FileSystem;
 public class BlobData : IBlobProvider
 {
     private readonly IBlobConfigurationFactory _config;
-    private BlobServiceClient BlobServiceClient { get; set; }
-    private BlobContainerClient ContainerClient { get; set; }
+    private readonly BlobServiceClient _blobServiceClient;
+    private readonly BlobContainerClient _containerClient;
     internal BlobData(IBlobConfigurationFactory config)
     {
         _config = config;
-        BlobServiceClient = new BlobServiceClient(_config.ConnectionString);
-        ContainerClient = BlobServiceClient.GetBlobContainerClient(_config.Container);
+        _blobServiceClient = new BlobServiceClient(_config.ConnectionString);
+        _containerClient = _blobServiceClient.GetBlobContainerClient(_config.Container);
     }
 
     public Task<IEnumerable<Models.File>> GetFilesAsync(IEnumerable<Models.File> files)
@@ -30,7 +28,7 @@ public class BlobData : IBlobProvider
                 throw new ArgumentException("Invalid file extension!");
             fileAtachment.Id = file.Id;
             fileAtachment.Extension = file.Extension;
-            BlobClient information = ContainerClient.GetBlobClient(file.Id + file.Extension);
+            BlobClient information = _containerClient.GetBlobClient(file.Id + file.Extension);
             fileAtachment.Link = GetBlobSasUri(information).ToString();
             if (fileAtachment.Link == null)
                 throw new ArgumentException($"Sas Invalid for {file.Name}!");
@@ -47,8 +45,7 @@ public class BlobData : IBlobProvider
             throw new ArgumentException("Invalid BlobName");
         if (file.Content == null)
             throw new ArgumentException("Invalid Content");
-        //await ContainerClient.CreateIfNotExistsAsync();
-        var blobClient = ContainerClient.GetBlobClient(file.BlobName);
+        var blobClient = _containerClient.GetBlobClient(file.BlobName);
         await blobClient.UploadAsync(file.Content);
     }
 
@@ -69,7 +66,7 @@ public class BlobData : IBlobProvider
 
     public async Task<bool> DeleteAsync(string name)
     {
-        BlobClient toDelete = ContainerClient.GetBlobClient(name);
+        BlobClient toDelete = _containerClient.GetBlobClient(name);
         await toDelete.DeleteAsync();
         return true;
     }

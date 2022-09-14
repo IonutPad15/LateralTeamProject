@@ -13,6 +13,10 @@ public class SQLDataAccess : ISQLDataAccess
     public SQLDataAccess(IConfiguration config)
     {
         _config = config;
+        InitializeDapper();
+    }
+    private void InitializeDapper()
+    {
         SqlMapper.AddTypeHandler(new DateTimeOffsetHandler());
         SqlMapper.AddTypeHandler(new GuidHandler());
         SqlMapper.AddTypeHandler(new TimeSpanHandler());

@@ -17,7 +17,7 @@ public class FileProviderTest : BaseClass
         };
         filesModels.Add(fileModel);
         IEnumerable<File> files = filesModels;
-        FileProviderData.GetAsync(files);
+        TestFileProvider.GetAsync(files);
     }
 
     [TestMethod]
@@ -32,7 +32,7 @@ public class FileProviderTest : BaseClass
         };
         filesModels.Add(fileModel);
         IEnumerable<File> files = filesModels;
-        var result = FileProviderData.GetAsync(files);
+        var result = TestFileProvider.GetAsync(files);
         Assert.IsNotNull(result);
     }
 
@@ -49,7 +49,7 @@ public class FileProviderTest : BaseClass
         };
         filesModels.Add(fileModel);
         IEnumerable<File> files = filesModels;
-        FileProviderData.GetAsync(files);
+        TestFileProvider.GetAsync(files);
     }
 
     [TestMethod]
@@ -59,6 +59,6 @@ public class FileProviderTest : BaseClass
     {
         List<File> filesModels = new List<File>();
         IEnumerable<File> files = filesModels;
-        FileProviderData.GetAsync(files);
+        TestFileProvider.GetAsync(files);
     }
 }

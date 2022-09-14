@@ -1,5 +1,4 @@
 ﻿namespace IssueTracker.FileSystem;
-
 internal interface IMetaDataProvider
 {
     IEnumerable<Models.File> Get(IEnumerable<Models.File> files);

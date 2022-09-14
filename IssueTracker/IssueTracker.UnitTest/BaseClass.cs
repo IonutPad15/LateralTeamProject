@@ -6,11 +6,11 @@ using System.Data.SqlClient;
 namespace IssueTracker.UnitTest;
 public abstract class BaseClass
 {
-    public static IIssueRepository IssueData = null!;
+    public static IIssueRepository TestIssueRepository = null!;
     public static TestContext TestContext { get; set; } = null!;
     public static DataTable? TestDataTable { get; set; }
-    public static IParticipantRepository ParticipantData = null!;
-    public static IFileProvider FileProviderData = null!;
+    public static IParticipantRepository TestParticipantRepository { get; set; } = null!;
+    public static IFileProvider TestFileProvider { get; set; } = null!;
 
     public static DataTable? LoadDataTable(string sql, string connection)
     {
