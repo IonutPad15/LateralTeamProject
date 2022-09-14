@@ -25,14 +25,6 @@ public class TimeTrackerController : ControllerBase
         return Ok();
     }
 
-    [HttpGet("getAll-timeTracker")]
-    public async Task<IActionResult> GetAll()
-    {
-        var timeTracker = await _trackerData.GetAll();
-        var result = _map.Map<IEnumerable<TimeTracker>>(timeTracker);
-        return Ok(result);
-    }
-
     [HttpDelete("delete-timeTracker")]
     public async Task<IActionResult> Delete(int id)
     {
