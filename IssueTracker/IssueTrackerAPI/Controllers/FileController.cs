@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Data.SqlClient;
+using AutoMapper;
 using DataAccess.Repository;
 using FluentValidation.Results;
 using IssueTracker.FileSystem;
@@ -15,11 +16,11 @@ public class FileController : ControllerBase
 {
     private readonly IFileProvider _fileProvider;
     private readonly Mapper _mapper;
-    private readonly IFileRepository _fileData;
-    public FileController(IFileRepository fileData, IFileProvider fileProvider)
+    private readonly IFileRepository _fileRepository;
+    public FileController(IFileRepository fileRepository, IFileProvider fileProvider)
     {
         _fileProvider = fileProvider;
-        _fileData = fileData;
+        _fileRepository = fileRepository;
         _mapper = AutoMapperConfig.Config();
     }
 
@@ -53,7 +54,7 @@ public class FileController : ControllerBase
         fileModel.FileId = file.Id;
         fileModel.FileIssueId = issueId;
         fileModel.FileCommentId = commentId;
-        await _fileData.AddAsync(fileModel);
+        await _fileRepository.AddAsync(fileModel);
         await _fileProvider.UploadAsync(file);
         return Results.Ok();
     }
@@ -86,9 +87,14 @@ public class FileController : ControllerBase
             List<ValidationFailure> failures = results.Errors;
             return Results.BadRequest(failures);
         }
-        await _fileData.DeleteAsync(fileDelete.FileId);
-        var file = _mapper.Map<IssueTracker.FileSystem.Models.File>(fileDelete);
-        await _fileProvider.DeleteAsync(file);
+        try
+        {
+            await _fileRepository.DeleteAsync(fileDelete.FileId);
+        }
+        catch (SqlException)
+        {
+            return Results.BadRequest("file does not exists");
+        }
         return Results.Ok();
     }
 }

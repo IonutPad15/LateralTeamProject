@@ -1,23 +1,28 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using System.Runtime.CompilerServices;
+using Microsoft.Extensions.Configuration;
 
+[assembly: InternalsVisibleTo("IssueTracker.UnitTest")]
 namespace IssueTracker.FileSystem;
 internal class FileProvider : IFileProvider
 {
     private readonly IMetaDataProvider _metadata;
-    private readonly IBolbData _bolb;
+    private readonly IBlobProvider _bolb;
 
     public FileProvider(IConfiguration config)
     {
         IConfigurationFactory cf = new ConfigurationFactory(config);
         var metaDataConfig = cf.Create<IMetaDataConfiguration>();
         _metadata = new MetaData(metaDataConfig);
-        var blobConfig = cf.Create<IBolbConfigurationFactory>();
-        _bolb = new BolbData(blobConfig);
+        var blobConfig = cf.Create<IBlobConfigurationFactory>();
+        _bolb = new BlobData(blobConfig);
     }
 
-    public async Task DeleteAsync(Models.File file)
+    public async Task<bool> DeleteAsync(Models.File file)
     {
-        await _metadata.DeleteAsync(file.Id, file.Extension);
+        var result = await _metadata.DeleteAsync(file.Id, file.Extension);
+        if (result == false) return false;
+        result = await _bolb.DeleteAsync(file.Id + file.Extension);
+        return result;
     }
 
     public async Task<IEnumerable<Models.File>> GetAsync(IEnumerable<Models.File> files)

@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using IssueTracker.FileSystem;
-
+using IssueTrackerAPI.Utils;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,6 +24,7 @@ builder.Services.AddSingleton<ICommentRepository, CommentRepository>();
 builder.Services.AddSingleton<IFileRepository, FileRepository>();
 builder.Services.AddFileSystemServices();
 //builder.Services.AddSingleton<IFileProvider, FileProvider>();
+
 
 
 builder.Services.AddAuthentication(options =>
@@ -49,7 +50,12 @@ builder.Services.AddSingleton<IIssueTypeRepository, IssueTypeRepository>();
 builder.Services.AddSingleton<IPriorityRepository, PriorityRepository>();
 builder.Services.AddSingleton<IStatusRepository, StatusRepository>();
 
+builder.Services.AddHostedService<Cleanup>();
+
+
+
 var app = builder.Build();
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -57,6 +63,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
 
 app.UseHttpsRedirection();
 

@@ -5,6 +5,7 @@
     [FileIssueId] INT,
     [FileCommentId] INT,
     [FileIsDeleted] BIT DEFAULT (CONVERT([bit],(0))) NOT NULL,
+    [Updated] DATETIME NOT NULL,
     FOREIGN KEY (FileIssueId) REFERENCES [dbo].[Issue](Id),
 	FOREIGN KEY (FileCommentId) REFERENCES [dbo].[Comment](Id)
 )
