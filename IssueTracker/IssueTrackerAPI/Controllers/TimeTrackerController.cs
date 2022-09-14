@@ -21,7 +21,7 @@ public class TimeTrackerController : ControllerBase
     public async Task<IActionResult> Add(TimeTrackerRequest entity)
     {
         var timeTracker = _map.Map<TimeTracker>(entity);
-        await _trackerData.Add(timeTracker);
+        await _trackerData.AddAsync(timeTracker);
         return Ok();
     }
 
@@ -36,7 +36,7 @@ public class TimeTrackerController : ControllerBase
     [HttpDelete("delete-timeTracker")]
     public async Task<IActionResult> Delete(int id)
     {
-        await _trackerData.Delete(id);
+        await _trackerData.DeleteAsync(id);
         return Ok();
     }
 }

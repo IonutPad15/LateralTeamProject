@@ -3,6 +3,6 @@
 namespace DataAccess.Data.IData;
 public interface ITimeTrackerData
 {
-    Task Add(TimeTracker entity);
-    Task Delete(int id);
+    Task AddAsync(TimeTracker entity);
+    Task DeleteAsync(int id);
 }

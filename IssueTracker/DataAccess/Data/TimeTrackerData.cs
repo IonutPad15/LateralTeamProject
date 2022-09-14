@@ -10,7 +10,7 @@ public class TimeTrackerData : ITimeTrackerData
     {
         _db = db;
     }
-    public async Task Add(TimeTracker entity)
+    public async Task AddAsync(TimeTracker entity)
     {
         await _db.SaveDataAsync("spTimeTracker_Insert", new
         {
@@ -25,7 +25,7 @@ public class TimeTrackerData : ITimeTrackerData
         });
     }
 
-    public async Task Delete(int id)
+    public async Task DeleteAsync(int id)
     {
         await _db.SaveDataAsync("spTimeTracker_Delete", new { Id = id });
     }
