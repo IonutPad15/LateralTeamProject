@@ -29,9 +29,4 @@ public class TimeTrackerData : ITimeTrackerData
     {
         await _db.SaveDataAsync("spTimeTracker_Delete", new { Id = id });
     }
-
-    public async Task<IEnumerable<TimeTracker>> GetAll()
-    {
-        return await _db.LoadDataAsync<TimeTracker>("spTimeTracker_GetAll");
-    }
 }

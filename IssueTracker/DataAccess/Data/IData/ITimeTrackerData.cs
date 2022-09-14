@@ -5,5 +5,4 @@ public interface ITimeTrackerData
 {
     Task Add(TimeTracker entity);
     Task Delete(int id);
-    Task<IEnumerable<TimeTracker>> GetAll();
 }
