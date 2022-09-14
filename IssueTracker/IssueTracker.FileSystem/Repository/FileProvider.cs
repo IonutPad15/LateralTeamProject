@@ -3,7 +3,7 @@ using Microsoft.Extensions.Configuration;
 
 [assembly: InternalsVisibleTo("IssueTracker.UnitTest")]
 namespace IssueTracker.FileSystem;
-internal class FileProvider : IFileProvider
+public class FileProvider : IFileProvider
 {
     private readonly IMetaDataProvider _metadata;
     private readonly IBlobProvider _bolb;
@@ -12,7 +12,7 @@ internal class FileProvider : IFileProvider
     {
         IConfigurationFactory cf = new ConfigurationFactory(config);
         var metaDataConfig = cf.Create<IMetaDataConfiguration>();
-        _metadata = new MetaData(metaDataConfig);
+        _metadata = new MetaDataProvider(metaDataConfig);
         var blobConfig = cf.Create<IBlobConfigurationFactory>();
         _bolb = new BlobData(blobConfig);
     }
@@ -27,7 +27,7 @@ internal class FileProvider : IFileProvider
 
     public async Task<IEnumerable<Models.File>> GetAsync(IEnumerable<Models.File> files)
     {
-        var entities = _metadata.GetAll(files);
+        var entities = _metadata.Get(files);
         if (!entities.Any()) throw new ArgumentException("Detail file is null!");
         var bolb = await _bolb.GetFilesAsync(files);
         if (!entities.Any()) throw new ArgumentException("File is null!");

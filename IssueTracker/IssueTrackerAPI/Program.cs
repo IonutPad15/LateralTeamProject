@@ -23,7 +23,7 @@ builder.Services.AddSingleton<IParticipantRepository, ParticipantRepository>();
 builder.Services.AddSingleton<ICommentRepository, CommentRepository>();
 builder.Services.AddSingleton<IFileRepository, FileRepository>();
 builder.Services.AddFileSystemServices();
-//builder.Services.AddSingleton<IFileProvider, FileProvider>();
+builder.Services.AddSingleton<IFileProvider, FileProvider>();
 
 
 

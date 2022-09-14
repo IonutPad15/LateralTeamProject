@@ -1,19 +1,18 @@
 ﻿using Microsoft.Azure.Cosmos.Table;
-using IssueTracker.FileSystem.Models;
 
 namespace IssueTracker.FileSystem;
 
-public class MetaData : IMetaDataProvider
+public class MetaDataProvider : IMetaDataProvider
 {
     private readonly CloudTable _metaDataTable;
-    internal MetaData(IMetaDataConfiguration config)
+    internal MetaDataProvider(IMetaDataConfiguration config)
     {
         var storageAccount = CloudStorageAccount.Parse(config.ConnectionString);
         var tableClient = storageAccount.CreateCloudTableClient();
         _metaDataTable = tableClient.GetTableReference(config.AzureTable);
         _metaDataTable.CreateIfNotExists();
     }
-    public IEnumerable<Models.File> GetAll(IEnumerable<Models.File> files)
+    public IEnumerable<Models.File> Get(IEnumerable<Models.File> files)
     {
         var query = new TableQuery<MetaDataEntity>();
         var entities = _metaDataTable.ExecuteQuery(query);
@@ -56,18 +55,6 @@ public class MetaData : IMetaDataProvider
             return true;
         }
         return false;
-    }
-    public async Task<MetaDataResponse?> GetAsync(string id, string group)
-    {
-        var operation = TableOperation.Retrieve<MetaDataEntity>(group, id);
-        var result = await _metaDataTable.ExecuteAsync(operation);
-        var resultEntity = result.Result as MetaDataEntity;
-        if (resultEntity != null)
-        {
-            var entity = new MetaDataResponse(resultEntity.RowKey, resultEntity.PartitionKey, resultEntity.Name, resultEntity.Type, resultEntity.SizeKb);
-            return entity;
-        }
-        return null;
     }
 }
 internal class MetaDataEntity : TableEntity

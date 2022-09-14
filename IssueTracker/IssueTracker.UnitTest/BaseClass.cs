@@ -1,5 +1,5 @@
 ﻿using DataAccess.Repository;
-using IssueTracker.FileSystem.Repository.IRepository;
+using IssueTracker.FileSystem;
 using System.Data;
 using System.Data.SqlClient;
 

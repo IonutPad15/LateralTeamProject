@@ -68,7 +68,6 @@
     <Folder Include="dbo\StoredProcedures\Project" />
     <Folder Include="dbo\StoredProcedures\Comment" />
     <Folder Include="dbo\StoredProcedures\Issue" />
-    <Folder Include="dbo\StoredProcedures\History" />
     <Folder Include="dbo\StoredProcedures\File" />
   </ItemGroup>
   <ItemGroup>
@@ -123,11 +122,6 @@
     <Build Include="dbo\StoredProcedures\Issue\spIssue_Delete.sql" />
     <Build Include="dbo\StoredProcedures\Issue\spIssue_UpdateStatus.sql" />
     <Build Include="dbo\StoredProcedures\Issue\spIssue_Update.sql" />
-    <Build Include="dbo\Tables\History.sql" />
-    <Build Include="dbo\StoredProcedures\History\spHistory_GetByIssueId.sql" />
-    <Build Include="dbo\StoredProcedures\History\spHistory_GetByProjectId.sql" />
-    <Build Include="dbo\StoredProcedures\History\spHistory_Insert.sql" />
-    <Build Include="dbo\StoredProcedures\Issue\spIssue_GetProjectId.sql" />
     <Build Include="dbo\Tables\File.sql" />
     <Build Include="dbo\StoredProcedures\File\spFile_Delete.sql" />
     <Build Include="dbo\StoredProcedures\File\spFile_Insert.sql" />
