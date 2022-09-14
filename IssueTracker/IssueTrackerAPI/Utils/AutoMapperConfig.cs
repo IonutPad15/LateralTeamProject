@@ -27,6 +27,8 @@ public class AutoMapperConfig
             cfg.CreateMap<ProjectRequest, Project>();
             cfg.CreateMap<RolesType, RoleType>();
             cfg.CreateMap<RoleType, RolesType>();
+            cfg.CreateMap<TimeTrackerRequest, TimeTracker>();
+            cfg.CreateMap<TimeTracker, TimeTrackerResponse>();
         });
         Mapper mapper = new Mapper(config);
         return mapper;

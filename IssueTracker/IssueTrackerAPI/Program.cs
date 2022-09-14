@@ -20,8 +20,7 @@ builder.Services.AddSingleton<IProjectData, ProjectData>();
 builder.Services.AddSingleton<IIssueData, IssueData>();
 builder.Services.AddSingleton<IParticipantData, ParticipantData>();
 builder.Services.AddSingleton<ICommentData, CommentData>();
-
-
+builder.Services.AddSingleton<ITimeTrackerData, TimeTrackerData>();
 
 builder.Services.AddAuthentication(options =>
 
