@@ -18,7 +18,6 @@ public class AutoMapperConfig
         MapperConfiguration config = new MapperConfiguration(cfg =>
         {
             cfg.CreateMap<Comment, CommentResponse>()
-               //.ForSourceMember(x => x.Attachements, opt => opt.DoNotValidate())
                .ForMember(dest => dest.Created, opt => opt.Ignore());
             cfg.CreateMap<Comment, CommentRequest>();
             cfg.CreateMap<IssueRequest, Issue>();
