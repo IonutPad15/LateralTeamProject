@@ -69,6 +69,7 @@
     <Folder Include="dbo\StoredProcedures\Comment" />
     <Folder Include="dbo\StoredProcedures\Issue" />
     <Folder Include="dbo\StoredProcedures\File" />
+    <Folder Include="dbo\StoredProcedures\History" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="dbo\Tables\User.sql" />
@@ -128,6 +129,10 @@
     <Build Include="dbo\StoredProcedures\File\spFile_GetByFileId.sql" />
     <Build Include="dbo\StoredProcedures\File\spFile_GetByIssueId.sql" />
     <Build Include="dbo\StoredProcedures\File\spFile_GetForCleanup.sql" />
+    <Build Include="dbo\StoredProcedures\History\spHistory_GetByIssueId.sql" />
+    <Build Include="dbo\StoredProcedures\History\spHistory_GetByProjectId.sql" />
+    <Build Include="dbo\StoredProcedures\History\spHistory_Insert.sql" />
+    <Build Include="dbo\Tables\History.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Script.PostDeployment.sql" />

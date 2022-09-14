@@ -1,4 +1,4 @@
-﻿CREATE PROCEDURE dbo.spHistory_Insert
+﻿CREATE PROCEDURE [dbo].[spHistory_Insert]
 	@Type INT,
     @ProjectId INT,
     @UserId UNIQUEIDENTIFIER,
