@@ -2,13 +2,12 @@
 	@Name varchar(20),
     @Description varchar(max),
     @Date datetime,
-    @Worked smallint,
-    @Billable smallint,
-    @Remaining smallint,
+    @Worked BigInt,
+    @Billable BigInt,
     @UserId UNIQUEIDENTIFIER,
     @IssueId int
 AS
 begin
-	insert into TimeTracker (Name, Description, Date , Worked, Billable, Remaining, UserId, IssueId)
-    values (@Name, @Description, @Date, @Worked, @Billable, @Remaining, @UserId, @IssueId);
+	insert into TimeTracker (Name, Description, Date , Worked, Billable, UserId, IssueId)
+    values (@Name, @Description, @Date, @Worked, @Billable, @UserId, @IssueId);
 end

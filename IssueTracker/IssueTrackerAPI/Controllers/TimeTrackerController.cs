@@ -4,6 +4,7 @@ using DataAccess.Models;
 using IssueTrackerAPI.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Models.Request;
+using Validation;
 
 namespace IssueTrackerAPI.Controllers;
 [Route("api")]
@@ -20,7 +21,11 @@ public class TimeTrackerController : ControllerBase
     [HttpPost("add-timeTracker")]
     public async Task<IActionResult> Add(TimeTrackerRequest entity)
     {
+        if (!TimeTrackerValidator.IsValid(entity))
+            return BadRequest("Invalid TimeTracker!");
         var timeTracker = _map.Map<TimeTracker>(entity);
+        if (!TimeTrackerValidator.IsValid(timeTracker))
+            return BadRequest("Invalid Mapping!");
         await _trackerData.AddAsync(timeTracker);
         return Ok();
     }
@@ -28,6 +33,8 @@ public class TimeTrackerController : ControllerBase
     [HttpDelete("delete-timeTracker")]
     public async Task<IActionResult> Delete(int id)
     {
+        if (id <= 0)
+            return BadRequest("Id invalid!");
         await _trackerData.DeleteAsync(id);
         return Ok();
     }
