@@ -44,7 +44,7 @@ public class CommentController : ControllerBase
         }
         catch (FileSystemException ex)
         {
-            return Results.Conflict(ex.Message);
+            return Results.BadRequest(ex.Message);
         }
     }
     [HttpGet("issueid")]
@@ -60,7 +60,7 @@ public class CommentController : ControllerBase
         }
         catch (FileSystemException ex)
         {
-            return Results.Conflict(ex.Message);
+            return Results.BadRequest(ex.Message);
         }
     }
     private async Task<IEnumerable<CommentResponse>> GetAttachements(IEnumerable<Comment> comments, IEnumerable<CommentResponse> commentsResponse)
@@ -97,7 +97,7 @@ public class CommentController : ControllerBase
         }
         catch (FileSystemException ex)
         {
-            return Results.Conflict(ex.Message);
+            return Results.BadRequest(ex.Message);
         }
     }
     [HttpGet("userid")]
@@ -113,7 +113,7 @@ public class CommentController : ControllerBase
         }
         catch (FileSystemException ex)
         {
-            return Results.Conflict(ex.Message);
+            return Results.BadRequest(ex.Message);
         }
     }
     [HttpPost]

@@ -64,7 +64,7 @@ public class FileController : ControllerBase
         try
         {
             var response = await _fileProvider.GetAsync(fileAttachment);
-            if (response == null) return BadRequest("there are no foles");
+            if (response == null) return BadRequest("there are no files");
             return Ok(response);
         }
         catch (FileSystemException ex)
@@ -81,7 +81,7 @@ public class FileController : ControllerBase
         {
             var response = await _fileProvider.GetAsync(fileAttachment);
 
-            if (response == null) throw new ArgumentException("Result is null!");
+            if (response == null) return BadRequest("Result is null!");
             return Ok(response.FirstOrDefault());
         }
         catch (FileSystemException ex)

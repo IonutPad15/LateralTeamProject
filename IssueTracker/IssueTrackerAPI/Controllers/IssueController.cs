@@ -68,7 +68,7 @@ public class IssueController : ControllerBase
             }
             catch (FileSystemException ex)
             {
-                return Conflict(ex.Message);
+                return BadRequest(ex.Message);
             }
         }
         return Ok(resultList);
@@ -89,7 +89,7 @@ public class IssueController : ControllerBase
             }
             catch (FileSystemException ex)
             {
-                return Conflict(ex.Message);
+                return BadRequest(ex.Message);
             }
         return Ok(result);
     }
