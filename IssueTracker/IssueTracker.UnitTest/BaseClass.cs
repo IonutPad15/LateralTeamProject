@@ -9,7 +9,7 @@ public abstract class BaseClass
 {
     public static IIssueRepository IssueData = null!;
     public static TestContext TestContext { get; set; } = null!;
-    internal static File FileObject { get; set; } = null!;
+    internal static File File { get; set; } = null!;
     public static DataTable? TestDataTable { get; set; }
     public static IParticipantRepository ParticipantData = null!;
     internal static IFileProvider s_fileProviderData = null!;

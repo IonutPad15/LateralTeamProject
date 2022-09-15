@@ -6,93 +6,102 @@ namespace IssueTracker.UnitTest;
 public class FileProviderTest : BaseClass
 {
     [TestMethod]
-    [Description("Testing Upload Method with Id Empty, i expected error!")]
+    [Description("Given a invalid request Id is empty, when UploadAsync is called" +
+        "then I'm waiting for an error")]
     public async Task Upload_IdWrongAsync()
     {
-        var file = FileObject;
+        var file = File;
         file.Id = String.Empty;
 
         await Assert.ThrowsExceptionAsync<ArgumentException>(() => s_fileProviderData.UploadAsync(file));
     }
 
     [TestMethod]
-    [Description("Testing Upload Method with Id null, i expected error!")]
+    [Description("Given a invalid request Id is null, when UploadAsync is called" +
+        "then I'm waiting for an error")]
     public async Task Upload_IdNullAsync()
     {
-        var file = FileObject;
+        var file = File;
         file.Id = null!;
 
         await Assert.ThrowsExceptionAsync<ArgumentException>(() => s_fileProviderData.UploadAsync(file));
     }
 
     [TestMethod]
-    [Description("Testing Upload Method with Extension null, i expected error!")]
+    [Description("Given a invalid request Extension is null, when UploadAsync is called" +
+        "then I'm waiting for an error")]
     public async Task Upload_ExtensionNullAsync()
     {
-        var file = FileObject;
+        var file = File;
         file.Extension = null!;
 
         await Assert.ThrowsExceptionAsync<ArgumentException>(() => s_fileProviderData.UploadAsync(file));
     }
 
     [TestMethod]
-    [Description("Testing Upload Method with Extension empty, i expected error!")]
+    [Description("Given a invalid request Extension is empty, when UploadAsync is called" +
+        "then I'm waiting for an error")]
     public async Task Upload_ExtensionEmptyAsync()
     {
-        var file = FileObject;
+        var file = File;
         file.Extension = String.Empty;
 
         await Assert.ThrowsExceptionAsync<ArgumentException>(() => s_fileProviderData.UploadAsync(file));
     }
 
     [TestMethod]
-    [Description("Testing Upload Method with Content null, i expected error!")]
+    [Description("Given a invalid request Content is null, when UploadAsync is called" +
+        "then I'm waiting for an error")]
     public async Task Upload_ContentNullAsync()
     {
-        var file = FileObject;
+        var file = File;
         file.Content = null;
 
         await Assert.ThrowsExceptionAsync<ArgumentException>(() => s_fileProviderData.UploadAsync(file));
     }
 
     [TestMethod]
-    [Description("Testing Upload Method with Size negative, i expected error!")]
+    [Description("Given a invalid request Size is negative value, when UploadAsync is called" +
+        "then I'm waiting for an error")]
     public async Task Upload_SizeNegativeAsync()
     {
-        var file = FileObject;
+        var file = File;
         file.SizeKb = -21;
 
         await Assert.ThrowsExceptionAsync<ArgumentException>(() => s_fileProviderData.UploadAsync(file));
     }
 
     [TestMethod]
-    [Description("Testing Upload Method with BlobName Null, i expected error!")]
+    [Description("Given a invalid request BlobName is null, when UploadAsync is called" +
+        "then I'm waiting for an error")]
     public async Task Upload_BlobNameNullAsync()
     {
-        var file = FileObject;
+        var file = File;
         file.BlobName = null;
 
         await Assert.ThrowsExceptionAsync<ArgumentException>(() => s_fileProviderData.UploadAsync(file));
     }
 
     [TestMethod]
-    [Description("Testing Upload Method with BlobName empty, i expected error!")]
+    [Description("Given a invalid request BlobName is empty, when UploadAsync is called" +
+        "then I'm waiting for an error")]
     public async Task Upload_BlobNameEmptyAsync()
     {
-        var file = FileObject;
+        var file = File;
         file.BlobName = String.Empty;
 
         await Assert.ThrowsExceptionAsync<ArgumentException>(() => s_fileProviderData.UploadAsync(file));
     }
 
     [TestMethod]
-    [Description("Test Get method with id good and extension good, i expected result")]
+    [Description("Given a valid request, when GetAsync is called" +
+        "then I'm waiting for an result")]
     public void GetFiles_IdGood()
     {
         List<File> filesModels = new List<File>();
         var fileModel = new File
         {
-            Id = FileObject.Id,
+            Id = File.Id,
             Extension = ".png"
         };
         filesModels.Add(fileModel);
@@ -102,7 +111,8 @@ public class FileProviderTest : BaseClass
     }
 
     [TestMethod]
-    [Description("Test Get method with object null, i expected error")]
+    [Description("Given a invalid request object is null, when GetAsync is called" +
+        "then I'm waiting for an error")]
     public void GetFiles_ObjectNull()
     {
         List<File> filesModels = new List<File>();

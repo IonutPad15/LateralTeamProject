@@ -11,7 +11,7 @@ public class BlobStorageProviderTest : BaseClass
     {
         var file = new File
         {
-            BlobName = $"{FileObject.Id}.txt",
+            BlobName = $"{File.Id}.txt",
             Content = null
         };
 
@@ -25,7 +25,7 @@ public class BlobStorageProviderTest : BaseClass
         var file = new File
         {
             BlobName = null!,
-            Content = FileObject.Content
+            Content = File.Content
         };
 
         await Assert.ThrowsExceptionAsync<ArgumentException>(() => s_blobData.UploadFileAsync(file));
@@ -38,7 +38,7 @@ public class BlobStorageProviderTest : BaseClass
         var file = new File
         {
             BlobName = String.Empty,
-            Content = FileObject.Content
+            Content = File.Content
         };
 
         await Assert.ThrowsExceptionAsync<ArgumentException>(() => s_blobData.UploadFileAsync(file));
@@ -90,7 +90,7 @@ public class BlobStorageProviderTest : BaseClass
         List<File> files = new();
         var file = new File
         {
-            Id = FileObject.Id,
+            Id = File.Id,
             Extension = null!
         };
         files.Add(file);
@@ -105,7 +105,7 @@ public class BlobStorageProviderTest : BaseClass
         List<File> files = new();
         var file = new File
         {
-            Id = FileObject.Id,
+            Id = File.Id,
             Extension = String.Empty
         };
         files.Add(file);
@@ -120,7 +120,7 @@ public class BlobStorageProviderTest : BaseClass
         List<File> files = new();
         var file = new File
         {
-            Id = FileObject.Id,
+            Id = File.Id,
             Extension = ".txt"
         };
         files.Add(file);

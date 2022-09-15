@@ -9,7 +9,7 @@ public class MetaDataTest : BaseClass
     public async Task CreateAsync_Test()
     {
         //arrange
-        var rowkey = FileObject.Id;
+        var rowkey = File.Id;
         var partitionkey = ".txt";
         string name = "TextForTest";
         string type = "TextDocument";

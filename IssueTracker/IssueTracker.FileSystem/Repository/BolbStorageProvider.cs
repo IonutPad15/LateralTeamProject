@@ -17,14 +17,14 @@ public class BolbStorageProvider : IBolbStorageProvider
     public Task<IEnumerable<Models.File>> GetFilesAsync(IEnumerable<Models.File> files)
     {
         var fileResult = new List<Models.File>();
-        if (files.Count() <= 0)
+        if (files.Any())
             throw new ArgumentException("I can't get nothing, files is empty!");
         foreach (var file in files)
         {
             var fileAtachment = new Models.File();
-            if (file.Id == null || file.Id == string.Empty)
+            if (String.IsNullOrEmpty(file.Id))
                 throw new ArgumentException("Invalid file id!");
-            if (file.Extension == null || file.Extension == string.Empty)
+            if (String.IsNullOrEmpty(file.Extension))
                 throw new ArgumentException("Invalid file extension!");
             fileAtachment.Id = file.Id;
             fileAtachment.Extension = file.Extension;
@@ -45,7 +45,7 @@ public class BolbStorageProvider : IBolbStorageProvider
             throw new ArgumentException("Invalid BlobName");
         if (file.Content == null)
             throw new ArgumentException("Invalid Content");
-        //await ContainerClient.CreateIfNotExistsAsync();
+        var container = await ContainerClient.CreateIfNotExistsAsync();
         var blobClient = ContainerClient.GetBlobClient(file.BlobName);
         blobClient.Upload(file.Content);
     }

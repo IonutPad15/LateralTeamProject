@@ -54,6 +54,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="FileSystemTests\TextForTest.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="IssueTracker.UnitTest.runsettings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>IssueTracker.UnitTest.Designer.cs</LastGenOutput>
