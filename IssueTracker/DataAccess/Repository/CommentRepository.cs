@@ -1,4 +1,5 @@
-﻿using DataAccess.DbAccess;
+﻿using System.Data.SqlClient;
+using DataAccess.DbAccess;
 using DataAccess.Models;
 
 namespace DataAccess.Repository;
@@ -10,9 +11,9 @@ public class CommentRepository : ICommentRepository
     {
         _db = db;
     }
-    public async Task AddAsync(Comment comment)
+    public async Task<int> AddAsync(Comment comment)
     {
-        await _db.SaveDataAsync("dbo.spComment_Insert",
+        var result = await _db.SaveDataAndGetIdAsync<object, int>("dbo.spComment_Insert",
             new
             {
                 comment.UserId,
@@ -23,6 +24,7 @@ public class CommentRepository : ICommentRepository
                 comment.Created,
                 comment.Updated
             });
+        return result;
     }
     public async Task<Comment?> GetByIdAsync(int id)
     {
@@ -52,12 +54,26 @@ public class CommentRepository : ICommentRepository
 
     public async Task UpdateAsync(Comment comment)
     {
-        await _db.SaveDataAsync("dbo.spComment_Update", new { comment.Id, comment.Body, comment.Updated });
+        try
+        {
+            await _db.SaveDataAsync("dbo.spComment_Update", new { comment.Id, comment.Body, comment.Updated });
+        }
+        catch (SqlException ex)
+        {
+            throw new RepositoryException(ex.Message);
+        }
     }
 
     public async Task DeleteAsync(int id)
     {
-        await _db.SaveDataAsync("dbo.spComment_Delete", new { Id = id });
+        try
+        {
+            await _db.SaveDataAsync("dbo.spComment_Delete", new { Id = id });
+        }
+        catch (SqlException ex)
+        {
+            throw new RepositoryException(ex.Message);
+        }
     }
 }
 public static class Extensions

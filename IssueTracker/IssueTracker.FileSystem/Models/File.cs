@@ -1,9 +1,6 @@
 ﻿namespace IssueTracker.FileSystem.Models;
 public class File
 {
-    public File()
-    {
-    }
     public File(string id, string extension)
     {
         Id = id;

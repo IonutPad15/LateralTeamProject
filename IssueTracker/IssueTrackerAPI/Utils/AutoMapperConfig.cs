@@ -54,8 +54,15 @@ public class AutoMapperConfig
         List<FileResponse> results = new List<FileResponse>();
         foreach (var file in files)
         {
-            var result = await attachements.GetAttachements(file);
-            results.Add(result);
+            try
+            {
+                var result = await attachements.GetAttachements(file);
+                results.Add(result);
+            }
+            catch (FileSystemException ex)
+            {
+                throw ex;
+            }
         }
         return results.AsEnumerable();
     }

@@ -37,8 +37,15 @@ public class CommentController : ControllerBase
         var comment = await _commentData.GetByIdAsync(id);
         if (comment == null) return Results.NotFound("Couldn't find any comment");
         var commentResponse = _mapper.Map<CommentResponse>(comment);
-        commentResponse.Attachements = await AutoMapperConfig.GetAttachements(comment.Attachements);
-        return Results.Ok(commentResponse);
+        try
+        {
+            commentResponse.Attachements = await AutoMapperConfig.GetAttachements(comment.Attachements);
+            return Results.Ok(commentResponse);
+        }
+        catch (FileSystemException ex)
+        {
+            return Results.Conflict(ex.Message);
+        }
     }
     [HttpGet("issueid")]
     public async Task<IResult> GetByIssueId(int id)
@@ -46,8 +53,15 @@ public class CommentController : ControllerBase
         var comments = await _commentData.GetAllByIssueIdAsync(id);
         if (comments == null || comments.Count() == 0) return Results.NotFound("Couldn't find any comments");
         var commentsResponse = _mapper.Map<IEnumerable<CommentResponse>>(comments);
-        commentsResponse = await GetAttachements(comments!, commentsResponse);
-        return Results.Ok(commentsResponse);
+        try
+        {
+            commentsResponse = await GetAttachements(comments!, commentsResponse);
+            return Results.Ok(commentsResponse);
+        }
+        catch (FileSystemException ex)
+        {
+            return Results.Conflict(ex.Message);
+        }
     }
     private async Task<IEnumerable<CommentResponse>> GetAttachements(IEnumerable<Comment> comments, IEnumerable<CommentResponse> commentsResponse)
     {
@@ -76,8 +90,15 @@ public class CommentController : ControllerBase
         var comments = await _commentData.GetAllByCommentIdAsync(id);
         if (comments.Count() == 0) return Results.NotFound("Couldn't find any comments");
         var commentsResponse = _mapper.Map<IEnumerable<CommentResponse>>(comments);
-        commentsResponse = await GetAttachements(comments!, commentsResponse);
-        return Results.Ok(commentsResponse);
+        try
+        {
+            commentsResponse = await GetAttachements(comments!, commentsResponse);
+            return Results.Ok(commentsResponse);
+        }
+        catch (FileSystemException ex)
+        {
+            return Results.Conflict(ex.Message);
+        }
     }
     [HttpGet("userid")]
     public async Task<IResult> GetByUserId(Guid id)
@@ -85,8 +106,15 @@ public class CommentController : ControllerBase
         var comments = await _commentData.GetAllByUserIdAsync(id);
         if (comments.Count() == 0) return Results.NotFound("Couldn't find any comments");
         IEnumerable<CommentResponse> commentsResponse = _mapper.Map<IEnumerable<CommentResponse>>(comments);
-        commentsResponse = await GetAttachements(comments!, commentsResponse);
-        return Results.Ok(commentsResponse);
+        try
+        {
+            commentsResponse = await GetAttachements(comments!, commentsResponse);
+            return Results.Ok(commentsResponse);
+        }
+        catch (FileSystemException ex)
+        {
+            return Results.Conflict(ex.Message);
+        }
     }
     [HttpPost]
     public async Task<IResult> Create([FromBody] CommentRequest commentRequest)

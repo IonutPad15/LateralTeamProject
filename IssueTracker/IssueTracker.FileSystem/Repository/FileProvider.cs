@@ -27,19 +27,27 @@ public class FileProvider : IFileProvider
 
     public async Task<IEnumerable<Models.File>> GetAsync(IEnumerable<Models.File> files)
     {
-        var entities = _metaDataProvider.Get(files);
-        if (!entities.Any()) throw new ArgumentException("Detail file is null!");
+        var entities = Enumerable.Empty<Models.File>();
+        try
+        {
+            entities = _metaDataProvider.Get(files);
+        }
+        catch (FileSystemException ex)
+        {
+            throw ex;
+        }
+        if (!entities.Any()) throw new FileSystemException("Detail file is null!");
         var bolb = await _bolbProvider.GetFilesAsync(files);
-        if (!entities.Any()) throw new ArgumentException("File is null!");
+        if (!entities.Any()) throw new FileSystemException("File is null!");
         foreach (var entity in entities)
         {
             var link = bolb.Where(b => b.Id == entity.Id).FirstOrDefault()?.Link;
-            if (link == null || link == String.Empty)
-                throw new ArgumentException("Link null or empty");
+            if (string.IsNullOrEmpty(link))
+                throw new FileSystemException("Link null or empty");
             entity.Link = link;
             var extension = bolb.FirstOrDefault(b => b.Id == entity.Id)?.Extension;
-            if (extension == null || extension == String.Empty)
-                throw new ArgumentException("Extension null or empty");
+            if (string.IsNullOrEmpty(extension))
+                throw new FileSystemException("Extension null or empty");
             entity.Extension = extension;
         }
         return entities;
@@ -48,7 +56,7 @@ public class FileProvider : IFileProvider
     public async Task UploadAsync(Models.File file)
     {
         if (file == null)
-            throw new ArgumentException("File is null!");
+            throw new FileSystemException("File is null!");
         await _bolbProvider.UploadFileAsync(file);
         await _metaDataProvider.CreateAsync(file);
     }

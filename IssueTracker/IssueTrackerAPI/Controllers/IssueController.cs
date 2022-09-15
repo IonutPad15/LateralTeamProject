@@ -56,12 +56,19 @@ public class IssueController : ControllerBase
         List<IssueResponse> resultList = new();
         foreach (var issue in issues!)
         {
-            issue.Attachements = await _file.GetByIssueIdAsync(issue.Id);
-            resultList.Add(_mapper.Map<IssueResponse>(issue));
-            foreach (var result in resultList)
+            try
             {
-                if (issue.Attachements.Count() > 0)
-                    result.Attachments = await AutoMapperConfig.GetAttachements(issue.Attachements);
+                issue.Attachements = await _file.GetByIssueIdAsync(issue.Id);
+                resultList.Add(_mapper.Map<IssueResponse>(issue));
+                foreach (var result in resultList)
+                {
+                    if (issue.Attachements.Count() > 0)
+                        result.Attachments = await AutoMapperConfig.GetAttachements(issue.Attachements);
+                }
+            }
+            catch (FileSystemException ex)
+            {
+                return Conflict(ex.Message);
             }
         }
         return Ok(resultList);
@@ -76,7 +83,14 @@ public class IssueController : ControllerBase
         issue!.Attachements = await _file.GetByIssueIdAsync(issue.Id);
         var result = _mapper.Map<IssueResponse>(issue);
         if (issue!.Attachements.Count() > 0)
-            result.Attachments = await AutoMapperConfig.GetAttachements(issue!.Attachements);
+            try
+            {
+                result.Attachments = await AutoMapperConfig.GetAttachements(issue!.Attachements);
+            }
+            catch (FileSystemException ex)
+            {
+                return Conflict(ex.Message);
+            }
         return Ok(result);
     }
 

@@ -18,17 +18,24 @@ public class AttachementsHelper
             var fileModel = new IssueTracker.FileSystem.Models.File(file.FileId, file.Extension);
             List<IssueTracker.FileSystem.Models.File> files = new List<IssueTracker.FileSystem.Models.File>();
             files.Add(fileModel);
-            var result = (await _fileProvider.GetAsync(files)).FirstOrDefault();
-            if (result != null)
+            try
             {
-                response.FileId = result.Id;
-                response.Extension = result.Extension;
-                response.IssueId = file.FileIssueId;
-                response.CommentId = file.FileCommentId;
-                response.Name = result.Name!;
-                response.Type = result.Type;
-                response.SizeKb = result.SizeKb;
-                response.Link = result.Link!;
+                var result = (await _fileProvider.GetAsync(files)).FirstOrDefault();
+                if (result != null)
+                {
+                    response.FileId = result.Id;
+                    response.Extension = result.Extension;
+                    response.IssueId = file.FileIssueId;
+                    response.CommentId = file.FileCommentId;
+                    response.Name = result.Name!;
+                    response.Type = result.Type;
+                    response.SizeKb = result.SizeKb;
+                    response.Link = result.Link!;
+                }
+            }
+            catch (FileSystemException ex)
+            {
+                throw ex;
             }
         }
         return response;
