@@ -18,20 +18,18 @@ public class BlobData : IBlobProvider
     {
         var fileResult = new List<Models.File>();
         if (files.Count() <= 0)
-            throw new ArgumentException("I can't get nothing, files is empty!");
+            throw new FileSystemException("I can't get nothing, files is empty!");
         foreach (var file in files)
         {
-            var fileAtachment = new Models.File();
-            if (file.Id == null || file.Id == string.Empty)
-                throw new ArgumentException("Invalid file id!");
-            if (file.Extension == null || file.Extension == string.Empty)
-                throw new ArgumentException("Invalid file extension!");
-            fileAtachment.Id = file.Id;
-            fileAtachment.Extension = file.Extension;
+            if (string.IsNullOrEmpty(file.Id))
+                throw new FileSystemException("Invalid file id!");
+            if (string.IsNullOrEmpty(file.Extension))
+                throw new FileSystemException("Invalid file extension!");
+            var fileAtachment = new Models.File(file.Id, file.Extension);
             BlobClient information = _containerClient.GetBlobClient(file.Id + file.Extension);
             fileAtachment.Link = GetBlobSasUri(information).ToString();
-            if (fileAtachment.Link == null)
-                throw new ArgumentException($"Sas Invalid for {file.Name}!");
+            if (string.IsNullOrEmpty(fileAtachment.Link))
+                throw new FileSystemException($"Sas Invalid for {file.Name}!");
             fileResult.Add(fileAtachment);
         }
         return Task.FromResult<IEnumerable<Models.File>>(fileResult);
@@ -40,11 +38,11 @@ public class BlobData : IBlobProvider
     public async Task UploadFileAsync(Models.File file)
     {
         if (file == null)
-            throw new ArgumentException("You don't have files!");
-        if (file.BlobName == String.Empty || file.BlobName == null)
-            throw new ArgumentException("Invalid BlobName");
+            throw new FileSystemException("You don't have files!");
+        if (string.IsNullOrEmpty(file.BlobName))
+            throw new FileSystemException("Invalid BlobName");
         if (file.Content == null)
-            throw new ArgumentException("Invalid Content");
+            throw new FileSystemException("Invalid Content");
         var blobClient = _containerClient.GetBlobClient(file.BlobName);
         await blobClient.UploadAsync(file.Content);
     }

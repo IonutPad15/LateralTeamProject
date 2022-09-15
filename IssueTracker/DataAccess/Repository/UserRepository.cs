@@ -1,4 +1,5 @@
-﻿using DataAccess.DbAccess;
+﻿using System.Data.SqlClient;
+using DataAccess.DbAccess;
 using DataAccess.Models;
 namespace DataAccess.Repository;
 
@@ -37,11 +38,25 @@ public class UserRepository : IUserRepository
     }
     public async Task UpdateUserAsync(User user)
     {
-        await _db.SaveDataAsync("dbo.spUser_Update",
+        try
+        {
+            await _db.SaveDataAsync("dbo.spUser_Update",
             new { Id = user.Id, UserName = user.UserName, Email = user.Email, Password = user.Password });
+        }
+        catch (SqlException ex)
+        {
+            throw new RepositoryException(ex.Message);
+        }
     }
     public async Task DeleteUserAsync(Guid id)
     {
-        await _db.SaveDataAsync("dbo.spUser_Delete", new { Id = id });
+        try
+        {
+            await _db.SaveDataAsync("dbo.spUser_Delete", new { Id = id });
+        }
+        catch (SqlException ex)
+        {
+            throw new RepositoryException(ex.Message);
+        }
     }
 }

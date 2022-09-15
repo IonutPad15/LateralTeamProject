@@ -10,11 +10,7 @@ public class FileProviderTest : BaseClass
     public void GetFiles_IdWrong()
     {
         List<File> filesModels = new List<File>();
-        var fileModel = new File
-        {
-            Id = Guid.NewGuid().ToString(),
-            Extension = ".png"
-        };
+        var fileModel = new File(Guid.NewGuid().ToString(), ".png");
         filesModels.Add(fileModel);
         IEnumerable<File> files = filesModels;
         TestFileProvider.GetAsync(files);
@@ -25,11 +21,7 @@ public class FileProviderTest : BaseClass
     public void GetFiles_IdGood()
     {
         List<File> filesModels = new List<File>();
-        var fileModel = new File
-        {
-            Id = "f8ae9dc3-b990-4d08-bbba-c3b3fd6e18ae",
-            Extension = ".png"
-        };
+        var fileModel = new File("f8ae9dc3-b990-4d08-bbba-c3b3fd6e18ae", ".png");
         filesModels.Add(fileModel);
         IEnumerable<File> files = filesModels;
         var result = TestFileProvider.GetAsync(files);
@@ -42,11 +34,7 @@ public class FileProviderTest : BaseClass
     public void GetFiles_ExtensionWrong()
     {
         List<File> filesModels = new List<File>();
-        var fileModel = new File
-        {
-            Id = "f8ae9dc3-b990-4d08-bbba-c3b3fd6e18ae",
-            Extension = ".sasd"
-        };
+        var fileModel = new File("f8ae9dc3-b990-4d08-bbba-c3b3fd6e18ae", ".png");
         filesModels.Add(fileModel);
         IEnumerable<File> files = filesModels;
         TestFileProvider.GetAsync(files);

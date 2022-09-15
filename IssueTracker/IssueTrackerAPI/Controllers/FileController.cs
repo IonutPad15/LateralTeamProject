@@ -1,5 +1,5 @@
-﻿using System.Data.SqlClient;
-using AutoMapper;
+﻿using AutoMapper;
+using DataAccess;
 using DataAccess.Repository;
 using FluentValidation.Results;
 using IssueTracker.FileSystem;
@@ -39,12 +39,10 @@ public class FileController : ControllerBase
         }
         var fileId = Guid.NewGuid();
         var blobFileName = $"{fileId}{Path.GetExtension(formFile.FileName)}";
-        var file = new IssueTracker.FileSystem.Models.File
+        var file = new IssueTracker.FileSystem.Models.File(fileId.ToString(), Path.GetExtension(formFile.FileName))
         {
-            Id = fileId.ToString(),
             Name = formFile.FileName,
             BlobName = blobFileName,
-            Extension = Path.GetExtension(formFile.FileName),
             Content = formFile.OpenReadStream(),
             SizeKb = formFile.Length / 1024,
             Type = formFile.ContentType
@@ -63,18 +61,33 @@ public class FileController : ControllerBase
     public async Task<IActionResult> GetFiles(IEnumerable<FileGetRequest> fileName)
     {
         var fileAttachment = _mapper.Map<IEnumerable<IssueTracker.FileSystem.Models.File>>(fileName);
-        var response = await _fileProvider.GetAsync(fileAttachment);
-        if (response == null) throw new ArgumentException("Result is null!");
-        return Ok(response);
+        try
+        {
+            var response = await _fileProvider.GetAsync(fileAttachment);
+            if (response == null) return BadRequest("there are no files");
+            return Ok(response);
+        }
+        catch (FileSystemException ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
 
     [HttpGet("getone")]
     public async Task<IActionResult> GetFile(FileGetRequest fileName)
     {
         var fileAttachment = _mapper.Map<IEnumerable<IssueTracker.FileSystem.Models.File>>(fileName);
-        var response = await _fileProvider.GetAsync(fileAttachment);
-        if (response == null) throw new ArgumentException("Result is null!");
-        return Ok(response.FirstOrDefault());
+        try
+        {
+            var response = await _fileProvider.GetAsync(fileAttachment);
+
+            if (response == null) return BadRequest("Result is null!");
+            return Ok(response.FirstOrDefault());
+        }
+        catch (FileSystemException ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
 
     [HttpDelete]
@@ -91,9 +104,9 @@ public class FileController : ControllerBase
         {
             await _fileRepository.DeleteAsync(fileDelete.FileId);
         }
-        catch (SqlException)
+        catch (RepositoryException ex)
         {
-            return Results.BadRequest("file does not exists");
+            return Results.BadRequest(ex.Message);
         }
         return Results.Ok();
     }

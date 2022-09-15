@@ -1,4 +1,5 @@
-﻿using DataAccess.DbAccess;
+﻿using System.Data.SqlClient;
+using DataAccess.DbAccess;
 using DataAccess.Models;
 
 namespace DataAccess.Repository;
@@ -39,26 +40,40 @@ public class IssueRepository : IIssueRepository
     }
     public async Task UpdateAsync(Issue entity)
     {
-        entity.Updated = DateTime.UtcNow;
-        await _db.SaveDataAsync(
-            "dbo.spIssue_Update",
-            new
-            {
-                Id = entity.Id,
-                Title = entity.Title,
-                Description = entity.Description,
-                Updated = entity.Updated,
-                ProjectId = entity.ProjectId,
-                RoleId = entity.RoleId,
-                IssueTypeId = entity.IssueTypeId,
-                UserAssignedId = entity.UserAssignedId,
-                PriorityId = entity.PriorityId,
-                StatusId = entity.StatusId
-            });
+        try
+        {
+            entity.Updated = DateTime.UtcNow;
+            await _db.SaveDataAsync(
+                "dbo.spIssue_Update",
+                new
+                {
+                    Id = entity.Id,
+                    Title = entity.Title,
+                    Description = entity.Description,
+                    Updated = entity.Updated,
+                    ProjectId = entity.ProjectId,
+                    RoleId = entity.RoleId,
+                    IssueTypeId = entity.IssueTypeId,
+                    UserAssignedId = entity.UserAssignedId,
+                    PriorityId = entity.PriorityId,
+                    StatusId = entity.StatusId
+                });
+        }
+        catch (SqlException ex)
+        {
+            throw new RepositoryException(ex.Message);
+        }
     }
     public async Task DeleteAsync(int id)
     {
-        await _db.SaveDataAsync("dbo.spIssue_Delete", new { Id = id });
+        try
+        {
+            await _db.SaveDataAsync("dbo.spIssue_Delete", new { Id = id });
+        }
+        catch (SqlException ex)
+        {
+            throw new RepositoryException(ex.Message);
+        }
     }
     public async Task NextStatusOfIssueAsync(int id, int statusId)
     {
