@@ -1,5 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-using Azure.Storage.Blobs;
+﻿using Azure.Storage.Blobs;
 using Azure.Storage.Sas;
 
 namespace IssueTracker.FileSystem;
@@ -64,5 +63,11 @@ public class BolbStorageProvider : IBolbStorageProvider
         sasBuilder.SetPermissions(BlobSasPermissions.Read);
         var sas = sasBuilder.ToSasQueryParameters(new Azure.Storage.StorageSharedKeyCredential(_config.AccountName, _config.AccountKey)).ToString();
         return $"{blobClient.Uri}?{sas}";
+    }
+
+    public async Task<bool> DeleteFileAsync(string name)
+    {
+        await ContainerClient.DeleteBlobIfExistsAsync(name);
+        return true;
     }
 }

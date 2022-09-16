@@ -11,11 +11,11 @@ public class BlobDataTest : BaseClass
     {
         var file = new File
         {
-            BlobName = $"{IdFileTest}.txt",
+            BlobName = $"{File.Id}.txt",
             Content = null
         };
 
-        await Assert.ThrowsExceptionAsync<ArgumentException>(() => s_blobData.UploadFileAsync(file));
+        await Assert.ThrowsExceptionAsync<ArgumentException>(() => s_blobStorageProvider.UploadFileAsync(file));
     }
 
     [TestMethod]
@@ -25,10 +25,10 @@ public class BlobDataTest : BaseClass
         var file = new File
         {
             BlobName = null!,
-            Content = FileStreamTest
+            Content = File.Content
         };
 
-        await Assert.ThrowsExceptionAsync<ArgumentException>(() => s_blobData.UploadFileAsync(file));
+        await Assert.ThrowsExceptionAsync<ArgumentException>(() => s_blobStorageProvider.UploadFileAsync(file));
     }
 
     [TestMethod]
@@ -38,10 +38,10 @@ public class BlobDataTest : BaseClass
         var file = new File
         {
             BlobName = String.Empty,
-            Content = FileStreamTest
+            Content = File.Content
         };
 
-        await Assert.ThrowsExceptionAsync<ArgumentException>(() => s_blobData.UploadFileAsync(file));
+        await Assert.ThrowsExceptionAsync<ArgumentException>(() => s_blobStorageProvider.UploadFileAsync(file));
     }
 
     [TestMethod]
@@ -51,10 +51,10 @@ public class BlobDataTest : BaseClass
         var file = new File
         {
             BlobName = Guid.NewGuid().ToString(),
-            Content = FileStreamTest
+            Content = File.Content
         };
 
-        await s_blobData.UploadFileAsync(file);
+        await s_blobStorageProvider.UploadFileAsync(file);
 
         Assert.IsTrue(true);
     }
@@ -65,7 +65,7 @@ public class BlobDataTest : BaseClass
     {
         List<File> files = new();
 
-        await Assert.ThrowsExceptionAsync<ArgumentException>(() => s_blobData.GetFilesAsync(files));
+        await Assert.ThrowsExceptionAsync<ArgumentException>(() => s_blobStorageProvider.GetFilesAsync(files));
     }
 
     [TestMethod]
@@ -80,7 +80,7 @@ public class BlobDataTest : BaseClass
         };
         files.Add(file);
 
-        await Assert.ThrowsExceptionAsync<ArgumentException>(() => s_blobData.GetFilesAsync(files));
+        await Assert.ThrowsExceptionAsync<ArgumentException>(() => s_blobStorageProvider.GetFilesAsync(files));
     }
 
     [TestMethod]
@@ -95,7 +95,7 @@ public class BlobDataTest : BaseClass
         };
         files.Add(file);
 
-        await Assert.ThrowsExceptionAsync<ArgumentException>(() => s_blobData.GetFilesAsync(files));
+        await Assert.ThrowsExceptionAsync<ArgumentException>(() => s_blobStorageProvider.GetFilesAsync(files));
     }
 
     [TestMethod]
@@ -105,12 +105,12 @@ public class BlobDataTest : BaseClass
         List<File> files = new();
         var file = new File
         {
-            Id = IdFileTest,
+            Id = File.Id,
             Extension = null!
         };
         files.Add(file);
 
-        await Assert.ThrowsExceptionAsync<ArgumentException>(() => s_blobData.GetFilesAsync(files));
+        await Assert.ThrowsExceptionAsync<ArgumentException>(() => s_blobStorageProvider.GetFilesAsync(files));
     }
 
     [TestMethod]
@@ -120,12 +120,12 @@ public class BlobDataTest : BaseClass
         List<File> files = new();
         var file = new File
         {
-            Id = IdFileTest,
+            Id = File.Id,
             Extension = String.Empty
         };
         files.Add(file);
 
-        await Assert.ThrowsExceptionAsync<ArgumentException>(() => s_blobData.GetFilesAsync(files));
+        await Assert.ThrowsExceptionAsync<ArgumentException>(() => s_blobStorageProvider.GetFilesAsync(files));
     }
 
     [TestMethod]
@@ -135,12 +135,12 @@ public class BlobDataTest : BaseClass
         List<File> files = new();
         var file = new File
         {
-            Id = IdFileTest,
+            Id = File.Id,
             Extension = ".txt"
         };
         files.Add(file);
 
-        var result = await s_blobData.GetFilesAsync(files);
+        var result = await s_blobStorageProvider.GetFilesAsync(files);
 
         Assert.IsNotNull(result);
     }
