@@ -1,7 +1,8 @@
-﻿using Azure.Storage.Blobs;
+﻿using System.Runtime.CompilerServices;
+using Azure.Storage.Blobs;
 using Azure.Storage.Sas;
 
-
+[assembly: InternalsVisibleTo("IssueTracker.UnitTest")]
 namespace IssueTracker.FileSystem;
 public class BolbData : IBolbData
 {
@@ -18,17 +19,18 @@ public class BolbData : IBolbData
     public Task<IEnumerable<Models.File>> GetFilesAsync(IEnumerable<Models.File> files)
     {
         var fileResult = new List<Models.File>();
-
+        if (files.Count() <= 0)
+            throw new ArgumentException("I can't get nothing, files is empty!");
         foreach (var file in files)
         {
             var fileAtachment = new Models.File();
             if (file.Id == null || file.Id == string.Empty)
                 throw new ArgumentException("Invalid file id!");
+            if (file.Extension == null || file.Extension == string.Empty)
+                throw new ArgumentException("Invalid file extension!");
             fileAtachment.Id = file.Id;
             fileAtachment.Extension = file.Extension;
             BlobClient information = ContainerClient.GetBlobClient(file.Id + file.Extension);
-            if (information == null)
-                throw new ArgumentException("Don't exist or was delete this file!");
             fileAtachment.Link = GetBlobSasUri(information).ToString();
             if (fileAtachment.Link == null)
                 throw new ArgumentException($"Sas Invalid for {file.Name}!");
@@ -41,8 +43,11 @@ public class BolbData : IBolbData
     {
         if (file == null)
             throw new ArgumentException("You don't have files!");
-
-        await ContainerClient.CreateIfNotExistsAsync();
+        if (file.BlobName == String.Empty || file.BlobName == null)
+            throw new ArgumentException("Invalid BlobName");
+        if (file.Content == null)
+            throw new ArgumentException("Invalid Content");
+        //await ContainerClient.CreateIfNotExistsAsync();
         var blobClient = ContainerClient.GetBlobClient(file.BlobName);
         blobClient.Upload(file.Content);
     }
@@ -62,16 +67,10 @@ public class BolbData : IBolbData
         return $"{blobClient.Uri}?{sas}";
     }
 
-    public async Task<Stream> DownloadFileAsync(string link)
+    public async Task<bool> DeleteFileAsync(string name)
     {
-        Uri sasUri = new Uri(link);
-        BlobClient blobClient = new BlobClient(sasUri, null);
-        if (blobClient == null)
-            throw new ArgumentException("This file can't be find!");
-        var memoryStream = new MemoryStream();
-        await blobClient.DownloadToAsync(memoryStream);
-        if (memoryStream.Length <= 0)
-            throw new ArgumentException("This file can't be downloading!");
-        return memoryStream;
+        BlobClient toDelete = ContainerClient.GetBlobClient(name);
+        await toDelete.DeleteAsync();
+        return true;
     }
 }

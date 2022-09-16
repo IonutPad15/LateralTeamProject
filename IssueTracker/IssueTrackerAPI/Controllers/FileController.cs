@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Data.SqlClient;
+using AutoMapper;
 using DataAccess.Repository;
 using FluentValidation.Results;
 using IssueTracker.FileSystem;
@@ -86,9 +87,14 @@ public class FileController : ControllerBase
             List<ValidationFailure> failures = results.Errors;
             return Results.BadRequest(failures);
         }
-        await _fileData.DeleteAsync(fileDelete.FileId);
-        var file = _mapper.Map<IssueTracker.FileSystem.Models.File>(fileDelete);
-        await _fileProvider.DeleteAsync(file);
+        try
+        {
+            await _fileData.DeleteAsync(fileDelete.FileId);
+        }
+        catch (SqlException)
+        {
+            return Results.BadRequest("file does not exists");
+        }
         return Results.Ok();
     }
 }
