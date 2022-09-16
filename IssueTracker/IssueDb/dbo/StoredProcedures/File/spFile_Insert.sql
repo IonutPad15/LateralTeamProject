@@ -3,10 +3,11 @@
     @Extension NVARCHAR(350),
     @FileIssueId INT,
     @FileCommentId INT,
-    @Updated DATETIME
+    @Updated DATETIME,
+    @FileUserId UNIQUEIDENTIFIER
 AS
-	insert into dbo.[File] (FileId, Extension, FileIssueId, FileCommentId, Updated)
-	values (@FileId, @Extension, @FileIssueId, @FileCommentId, @Updated)
+	insert into dbo.[File] (FileId, Extension, FileIssueId, FileCommentId, Updated, FileUserId)
+	values (@FileId, @Extension, @FileIssueId, @FileCommentId, @Updated, @FileUserId)
     select FileId
     from dbo.[File]
     where @FileId = FileId

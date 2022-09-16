@@ -19,7 +19,7 @@ public class MetaDataProvider : IMetaDataProvider
         var result = new List<Models.File>();
         foreach (var file in files)
         {
-            var model = entities.FirstOrDefault(x => x.RowKey == file.BlobName && x.PartitionKey == file.Extension);
+            var model = entities.FirstOrDefault(x => x.RowKey == file.Id && x.PartitionKey == file.Extension);
             if (model != null)
             {
                 var resultFile = new Models.File(model.RowKey, model.PartitionKey, model.Name, model.Type, model.SizeKb);

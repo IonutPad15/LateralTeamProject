@@ -18,7 +18,7 @@ public class SQLDataAccess : ISQLDataAccess
     private void InitializeDapper()
     {
         SqlMapper.AddTypeHandler(new DateTimeOffsetHandler());
-        SqlMapper.AddTypeHandler(new GuidHandler());
+        //SqlMapper.AddTypeHandler(new GuidHandler());
         SqlMapper.AddTypeHandler(new TimeSpanHandler());
     }
 

@@ -17,7 +17,8 @@ public class FileRepository : IFileRepository
             Extension = entity.Extension,
             FileIssueId = entity.FileIssueId,
             FileCommentId = entity.FileCommentId,
-            Updated = upate
+            Updated = upate,
+            FileUserId = entity.FileUserId
         });
         return result;
     }
@@ -31,6 +32,11 @@ public class FileRepository : IFileRepository
     public async Task<IEnumerable<Models.File>> GetByIssueIdAsync(int issueId)
     {
         var result = await _db.LoadDataAsync<Models.File, object>("spFile_GetByIssueId", new { IssueId = issueId });
+        return result;
+    }
+    public async Task<Models.File?> GetAsync(string fileId)
+    {
+        var result = (await _db.LoadDataAsync<Models.File, object>("spFile_GetByFileId", new { FileId = fileId })).FirstOrDefault();
         return result;
     }
     public async Task<IEnumerable<Models.File>> GetForCleanupAsync(TimeSpan timeSpan)
