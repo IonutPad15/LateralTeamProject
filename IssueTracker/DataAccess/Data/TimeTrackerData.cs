@@ -12,14 +12,8 @@ public class TimeTrackerData : ITimeTrackerData
     }
     public async Task AddAsync(TimeTracker entity)
     {
-        if (String.IsNullOrEmpty(entity.Name))
-            throw new ArgumentException("Name invalid");
-        if (entity.Worked == TimeSpan.Zero || entity.Billable == TimeSpan.Zero)
-            throw new ArgumentException("Invalid Worked or Billable");
-        if (entity.UserId == Guid.Empty)
-            throw new ArgumentException("Invalid User!");
-        if (entity.IssueId <= 0)
-            throw new ArgumentException("Invalid Issue!");
+        if (IsValid(entity))
+            throw new ArgumentException("TimeTracker is invalid!");
         await _db.SaveDataAsync("spTimeTracker_Insert", new
         {
             Name = entity.Name,
@@ -37,5 +31,17 @@ public class TimeTrackerData : ITimeTrackerData
         if (id <= 0)
             throw new ArgumentException("Id is invalid");
         await _db.SaveDataAsync("spTimeTracker_Delete", new { Id = id });
+    }
+    private bool IsValid(TimeTracker entity)
+    {
+        if (String.IsNullOrEmpty(entity.Name))
+            return false;
+        if (entity.Worked == TimeSpan.Zero || entity.Billable == TimeSpan.Zero)
+            return false;
+        if (entity.UserId == Guid.Empty)
+            return false;
+        if (entity.IssueId <= 0)
+            return false;
+        return true;
     }
 }

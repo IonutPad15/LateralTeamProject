@@ -32,20 +32,6 @@ public class TimeTrackerValidator : AbstractValidator<TimeTracker>
             return false;
         return true;
     }
-    public static bool IsValid(TimeTracker entity)
-    {
-        if (entity == null)
-            return false;
-        if (string.IsNullOrEmpty(entity.Name))
-            return false;
-        if (entity.IssueId <= 0)
-            return false;
-        if (entity.UserId == Guid.Empty)
-            return false;
-        if (entity.Worked == TimeSpan.Zero || entity.Billable == TimeSpan.Zero)
-            return false;
-        return true;
-    }
     public static bool IsValid(TimeTrackerResponse entity)
     {
         if (entity == null)

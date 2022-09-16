@@ -24,8 +24,6 @@ public class TimeTrackerController : ControllerBase
         if (!TimeTrackerValidator.IsValid(entity))
             return BadRequest("Invalid TimeTracker!");
         var timeTracker = _map.Map<TimeTracker>(entity);
-        if (!TimeTrackerValidator.IsValid(timeTracker))
-            return BadRequest("Invalid Mapping!");
         await _trackerData.AddAsync(timeTracker);
         return Ok();
     }
