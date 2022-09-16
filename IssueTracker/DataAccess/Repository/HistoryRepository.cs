@@ -36,4 +36,6 @@ public class HistoryRepository : IHistoryRepository
         });
         return result;
     }
+
+
 }

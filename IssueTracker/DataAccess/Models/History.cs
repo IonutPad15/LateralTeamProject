@@ -19,6 +19,8 @@ public class History
         UserId = userId;
         Updated = updated;
     }
+
+
 }
 public enum HistoryType
 {
