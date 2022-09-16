@@ -3,10 +3,10 @@ using DataAccess.DbAccess;
 using DataAccess.Models;
 
 namespace DataAccess.Data;
-public class TimeTrackerData : ITimeTrackerData
+public class TimeTrackerRepository : ITimeTrackerRepository
 {
     private readonly ISQLDataAccess _db;
-    public TimeTrackerData(ISQLDataAccess db)
+    public TimeTrackerRepository(ISQLDataAccess db)
     {
         _db = db;
     }

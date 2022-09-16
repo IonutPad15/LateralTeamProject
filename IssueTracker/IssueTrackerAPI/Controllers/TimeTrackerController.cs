@@ -12,8 +12,8 @@ namespace IssueTrackerAPI.Controllers;
 public class TimeTrackerController : ControllerBase
 {
     private readonly Mapper _map;
-    private readonly ITimeTrackerData _trackerData;
-    public TimeTrackerController(ITimeTrackerData trackerData)
+    private readonly ITimeTrackerRepository _trackerData;
+    public TimeTrackerController(ITimeTrackerRepository trackerData)
     {
         _trackerData = trackerData;
         _map = AutoMapperConfig.Config();
