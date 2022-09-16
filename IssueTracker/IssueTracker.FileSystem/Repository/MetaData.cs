@@ -15,8 +15,7 @@ public class MetaData : IMetaDataProvider
     }
     public IEnumerable<Models.File> GetAll(IEnumerable<Models.File> files)
     {
-        var query = new TableQuery<MetaDataEntity>().Where(TableQuery.
-            GenerateFilterConditionForBool(nameof(MetaDataEntity.IsDeleted), QueryComparisons.Equal, false));
+        var query = new TableQuery<MetaDataEntity>();
         var entities = _metaDataTable.ExecuteQuery(query);
         var result = new List<Models.File>();
         foreach (var file in files)
@@ -52,8 +51,7 @@ public class MetaData : IMetaDataProvider
         var x = result.Result as MetaDataEntity;
         if (x != null)
         {
-            x.IsDeleted = true;
-            operation = TableOperation.Replace(x);
+            operation = TableOperation.Delete(x);
             await _metaDataTable.ExecuteAsync(operation);
             return true;
         }
@@ -64,7 +62,7 @@ public class MetaData : IMetaDataProvider
         var operation = TableOperation.Retrieve<MetaDataEntity>(group, id);
         var result = await _metaDataTable.ExecuteAsync(operation);
         var x = result.Result as MetaDataEntity;
-        if (x != null && x.IsDeleted == false)
+        if (x != null)
         {
             var entity = new MetaDataResponse(x.RowKey, x.PartitionKey, x.Name, x.Type, x.SizeKb);
             return entity;
@@ -77,5 +75,4 @@ internal class MetaDataEntity : TableEntity
     public string Name { get; set; } = string.Empty;
     public string Type { get; set; } = string.Empty;
     public double SizeKb { get; set; }
-    public bool IsDeleted { get; set; }
 }

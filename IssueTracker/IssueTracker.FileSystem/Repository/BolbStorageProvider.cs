@@ -1,4 +1,5 @@
-﻿using Azure.Storage.Blobs;
+﻿using System.Runtime.CompilerServices;
+using Azure.Storage.Blobs;
 using Azure.Storage.Sas;
 
 namespace IssueTracker.FileSystem;
