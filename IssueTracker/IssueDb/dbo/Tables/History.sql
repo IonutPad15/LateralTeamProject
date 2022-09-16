@@ -14,4 +14,5 @@
     FOREIGN KEY (ProjectId) REFERENCES [dbo].[Project](Id),
     FOREIGN KEY (IssueId) REFERENCES [dbo].[Issue](Id),
     FOREIGN KEY (UserId) REFERENCES [dbo].[User](Id),
+
 )
