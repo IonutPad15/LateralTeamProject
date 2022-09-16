@@ -11,13 +11,14 @@ public class FileRepository : IFileRepository
     public async Task<string?> AddAsync(Models.File entity)
     {
         DateTime upate = DateTime.UtcNow;
-        var result = await _db.SaveDataAndGetIdAsync<dynamic, string>("dbo.spFile_Insert", new
+        var result = await _db.SaveDataAndGetIdAsync<object, string>("dbo.spFile_Insert", new
         {
             FileId = entity.FileId,
             Extension = entity.Extension,
             FileIssueId = entity.FileIssueId,
             FileCommentId = entity.FileCommentId,
-            Updated = upate
+            Updated = upate,
+            FileUserId = entity.FileUserId
         });
         return result;
     }
@@ -30,14 +31,19 @@ public class FileRepository : IFileRepository
 
     public async Task<IEnumerable<Models.File>> GetByIssueIdAsync(int issueId)
     {
-        var result = await _db.LoadDataAsync<Models.File, dynamic>("spFile_GetByIssueId", new { IssueId = issueId });
+        var result = await _db.LoadDataAsync<Models.File, object>("spFile_GetByIssueId", new { IssueId = issueId });
+        return result;
+    }
+    public async Task<Models.File?> GetAsync(string fileId)
+    {
+        var result = (await _db.LoadDataAsync<Models.File, object>("spFile_GetByFileId", new { FileId = fileId })).FirstOrDefault();
         return result;
     }
     public async Task<IEnumerable<Models.File>> GetForCleanupAsync(TimeSpan timeSpan)
     {
         var updated = DateTime.UtcNow;
         updated = updated.AddMilliseconds(-timeSpan.TotalMilliseconds);
-        var result = await _db.LoadDataAsync<Models.File, dynamic>("spFile_GetForCleanup", new { Updated = updated });
+        var result = await _db.LoadDataAsync<Models.File, object>("spFile_GetForCleanup", new { Updated = updated });
         return result;
     }
 }

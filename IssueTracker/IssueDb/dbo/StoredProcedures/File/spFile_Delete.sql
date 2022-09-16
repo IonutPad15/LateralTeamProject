@@ -3,7 +3,7 @@
     @Updated DATETIME
 AS
 begin
-	IF EXISTS(SELECT * FROM dbo.[File] WHERE FileId = @FileId)
+	IF EXISTS(SELECT * FROM dbo.[File] WHERE FileId = @FileId and FileIsDeleted = 0)
 	begin
 		update dbo.[File]
 		set FileIsDeleted = 1, Updated = @Updated/*TRUE*/

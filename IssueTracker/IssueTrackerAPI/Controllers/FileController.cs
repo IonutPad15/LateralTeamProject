@@ -1,9 +1,11 @@
-﻿using System.Data.SqlClient;
-using AutoMapper;
+﻿using AutoMapper;
+using DataAccess;
 using DataAccess.Repository;
 using FluentValidation.Results;
 using IssueTracker.FileSystem;
 using IssueTrackerAPI.Utils;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Models.Request;
 using Validation;
@@ -25,8 +27,11 @@ public class FileController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public async Task<IResult> PostFile([FromForm] IFormFile formFile, [FromForm] int? issueId, [FromForm] int? commentId)
     {
+        var idclaim = User.Claims.FirstOrDefault(x => x.Type.Equals("UserId"));
+        if (idclaim == null) return Results.Unauthorized();
         FileRequest fileRequest = new FileRequest(formFile);
         fileRequest.IssueId = issueId;
         fileRequest.CommentId = commentId;
@@ -39,45 +44,28 @@ public class FileController : ControllerBase
         }
         var fileId = Guid.NewGuid();
         var blobFileName = $"{fileId}{Path.GetExtension(formFile.FileName)}";
-        var file = new IssueTracker.FileSystem.Models.File
+        var file = new IssueTracker.FileSystem.Models.File(fileId.ToString(), Path.GetExtension(formFile.FileName))
         {
-            Id = fileId.ToString(),
             Name = formFile.FileName,
             BlobName = blobFileName,
-            Extension = Path.GetExtension(formFile.FileName),
             Content = formFile.OpenReadStream(),
             SizeKb = formFile.Length / 1024,
-            Type = formFile.ContentType
+            Type = formFile.ContentType,
+            UserId = Guid.Parse(idclaim.Value)
         };
         var fileModel = new File();
         fileModel.Extension = file.Extension;
         fileModel.FileId = file.Id;
         fileModel.FileIssueId = issueId;
         fileModel.FileCommentId = commentId;
+        fileModel.FileUserId = Guid.Parse(idclaim.Value);
         await _fileRepository.AddAsync(fileModel);
         await _fileProvider.UploadAsync(file);
         return Results.Ok();
     }
 
-    [HttpGet("getFiles")]
-    public async Task<IActionResult> GetFiles(IEnumerable<FileGetRequest> fileName)
-    {
-        var fileAttachment = _mapper.Map<IEnumerable<IssueTracker.FileSystem.Models.File>>(fileName);
-        var response = await _fileProvider.GetAsync(fileAttachment);
-        if (response == null) throw new ArgumentException("Result is null!");
-        return Ok(response);
-    }
-
-    [HttpGet("getone")]
-    public async Task<IActionResult> GetFile(FileGetRequest fileName)
-    {
-        var fileAttachment = _mapper.Map<IEnumerable<IssueTracker.FileSystem.Models.File>>(fileName);
-        var response = await _fileProvider.GetAsync(fileAttachment);
-        if (response == null) throw new ArgumentException("Result is null!");
-        return Ok(response.FirstOrDefault());
-    }
-
     [HttpDelete]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public async Task<IResult> Delete([FromBody] FileDeleteRequest fileDelete)
     {
         var validator = new FileDeleteRequestValidation();
@@ -87,13 +75,17 @@ public class FileController : ControllerBase
             List<ValidationFailure> failures = results.Errors;
             return Results.BadRequest(failures);
         }
+        var file = await _fileRepository.GetAsync(fileDelete.FileId);
+        if (file == null) return Results.NotFound("No record to delete");
+        var idclaim = User.Claims.FirstOrDefault(x => x.Type.Equals("UserId"));
+        if (idclaim == null || file.FileUserId != Guid.Parse(idclaim.Value)) return Results.Unauthorized();
         try
         {
             await _fileRepository.DeleteAsync(fileDelete.FileId);
         }
-        catch (SqlException)
+        catch (RepositoryException ex)
         {
-            return Results.BadRequest("file does not exists");
+            return Results.BadRequest(ex.Message);
         }
         return Results.Ok();
     }

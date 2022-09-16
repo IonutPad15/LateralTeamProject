@@ -4,7 +4,7 @@ namespace DataAccess.Repository;
 
 public interface ICommentRepository
 {
-    Task AddAsync(Comment comment);
+    Task<int> AddAsync(Comment comment);
     Task DeleteAsync(int id);
     Task<IEnumerable<Comment?>> GetAllByCommentIdAsync(int id);
     Task<IEnumerable<Comment?>> GetAllByIssueIdAsync(int id);

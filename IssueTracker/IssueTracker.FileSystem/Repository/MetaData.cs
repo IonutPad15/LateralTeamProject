@@ -19,9 +19,12 @@ public class MetaDataProvider : IMetaDataProvider
         var result = new List<Models.File>();
         foreach (var file in files)
         {
-            var models = entities.Where(x => x.RowKey == file.Id).Select(x => new Models.File(x.RowKey, x.PartitionKey, x.Name, x.Type, x.SizeKb)).FirstOrDefault();
-            if (models == null) throw new ArgumentException("I can't find it!");
-            result.Add(models);
+            var model = entities.FirstOrDefault(x => x.RowKey == file.Id && x.PartitionKey == file.Extension);
+            if (model != null)
+            {
+                var resultFile = new Models.File(model.RowKey, model.PartitionKey, model.Name, model.Type, model.SizeKb);
+                result.Add(resultFile);
+            }
         }
         if (result.Any())
             return result;

@@ -12,7 +12,7 @@ public class ParticipantDataTest : BaseClass
         "then it has at least one participant")]
     public async Task GetAll_Test()
     {
-        var participants = await ParticipantData.GetAllAsync();
+        var participants = await TestParticipantRepository.GetAllAsync();
         Assert.IsTrue(participants.Count() > 0);
     }
     [TestMethod]
@@ -28,9 +28,9 @@ public class ParticipantDataTest : BaseClass
             RoleId = (RolesType)4,
             UserId = userID
         };
-        var participantId = await ParticipantData.AddAsync(participant);
+        var participantId = await TestParticipantRepository.AddAsync(participant);
         //act
-        var result = await ParticipantData.GetByIdAsync(participantId);
+        var result = await TestParticipantRepository.GetByIdAsync(participantId);
         //assert
         Assert.AreEqual(participantId, result!.Id);
     }
@@ -45,27 +45,27 @@ public class ParticipantDataTest : BaseClass
             RoleId = (RolesType)1,
             UserId = new Guid()
         };
-        await Assert.ThrowsExceptionAsync<SqlException>(() => ParticipantData.AddAsync(participant));
+        await Assert.ThrowsExceptionAsync<SqlException>(() => TestParticipantRepository.AddAsync(participant));
     }
     [TestMethod]
     [Description("Given an invalid request (id <= 0), when DeleteAsync is called" +
         "then it should throw an SQLException")]
     public async Task DeleteAsync_Test_BadId()
     {
-        await Assert.ThrowsExceptionAsync<SqlException>(() => ParticipantData.DeleteAsync(-1));
+        await Assert.ThrowsExceptionAsync<SqlException>(() => TestParticipantRepository.DeleteAsync(-1));
     }
     [TestMethod]
     [Description("Given a valid request (id = 2), when DeleteAsync is called" +
         "then delets the participant")]
     public async Task DeleteAsync_Test()
     {
-        await ParticipantData.DeleteAsync(2);
+        await TestParticipantRepository.DeleteAsync(2);
     }
     [TestMethod]
     [Description("Given a valid request (id = 1), when GetByIdAsync is called, then returns that participant! ")]
     public async Task GetByIdAsync_Test()
     {
-        var participant = await ParticipantData.GetByIdAsync(1);
+        var participant = await TestParticipantRepository.GetByIdAsync(1);
         Assert.IsNotNull(participant);
     }
     [TestMethod]
@@ -73,7 +73,7 @@ public class ParticipantDataTest : BaseClass
         "then it return a null object")]
     public async Task GetByIdAsync_Test_BadId()
     {
-        var participant = await ParticipantData.GetByIdAsync(0);
+        var participant = await TestParticipantRepository.GetByIdAsync(0);
         Assert.IsNull(participant);
     }
     [TestMethod]
@@ -81,7 +81,7 @@ public class ParticipantDataTest : BaseClass
         "then returns a list of participants with these roles")]
     public async Task GetOwnersAndCollabsByProjectIdAsync_Test()
     {
-        var participants = await ParticipantData.GetOwnersAndCollabsByProjectIdAsync(1);
+        var participants = await TestParticipantRepository.GetOwnersAndCollabsByProjectIdAsync(1);
         TestContext.WriteLine(participants.Count().ToString());
         Assert.IsTrue(participants.Any());
     }
@@ -90,7 +90,7 @@ public class ParticipantDataTest : BaseClass
         "then it should be an empty list")]
     public async Task GetOwnersAndCollabsByProjectIdAsync_Test_BadRequest()
     {
-        var participants = await ParticipantData.GetOwnersAndCollabsByProjectIdAsync(0);
+        var participants = await TestParticipantRepository.GetOwnersAndCollabsByProjectIdAsync(0);
         Assert.IsTrue(!participants.Any());
     }
     [TestMethod]
@@ -98,7 +98,7 @@ public class ParticipantDataTest : BaseClass
         "then it should be a single Participant object")]
     public async Task GetOwnerByProjectIdAsync_Test()
     {
-        var participants = await ParticipantData.GetOwnerByProjectIdAsync(1);
+        var participants = await TestParticipantRepository.GetOwnerByProjectIdAsync(1);
         Assert.IsTrue(participants.Count() == 1);
     }
     [TestMethod]
@@ -106,7 +106,7 @@ public class ParticipantDataTest : BaseClass
         "then it should be an empty list or too many elements ")]
     public async Task GetOwnerByProjectIdAsync_Test_BadRequest()
     {
-        var participants = await ParticipantData.GetOwnerByProjectIdAsync(0);
+        var participants = await TestParticipantRepository.GetOwnerByProjectIdAsync(0);
         Assert.IsTrue(participants.Count() != 1);
     }
     [TestMethod]
@@ -127,7 +127,7 @@ public class ParticipantDataTest : BaseClass
                 ProjectId = row.Field<int>("ProjectId"),
                 RoleId = (RolesType)1
             };
-            await ParticipantData.UpdateAsync(participant);
+            await TestParticipantRepository.UpdateAsync(participant);
         }
         else
         {
@@ -150,7 +150,7 @@ public class ParticipantDataTest : BaseClass
             ProjectId = row.Field<int>("ProjectId"),
             RoleId = (RolesType)(-1)
         };
-        await Assert.ThrowsExceptionAsync<SqlException>(() => ParticipantData.UpdateAsync(participant));
+        await Assert.ThrowsExceptionAsync<SqlException>(() => TestParticipantRepository.UpdateAsync(participant));
     }
     [TestMethod]
     [Description("Given an invalid Id (-1), when UpdateAsync is called" +
@@ -168,6 +168,6 @@ public class ParticipantDataTest : BaseClass
             ProjectId = row.Field<int>("ProjectId"),
             RoleId = (RolesType)4
         };
-        await Assert.ThrowsExceptionAsync<SqlException>(() => ParticipantData.UpdateAsync(participant));
+        await Assert.ThrowsExceptionAsync<SqlException>(() => TestParticipantRepository.UpdateAsync(participant));
     }
 }
