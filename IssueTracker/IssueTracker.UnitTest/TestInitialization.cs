@@ -58,7 +58,7 @@ public class TestInitialization
             BlobName = $"{BaseClass.File.Id}.txt",
             Content = BaseClass.File.Content
         };
-        BaseClass.s_blobData.UploadFileAsync(file);
+        BaseClass.s_blobStorageProvider.UploadFileAsync(file);
     }
     private static IConfiguration SetConfiguration()
     {
@@ -70,17 +70,17 @@ public class TestInitialization
     private static void CreateInstances(TestContext tc)
     {
         var configuration = SetConfiguration();
-        BaseClass.IssueData = new IssueRepository(new SQLDataAccess(configuration));
-        BaseClass.ParticipantData = new ParticipantRepository(new SQLDataAccess(configuration));
+        BaseClass.IssueRepository = new IssueRepository(new SQLDataAccess(configuration));
+        BaseClass.ParticipantRepository = new ParticipantRepository(new SQLDataAccess(configuration));
         BaseClass.TestContext = tc;
         BaseClass.File = new File();
 
         IConfigurationFactory cf = new ConfigurationFactory(configuration);
         var blobConfig = cf.Create<IBolbConfigurationFactory>();
         var metadataconfig = cf.Create<IMetaDataConfiguration>();
-        BaseClass.s_blobData = new BolbStorageProvider(blobConfig);
+        BaseClass.s_blobStorageProvider = new BolbStorageProvider(blobConfig);
         BaseClass.s_metaDataProvider = new MetaData(metadataconfig);
-        BaseClass.s_fileProviderData = new FileProvider(configuration);
+        BaseClass.s_fileProvider = new FileProvider(configuration);
     }
     private static void PopulateDataBase()
     {
