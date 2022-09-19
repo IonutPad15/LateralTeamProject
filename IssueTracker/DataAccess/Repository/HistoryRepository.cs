@@ -25,17 +25,15 @@ public class HistoryRepository : IHistoryRepository
         {
             Type = entity.Type,
             ProjectId = entity.ProjectId,
-            UserId = entity.UserId,
+            Author = entity.Author,
             IssueId = entity.IssueId,
             ReferenceType = entity.ReferenceType,
             ReferenceId = entity.ReferenceId,
-            Field = entity.ReferenceId,
+            Field = entity.Field,
             OldValue = entity.OldValue,
             NewValue = entity.NewValue,
-            Updated = entity.NewValue
+            Updated = entity.Updated
         });
         return result;
     }
-
-    //I will delete this
 }

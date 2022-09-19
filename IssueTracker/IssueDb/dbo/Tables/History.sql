@@ -3,7 +3,7 @@
 	[Id] INT NOT NULL PRIMARY KEY IDENTITY,
     [Type] INT NOT NULL,
     [ProjectId] INT NOT NULL,
-    [UserId] UNIQUEIDENTIFIER NOT NULL,
+    [Author] NVARCHAR (30) NOT NULL,
     [IssueId] INT,
     [ReferenceType] INT,
     [ReferenceId] INT,
@@ -12,7 +12,6 @@
     [NewValue] VARCHAR (max),
     [Updated] [datetime2](7) NOT NULL,
     FOREIGN KEY (ProjectId) REFERENCES [dbo].[Project](Id),
-    FOREIGN KEY (IssueId) REFERENCES [dbo].[Issue](Id),
-    FOREIGN KEY (UserId) REFERENCES [dbo].[User](Id),
+    FOREIGN KEY (IssueId) REFERENCES [dbo].[Issue](Id)
 
 )

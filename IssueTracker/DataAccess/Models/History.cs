@@ -1,10 +1,23 @@
 ﻿namespace DataAccess.Models;
 public class History
 {
+    public History(HistoryType historyType, int projectId, string author, DateTime updated)
+    {
+        Type = historyType;
+        ProjectId = projectId;
+        Author = author;
+        Updated = updated;
+    }
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+    public History()
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+    {
+
+    }
     public int Id { get; set; }
     public HistoryType Type { get; set; }
     public int ProjectId { get; set; }
-    public Guid UserId { get; set; }
+    public string Author { get; set; }
     public int? IssueId { get; set; }
     public ReferenceType? ReferenceType { get; set; }
     public int? ReferenceId { get; set; }
@@ -12,14 +25,6 @@ public class History
     public string? OldValue { get; set; }
     public string? NewValue { get; set; }
     public DateTime Updated { get; set; }
-    public History(HistoryType historyType, int projectId, Guid userId, DateTime updated)
-    {
-        Type = historyType;
-        ProjectId = projectId;
-        UserId = userId;
-        Updated = updated;
-    }
-
 
 }
 public enum HistoryType

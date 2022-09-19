@@ -10,21 +10,22 @@ public class HistoryHandler
     {
         _repository = repository;
     }
-    public async void CreatedProject(int projectId, Guid userId, DateTime updated)
+    public async void CreatedProject(int projectId, string author, DateTime updated)
     {
-        History history = new History(HistoryType.Created, projectId, userId, updated);
+        History history = new History(HistoryType.Created, projectId, author, updated);
         await _repository.AddAsync(history);
     }
-    public async void CreatedIssue(int projectId, Guid userId, int issueId, DateTime updated)
+    public async void CreatedIssue(int projectId, string author, int issueId, DateTime updated)
     {
-        History history = new History(HistoryType.Created, projectId, userId, updated);
+        History history = new History(HistoryType.Created, projectId, author, updated);
         history.IssueId = issueId;
         await _repository.AddAsync(history);
     }
-    public async void CreatedComment(int projectId, int IssueId, int commentId, Guid userId, string newValue, DateTime updated)
+    public async void CreatedComment(int projectId, int IssueId, int commentId, string author, string newValue, DateTime updated)
     {
-        History history = new History(HistoryType.Created, projectId, userId, updated)
+        History history = new History(HistoryType.Created, projectId, author, updated)
         {
+            IssueId = IssueId,
             ReferenceType = ReferenceType.Comment,
             ReferenceId = commentId,
             Field = "Body",
@@ -32,18 +33,18 @@ public class HistoryHandler
         };
         await _repository.AddAsync(history);
     }
-    public async void CreatedParticipant(int projectId, int IssueId, int participantId, Guid userId, DateTime updated)
+    public async void CreatedParticipant(int projectId, int IssueId, int participantId, string author, DateTime updated)
     {
-        History history = new History(HistoryType.Created, projectId, userId, updated)
+        History history = new History(HistoryType.Created, projectId, author, updated)
         {
             ReferenceType = ReferenceType.Participant,
             ReferenceId = participantId
         };
         await _repository.AddAsync(history);
     }
-    public async void UpdatedProject(int projectId, Guid userId, DateTime updated, string field, string oldValue, string newValue)
+    public async void UpdatedProject(int projectId, string author, DateTime updated, string field, string oldValue, string newValue)
     {
-        History history = new History(HistoryType.Modified, projectId, userId, updated)
+        History history = new History(HistoryType.Modified, projectId, author, updated)
         {
             Field = field,
             OldValue = oldValue,
@@ -51,10 +52,10 @@ public class HistoryHandler
         };
         await _repository.AddAsync(history);
     }
-    public async void UpdatedIssue(int projectId, Guid userId, int issueId, DateTime updated,
+    public async void UpdatedIssue(int projectId, string author, int issueId, DateTime updated,
         string field, string oldValue, string newValue)
     {
-        History history = new History(HistoryType.Modified, projectId, userId, updated)
+        History history = new History(HistoryType.Modified, projectId, author, updated)
         {
             IssueId = issueId,
             Field = field,
@@ -63,10 +64,10 @@ public class HistoryHandler
         };
         await _repository.AddAsync(history);
     }
-    public void UpdatedComment(int projectId, Guid userId, int issueId, DateTime updated,
+    public void UpdatedComment(int projectId, string author, int issueId, DateTime updated,
         int commentId, string field, string oldValue, string newValue)
     {
-        History history = new History(HistoryType.Modified, projectId, userId, updated)
+        History history = new History(HistoryType.Modified, projectId, author, updated)
         {
             IssueId = issueId,
             Field = field,
@@ -77,10 +78,10 @@ public class HistoryHandler
         };
         _repository.AddAsync(history);
     }
-    public void UpdatedParticipant(int projectId, Guid userId, int issueId, DateTime updated,
+    public void UpdatedParticipant(int projectId, string author, int issueId, DateTime updated,
         int participantId, string field, string oldValue, string newValue)
     {
-        History history = new History(HistoryType.Modified, projectId, userId, updated)
+        History history = new History(HistoryType.Modified, projectId, author, updated)
         {
             IssueId = issueId,
             Field = field,
@@ -91,20 +92,20 @@ public class HistoryHandler
         };
         _repository.AddAsync(history);
     }
-    public void DeletedProject(int projectId, Guid userId, DateTime updated)
+    public void DeletedProject(int projectId, string author, DateTime updated)
     {
-        History history = new History(HistoryType.Deleted, projectId, userId, updated);
+        History history = new History(HistoryType.Deleted, projectId, author, updated);
         _repository.AddAsync(history);
     }
-    public void DeletedIssue(int projectId, Guid userId, int issueId, DateTime updated)
+    public void DeletedIssue(int projectId, string author, int issueId, DateTime updated)
     {
-        History history = new History(HistoryType.Deleted, projectId, userId, updated);
+        History history = new History(HistoryType.Deleted, projectId, author, updated);
         history.IssueId = issueId;
         _repository.AddAsync(history);
     }
-    public void DeletedComment(int projectId, Guid userId, int issueId, DateTime updated, int commentId, string oldValue)
+    public void DeletedComment(int projectId, string author, int issueId, DateTime updated, int commentId, string oldValue)
     {
-        History history = new History(HistoryType.Deleted, projectId, userId, updated)
+        History history = new History(HistoryType.Deleted, projectId, author, updated)
         {
             IssueId = issueId,
             ReferenceId = commentId,
@@ -113,10 +114,10 @@ public class HistoryHandler
         };
         _repository.AddAsync(history);
     }
-    public void DeletedParticipant(int projectId, Guid userId, int issueId, DateTime updated,
+    public void DeletedParticipant(int projectId, string author, int issueId, DateTime updated,
         int participantId, string field, string oldValue)
     {
-        History history = new History(HistoryType.Deleted, projectId, userId, updated)
+        History history = new History(HistoryType.Deleted, projectId, author, updated)
         {
             IssueId = issueId,
             Field = field,

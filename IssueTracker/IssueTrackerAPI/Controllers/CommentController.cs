@@ -23,12 +23,17 @@ public class CommentController : ControllerBase
     private readonly ICommentRepository _commentData;
     private readonly IUserRepository _userData;
     private readonly Mapper _mapper;
-    public CommentController(ICommentRepository commentData, IUserRepository userData, IFileProvider fileProvider)
+    private readonly HistoryHandler _historyHandler;
+    private readonly IIssueRepository _issueRepository;
+    public CommentController(ICommentRepository commentData, IUserRepository userData,
+        IFileProvider fileProvider, IHistoryRepository historyRepository, IIssueRepository issueRepository)
     {
+        _issueRepository = issueRepository;
         _userData = userData;
         _commentData = commentData;
         AutoMapperConfig.Initialize(fileProvider);
         _mapper = AutoMapperConfig.Config();
+        _historyHandler = new HistoryHandler(historyRepository);
 
     }
     [HttpGet]
@@ -126,6 +131,8 @@ public class CommentController : ControllerBase
             List<ValidationFailure> failures = result.Errors;
             return Results.BadRequest(failures);
         }
+        var issue = _issueRepository.GetByIdAsync(commentRequest.IssueId);
+        if (issue == null) return Results.BadRequest("There is no issue");
         var value = Request.Headers["Authorization"];
         if (!AuthenticationHeaderValue.TryParse(Request.Headers["Authorization"], out AuthenticationHeaderValue? headerValue))
         {
@@ -136,8 +143,11 @@ public class CommentController : ControllerBase
             comment.CommentId = commentRequest.CommentId;
             comment.Updated = DateTime.Now;
             comment.Created = DateTime.Now;
-            await _commentData.AddAsync(comment);
-            return Results.Ok();
+            var commentId = await _commentData.AddAsync(comment);
+            if (commentId <= 0) return Results.Problem("Could not create the comment");
+            int projectId = await _issueRepository.GetProjectId(comment.IssueId);
+            _historyHandler.CreatedComment(projectId, comment.IssueId, commentId, comment.Author, comment.Body, DateTime.UtcNow);
+            return Results.Ok($"Id:{commentId}");
 
         }
         if (headerValue != null)
@@ -157,8 +167,11 @@ public class CommentController : ControllerBase
                 comment.CommentId = commentRequest.CommentId;
                 comment.Updated = DateTime.Now;
                 comment.Created = DateTime.Now;
-                await _commentData.AddAsync(comment);
-                return Results.Ok();
+                var commentId = await _commentData.AddAsync(comment);
+                if (commentId <= 0) return Results.Problem("Could not create the comment");
+                int projectId = await _issueRepository.GetProjectId(comment.IssueId);
+                _historyHandler.CreatedComment(projectId, comment.IssueId, commentId, comment.Author, comment.Body, DateTime.UtcNow);
+                return Results.Ok($"Id:{commentId}");
             }
         }
         return Results.BadRequest();

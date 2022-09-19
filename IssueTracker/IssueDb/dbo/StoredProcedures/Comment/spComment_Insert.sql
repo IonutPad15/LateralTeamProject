@@ -10,4 +10,5 @@ AS
 begin
 	insert into dbo.[Comment] (UserId, IssueId, CommentId, Author, Body, Created, Updated)
 	values (@UserId, @IssueId, @CommentId,@Author, @Body, @Created, @Updated);
+    select CAST(SCOPE_IDENTITY() as int);
 end
