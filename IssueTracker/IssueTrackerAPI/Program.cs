@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using IssueTracker.FileSystem;
 using IssueTrackerAPI.Utils;
+using DataAccess.Repository.IRepository;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,7 +25,7 @@ builder.Services.AddSingleton<ICommentRepository, CommentRepository>();
 builder.Services.AddSingleton<IFileRepository, FileRepository>();
 builder.Services.AddFileSystemServices();
 builder.Services.AddSingleton<IFileProvider, FileProvider>();
-
+builder.Services.AddSingleton<ITimeTrackerRepository, TimeTrackerRepository>();
 
 
 
