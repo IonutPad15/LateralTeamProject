@@ -23,19 +23,24 @@ public class IssueController : ControllerBase
     private readonly IParticipantRepository _participant;
     private readonly IFileRepository _file;
     private readonly Mapper _mapper;
-    public IssueController(IIssueRepository issue, IParticipantRepository participant, IFileRepository file, IFileProvider fileProvider)
+    private readonly HistoryHandler _historyHandler;
+    public IssueController(IIssueRepository issue, IParticipantRepository participant, IFileRepository file,
+        IFileProvider fileProvider, IHistoryRepository historyRepository)
     {
         _participant = participant;
         _issue = issue;
         AutoMapperConfig.Initialize(fileProvider);
         _mapper = AutoMapperConfig.Config();
         _file = file;
+        _historyHandler = new HistoryHandler(historyRepository);
     }
 
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [HttpPost("add-Issue")]
     public async Task<IActionResult> AddIssue(IssueRequest entity)
     {
+        var userclaim = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimTypes.Name));
+        if (userclaim == null) return Unauthorized();
         var validator = new IssueValidation();
         ValidationResult result = validator.Validate(entity);
         if (!result.IsValid)
@@ -46,7 +51,9 @@ public class IssueController : ControllerBase
         try
         {
             var issue = _mapper.Map<Issue>(entity);
-            await _issue.AddAsync(issue);
+            var issueId = await _issue.AddAsync(issue);
+            var projectId = await _issue.GetProjectId(issueId);
+            _historyHandler.CreatedIssue(projectId, userclaim.Value, issueId, DateTime.Now);
             return Ok();
         }
         catch (RepositoryException ex)
@@ -150,6 +157,8 @@ public class IssueController : ControllerBase
     [HttpPut("update-Issue")]
     public async Task<IActionResult> UpdateIssue(IssueRequest entity)
     {
+        var userclaim = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimTypes.Name));
+        if (userclaim == null) return Unauthorized();
         var validator = new IssueValidation();
         ValidationResult result = validator.Validate(entity);
         if (!result.IsValid)
@@ -157,12 +166,20 @@ public class IssueController : ControllerBase
             List<ValidationFailure> failures = result.Errors;
             return BadRequest(failures);
         }
+
+        var oldIssue = await _issue.GetByIdAsync(entity.Id);
+        if (oldIssue == null) return NotFound("No issue found with that id");
+        if (oldIssue.ProjectId != entity.ProjectId) return BadRequest("You can't move an issue to another project");
         if (entity.Id > 0)
         {
             try
             {
                 var issue = _mapper.Map<Issue>(entity);
                 await _issue.UpdateAsync(issue);
+                string field, oldValue, newValue;
+                _historyHandler.IssueUpdatedValues(oldIssue, issue, out field, out oldValue, out newValue);
+                _historyHandler.UpdatedIssue(oldIssue.ProjectId, userclaim.Value, oldIssue.Id,
+                    DateTime.UtcNow, field, oldValue, newValue);
                 return Ok();
             }
             catch (RepositoryException ex)
@@ -175,13 +192,18 @@ public class IssueController : ControllerBase
 
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [HttpDelete("delete-Issue")]
-    public async Task<IActionResult> DeleteIssue(int id)
+    public async Task<IActionResult> DeleteIssue([FromQuery] int id)
     {
+        var userclaim = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimTypes.Name));
+        if (userclaim == null) return Unauthorized();
         if (id > 0)
         {
             try
             {
+                var issue = await _issue.GetByIdAsync(id);
+                if (issue == null) return NotFound("There is no issue to delete");
                 await _issue.DeleteAsync(id);
+                _historyHandler.DeletedIssue(issue.ProjectId, userclaim.Value, id, DateTime.UtcNow);
                 return Ok();
             }
             catch (RepositoryException ex)

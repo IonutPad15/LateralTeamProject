@@ -6,7 +6,7 @@
     [Author] NVARCHAR (30) NOT NULL,
     [IssueId] INT,
     [ReferenceType] INT,
-    [ReferenceId] INT,
+    [ReferenceId] VARCHAR(36),
     [Field] VARCHAR(1024),
     [OldValue] VARCHAR (max),
     [NewValue] VARCHAR (max),

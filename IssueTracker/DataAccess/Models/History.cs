@@ -20,7 +20,7 @@ public class History
     public string Author { get; set; }
     public int? IssueId { get; set; }
     public ReferenceType? ReferenceType { get; set; }
-    public int? ReferenceId { get; set; }
+    public string? ReferenceId { get; set; }
     public string? Field { get; set; }
     public string? OldValue { get; set; }
     public string? NewValue { get; set; }

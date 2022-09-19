@@ -4,7 +4,7 @@
     @Author NVARCHAR (30),
     @IssueId INT,
     @ReferenceType INT,
-    @ReferenceId INT,
+    @ReferenceId VARCHAR(36),
     @Field VARCHAR(1024),
     @OldValue VARCHAR (max),
     @NewValue VARCHAR (max),
