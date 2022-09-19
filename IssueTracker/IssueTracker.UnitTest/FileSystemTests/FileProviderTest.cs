@@ -1,4 +1,5 @@
-﻿using File = IssueTracker.FileSystem.Models.File;
+﻿using IssueTracker.FileSystem;
+using File = IssueTracker.FileSystem.Models.File;
 
 namespace IssueTracker.UnitTest;
 
@@ -13,7 +14,7 @@ public class FileProviderTest : BaseClass
         var file = File;
         file.Id = String.Empty;
 
-        await Assert.ThrowsExceptionAsync<ArgumentException>(() => s_fileProvider.UploadAsync(file));
+        await Assert.ThrowsExceptionAsync<FileSystemException>(() => TestFileProvider.UploadAsync(file));
     }
 
     [TestMethod]
@@ -24,7 +25,7 @@ public class FileProviderTest : BaseClass
         var file = File;
         file.Id = null!;
 
-        await Assert.ThrowsExceptionAsync<ArgumentException>(() => s_fileProvider.UploadAsync(file));
+        await Assert.ThrowsExceptionAsync<FileSystemException>(() => TestFileProvider.UploadAsync(file));
     }
 
     [TestMethod]
@@ -35,7 +36,7 @@ public class FileProviderTest : BaseClass
         var file = File;
         file.Extension = null!;
 
-        await Assert.ThrowsExceptionAsync<ArgumentException>(() => s_fileProvider.UploadAsync(file));
+        await Assert.ThrowsExceptionAsync<FileSystemException>(() => TestFileProvider.UploadAsync(file));
     }
 
     [TestMethod]
@@ -46,7 +47,7 @@ public class FileProviderTest : BaseClass
         var file = File;
         file.Extension = String.Empty;
 
-        await Assert.ThrowsExceptionAsync<ArgumentException>(() => s_fileProvider.UploadAsync(file));
+        await Assert.ThrowsExceptionAsync<FileSystemException>(() => TestFileProvider.UploadAsync(file));
     }
 
     [TestMethod]
@@ -57,7 +58,7 @@ public class FileProviderTest : BaseClass
         var file = File;
         file.Content = null;
 
-        await Assert.ThrowsExceptionAsync<ArgumentException>(() => s_fileProvider.UploadAsync(file));
+        await Assert.ThrowsExceptionAsync<FileSystemException>(() => TestFileProvider.UploadAsync(file));
     }
 
     [TestMethod]
@@ -68,7 +69,7 @@ public class FileProviderTest : BaseClass
         var file = File;
         file.SizeKb = -21;
 
-        await Assert.ThrowsExceptionAsync<ArgumentException>(() => s_fileProvider.UploadAsync(file));
+        await Assert.ThrowsExceptionAsync<FileSystemException>(() => TestFileProvider.UploadAsync(file));
     }
 
     [TestMethod]
@@ -79,7 +80,7 @@ public class FileProviderTest : BaseClass
         var file = File;
         file.BlobName = null;
 
-        await Assert.ThrowsExceptionAsync<ArgumentException>(() => s_fileProvider.UploadAsync(file));
+        await Assert.ThrowsExceptionAsync<FileSystemException>(() => TestFileProvider.UploadAsync(file));
     }
 
     [TestMethod]
@@ -90,7 +91,7 @@ public class FileProviderTest : BaseClass
         var file = File;
         file.BlobName = String.Empty;
 
-        await Assert.ThrowsExceptionAsync<ArgumentException>(() => s_fileProvider.UploadAsync(file));
+        await Assert.ThrowsExceptionAsync<FileSystemException>(() => TestFileProvider.UploadAsync(file));
     }
 
     [TestMethod]
@@ -106,7 +107,7 @@ public class FileProviderTest : BaseClass
         };
         filesModels.Add(fileModel);
         IEnumerable<File> files = filesModels;
-        var result = s_fileProvider.GetAsync(files);
+        var result = TestFileProvider.GetAsync(files);
         Assert.IsNotNull(result);
     }
 
@@ -117,6 +118,6 @@ public class FileProviderTest : BaseClass
     {
         List<File> filesModels = new List<File>();
         IEnumerable<File> files = filesModels;
-        Assert.ThrowsExceptionAsync<ArgumentException>(() => s_fileProvider.GetAsync(files));
+        Assert.ThrowsExceptionAsync<FileSystemException>(() => TestFileProvider.GetAsync(files));
     }
 }

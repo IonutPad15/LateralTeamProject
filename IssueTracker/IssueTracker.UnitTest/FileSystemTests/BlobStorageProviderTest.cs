@@ -1,4 +1,5 @@
-﻿using File = IssueTracker.FileSystem.Models.File;
+﻿using IssueTracker.FileSystem;
+using File = IssueTracker.FileSystem.Models.File;
 
 namespace IssueTracker.UnitTest.FileSystemTests;
 
@@ -15,7 +16,7 @@ public class BlobStorageProviderTest : BaseClass
             Content = null
         };
 
-        await Assert.ThrowsExceptionAsync<ArgumentException>(() => s_blobStorageProvider.UploadFileAsync(file));
+        await Assert.ThrowsExceptionAsync<FileSystemException>(() => TestBlobProvider.UploadFileAsync(file));
     }
 
     [TestMethod]
@@ -28,7 +29,7 @@ public class BlobStorageProviderTest : BaseClass
             Content = File.Content
         };
 
-        await Assert.ThrowsExceptionAsync<ArgumentException>(() => s_blobStorageProvider.UploadFileAsync(file));
+        await Assert.ThrowsExceptionAsync<FileSystemException>(() => TestBlobProvider.UploadFileAsync(file));
     }
 
     [TestMethod]
@@ -41,7 +42,7 @@ public class BlobStorageProviderTest : BaseClass
             Content = File.Content
         };
 
-        await Assert.ThrowsExceptionAsync<ArgumentException>(() => s_blobStorageProvider.UploadFileAsync(file));
+        await Assert.ThrowsExceptionAsync<FileSystemException>(() => TestBlobProvider.UploadFileAsync(file));
     }
 
     [TestMethod]
@@ -50,7 +51,7 @@ public class BlobStorageProviderTest : BaseClass
     {
         List<File> files = new();
 
-        await Assert.ThrowsExceptionAsync<ArgumentException>(() => s_blobStorageProvider.GetFilesAsync(files));
+        await Assert.ThrowsExceptionAsync<FileSystemException>(() => TestBlobProvider.GetFilesAsync(files));
     }
 
     [TestMethod]
@@ -65,7 +66,7 @@ public class BlobStorageProviderTest : BaseClass
         };
         files.Add(file);
 
-        await Assert.ThrowsExceptionAsync<ArgumentException>(() => s_blobStorageProvider.GetFilesAsync(files));
+        await Assert.ThrowsExceptionAsync<FileSystemException>(() => TestBlobProvider.GetFilesAsync(files));
     }
 
     [TestMethod]
@@ -80,7 +81,7 @@ public class BlobStorageProviderTest : BaseClass
         };
         files.Add(file);
 
-        await Assert.ThrowsExceptionAsync<ArgumentException>(() => s_blobStorageProvider.GetFilesAsync(files));
+        await Assert.ThrowsExceptionAsync<FileSystemException>(() => TestBlobProvider.GetFilesAsync(files));
     }
 
     [TestMethod]
@@ -95,7 +96,7 @@ public class BlobStorageProviderTest : BaseClass
         };
         files.Add(file);
 
-        await Assert.ThrowsExceptionAsync<ArgumentException>(() => s_blobStorageProvider.GetFilesAsync(files));
+        await Assert.ThrowsExceptionAsync<FileSystemException>(() => TestBlobProvider.GetFilesAsync(files));
     }
 
     [TestMethod]
@@ -110,7 +111,7 @@ public class BlobStorageProviderTest : BaseClass
         };
         files.Add(file);
 
-        await Assert.ThrowsExceptionAsync<ArgumentException>(() => s_blobStorageProvider.GetFilesAsync(files));
+        await Assert.ThrowsExceptionAsync<FileSystemException>(() => TestBlobProvider.GetFilesAsync(files));
     }
 
     [TestMethod]
@@ -125,7 +126,7 @@ public class BlobStorageProviderTest : BaseClass
         };
         files.Add(file);
 
-        var result = await s_blobStorageProvider.GetFilesAsync(files);
+        var result = await TestBlobProvider.GetFilesAsync(files);
 
         Assert.IsNotNull(result);
     }

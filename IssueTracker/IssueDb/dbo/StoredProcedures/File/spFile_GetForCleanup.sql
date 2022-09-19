@@ -1,5 +1,5 @@
 ﻿CREATE PROCEDURE [dbo].[spFile_GetForCleanup]
-    @Updated DATETIME
+	  @Updated DATETIME
 AS
 begin
     select *

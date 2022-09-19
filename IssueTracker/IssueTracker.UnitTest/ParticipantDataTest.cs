@@ -1,6 +1,6 @@
-﻿using DataAccess.Models;
+﻿using DataAccess;
+using DataAccess.Models;
 using System.Data;
-using System.Data.SqlClient;
 
 namespace IssueTracker.UnitTest;
 
@@ -36,7 +36,7 @@ public class ParticipantDataTest : BaseClass
     }
     [TestMethod]
     [Description("Given an invalid request (UserId = new Guid() and ProjectId = 0), when GetAllAsync is called" +
-        "then it should throw an SQLException (it violates the FK rule)")]
+        "then it should throw an RepositoryException (it violates the FK rule)")]
     public async Task AddAsyncFkException_Test()
     {
         Participant participant = new Participant()
@@ -45,14 +45,14 @@ public class ParticipantDataTest : BaseClass
             RoleId = (RolesType)1,
             UserId = new Guid()
         };
-        await Assert.ThrowsExceptionAsync<SqlException>(() => ParticipantRepository.AddAsync(participant));
+        await Assert.ThrowsExceptionAsync<RepositoryException>(() => ParticipantRepository.AddAsync(participant));
     }
     [TestMethod]
     [Description("Given an invalid request (id <= 0), when DeleteAsync is called" +
-        "then it should throw an SQLException")]
+        "then it should throw an RepositoryException")]
     public async Task DeleteAsync_Test_BadId()
     {
-        await Assert.ThrowsExceptionAsync<SqlException>(() => ParticipantRepository.DeleteAsync(-1));
+        await Assert.ThrowsExceptionAsync<RepositoryException>(() => ParticipantRepository.DeleteAsync(-1));
     }
     [TestMethod]
     [Description("Given a valid request (id = 2), when DeleteAsync is called" +
@@ -136,7 +136,7 @@ public class ParticipantDataTest : BaseClass
     }
     [TestMethod]
     [Description("Given an invalid RoleId (-1), when UpdateAsync is called" +
-        "then it should throw an SqlException")]
+        "then it should throw an RepositoryException")]
     public async Task UpdateAsync_Test_BadRoleId()
     {
         string? conn = TestContext.Properties["ConnectionString"]!.ToString();
@@ -150,11 +150,11 @@ public class ParticipantDataTest : BaseClass
             ProjectId = row.Field<int>("ProjectId"),
             RoleId = (RolesType)(-1)
         };
-        await Assert.ThrowsExceptionAsync<SqlException>(() => ParticipantRepository.UpdateAsync(participant));
+        await Assert.ThrowsExceptionAsync<RepositoryException>(() => ParticipantRepository.UpdateAsync(participant));
     }
     [TestMethod]
     [Description("Given an invalid Id (-1), when UpdateAsync is called" +
-        "then it should throw an SqlException")]
+        "then it should throw an RepositoryException")]
     public async Task UpdateAsync_Test_BadId()
     {
         string? conn = TestContext.Properties["ConnectionString"]!.ToString();
@@ -168,6 +168,6 @@ public class ParticipantDataTest : BaseClass
             ProjectId = row.Field<int>("ProjectId"),
             RoleId = (RolesType)4
         };
-        await Assert.ThrowsExceptionAsync<SqlException>(() => ParticipantRepository.UpdateAsync(participant));
+        await Assert.ThrowsExceptionAsync<RepositoryException>(() => ParticipantRepository.UpdateAsync(participant));
     }
 }

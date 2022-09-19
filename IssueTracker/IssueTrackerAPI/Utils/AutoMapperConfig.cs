@@ -18,7 +18,6 @@ public class AutoMapperConfig
         MapperConfiguration config = new MapperConfiguration(cfg =>
         {
             cfg.CreateMap<Comment, CommentResponse>()
-               //.ForSourceMember(x => x.Attachements, opt => opt.DoNotValidate())
                .ForMember(dest => dest.Created, opt => opt.Ignore());
             cfg.CreateMap<Comment, CommentRequest>();
             cfg.CreateMap<IssueRequest, Issue>();
@@ -36,8 +35,6 @@ public class AutoMapperConfig
             cfg.CreateMap<RolesType, RoleType>();
             cfg.CreateMap<RoleType, RolesType>();
             cfg.CreateMap<Models.Request.MetaDataRequest, IssueTracker.FileSystem.Models.File>();
-            cfg.CreateMap<IssueTracker.FileSystem.Models.MetaDataResponse, Models.Response.MetaDataResponse>();
-            cfg.CreateMap<Models.Response.MetaDataResponse, IssueTracker.FileSystem.Models.MetaDataResponse>();
             cfg.CreateMap<IssueTracker.FileSystem.Models.File, DataAccess.Models.File>()
                 .ForMember(dest => dest.FileId, opt => opt.MapFrom(src => src.Id)).ReverseMap();
             cfg.CreateMap<IssueTracker.FileSystem.Models.File, DataAccess.Models.File>()
@@ -53,12 +50,19 @@ public class AutoMapperConfig
     }
     public static async Task<IEnumerable<FileResponse>> GetAttachements(IEnumerable<DataAccess.Models.File> files)
     {
-        var attachements = new Attachements(s_fileProvider!);
+        var attachements = new AttachementsHelper(s_fileProvider!);
         List<FileResponse> results = new List<FileResponse>();
         foreach (var file in files)
         {
-            var result = await attachements.GetAttachements(file);
-            results.Add(result);
+            try
+            {
+                var result = await attachements.GetAttachements(file);
+                results.Add(result);
+            }
+            catch (FileSystemException ex)
+            {
+                throw ex;
+            }
         }
         return results.AsEnumerable();
     }

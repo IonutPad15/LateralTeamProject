@@ -14,6 +14,12 @@ public class SQLDataAccess : ISQLDataAccess
     {
         _config = config;
     }
+    private void InitializeDapper()
+    {
+        SqlMapper.AddTypeHandler(new DateTimeOffsetHandler());
+        SqlMapper.AddTypeHandler(new GuidHandler());
+        SqlMapper.AddTypeHandler(new TimeSpanHandler());
+    }
 
     public async Task<IEnumerable<TFirst>> LoadDataAsync<TFirst>(
         string storedProcedure,
@@ -302,9 +308,7 @@ public class SQLDataAccess : ISQLDataAccess
     {
         using (IDbConnection connection = new SqlConnection(_config.GetConnectionString(connectionId)))
         {
-            SqlMapper.AddTypeHandler(new DateTimeOffsetHandler());
-            SqlMapper.AddTypeHandler(new GuidHandler());
-            SqlMapper.AddTypeHandler(new TimeSpanHandler());
+            InitializeDapper();
             await connection.ExecuteAsync(storedProcedure, parameters,
                 commandType: CommandType.StoredProcedure);
         }
@@ -316,9 +320,7 @@ public class SQLDataAccess : ISQLDataAccess
     {
         using (IDbConnection connection = new SqlConnection(_config.GetConnectionString(connectionId)))
         {
-            SqlMapper.AddTypeHandler(new DateTimeOffsetHandler());
-            SqlMapper.AddTypeHandler(new GuidHandler());
-            SqlMapper.AddTypeHandler(new TimeSpanHandler());
+            InitializeDapper();
             var result = await connection.QueryAsync<U>(storedProcedure, parameters,
                 commandType: CommandType.StoredProcedure);
             return result.FirstOrDefault();

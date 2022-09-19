@@ -11,4 +11,5 @@ public interface IIssueRepository
     Task DeleteAsync(int id);
     Task NextStatusOfIssueAsync(int id, int statusId);
     Task PreviousStatusOfIssueAsync(int id, int statusId);
+    Task<int> GetProjectId(int id);
 }

@@ -43,6 +43,8 @@ public class TestInitialization
     {
         var path = "TextForTest.txt";
         var idFileTest = Guid.NewGuid().ToString();
+        FileStream fss = System.IO.File.Create(path);
+        fss.Close();
         using (FileStream fs = System.IO.File.OpenRead(path))
         {
             BaseClass.File.Id = idFileTest;
@@ -58,7 +60,7 @@ public class TestInitialization
             BlobName = $"{BaseClass.File.Id}.txt",
             Content = BaseClass.File.Content
         };
-        BaseClass.s_blobStorageProvider.UploadFileAsync(file);
+        BaseClass.TestBlobProvider.UploadFileAsync(file);
     }
     private static IConfiguration SetConfiguration()
     {
@@ -76,16 +78,16 @@ public class TestInitialization
         BaseClass.File = new File();
 
         IConfigurationFactory cf = new ConfigurationFactory(configuration);
-        var blobConfig = cf.Create<IBolbConfigurationFactory>();
+        var blobConfig = cf.Create<IBlobConfigurationFactory>();
         var metadataconfig = cf.Create<IMetaDataConfiguration>();
-        BaseClass.s_blobStorageProvider = new BolbStorageProvider(blobConfig);
-        BaseClass.s_metaDataProvider = new MetaData(metadataconfig);
-        BaseClass.s_fileProvider = new FileProvider(configuration);
+        BaseClass.TestBlobProvider = new BlobProvider(blobConfig);
+        BaseClass.TestMetaDataProvider = new MetaDataProvider(metadataconfig);
+        BaseClass.TestFileProvider = new FileProvider(configuration);
     }
     private static void PopulateDataBase()
     {
         var configuration = SetConfiguration();
-        string? conn = configuration["ConnectionStrings.Default"].ToString();
+        string? conn = configuration["ConnectionStrings:Default"].ToString();
         string sql = "TRUNCATE TABLE dbo.[Participant]";
         using (SqlConnection ConnectionObject = new SqlConnection(conn!))
         {

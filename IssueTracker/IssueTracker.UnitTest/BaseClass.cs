@@ -7,14 +7,14 @@ using System.Data.SqlClient;
 namespace IssueTracker.UnitTest;
 public abstract class BaseClass
 {
-    public static IIssueRepository IssueRepository = null!;
-    public static TestContext TestContext { get; set; } = null!;
+    internal static IIssueRepository IssueRepository { get; set; } = null!;
+    internal static TestContext TestContext { get; set; } = null!;
     internal static File File { get; set; } = null!;
-    public static DataTable? TestDataTable { get; set; }
-    public static IParticipantRepository ParticipantRepository = null!;
-    internal static IFileProvider s_fileProvider = null!;
-    internal static IMetaDataProvider s_metaDataProvider = null!;
-    internal static IBolbStorageProvider s_blobStorageProvider = null!;
+    internal static DataTable? TestDataTable { get; set; }
+    internal static IParticipantRepository ParticipantRepository { get; set; } = null!;
+    internal static IFileProvider TestFileProvider { get; set; } = null!;
+    internal static IMetaDataProvider TestMetaDataProvider { get; set; } = null!;
+    internal static IBlobProvider TestBlobProvider { get; set; } = null!;
 
     public static DataTable? LoadDataTable(string sql, string connection)
     {

@@ -1,6 +1,8 @@
-﻿
+﻿using System.Runtime.CompilerServices;
+
+[assembly: InternalsVisibleTo("IssueTracker.UnitTest")]
 namespace IssueTracker.FileSystem;
-internal interface IBolbConfigurationFactory : IConfigurationBase
+internal interface IBlobConfigurationFactory : IConfigurationBase
 {
     string Container { get; }
     string AccountName { get; }

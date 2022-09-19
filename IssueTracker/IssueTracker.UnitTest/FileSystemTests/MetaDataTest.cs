@@ -1,4 +1,5 @@
-﻿namespace IssueTracker.UnitTest;
+﻿using File = IssueTracker.FileSystem.Models.File;
+namespace IssueTracker.UnitTest;
 
 [TestClass]
 public class MetaDataTest : BaseClass
@@ -9,15 +10,17 @@ public class MetaDataTest : BaseClass
     public async Task CreateAsync_Test()
     {
         //arrange
-        var rowkey = File.Id;
+        var rowkey = Guid.NewGuid().ToString();
         var partitionkey = ".txt";
         string name = "TextForTest";
         string type = "TextDocument";
         double sizeKb = 12;
-        var file = new FileSystem.Models.File(rowkey, partitionkey, name, type, sizeKb);
-        await s_metaDataProvider.CreateAsync(file);
+        var file = new File(rowkey, partitionkey, name, type, sizeKb);
+        await TestMetaDataProvider.CreateAsync(file);
         //act
-        var result = await s_metaDataProvider.GetAsync(rowkey, partitionkey);
+        List<File> files = new List<File>();
+        files.Add(file);
+        var result = TestMetaDataProvider.Get(files).FirstOrDefault();
         //assert
         Assert.AreEqual(result!.Name, name);
     }
@@ -32,9 +35,9 @@ public class MetaDataTest : BaseClass
         string name = "fisier";
         string type = "TextDocument";
         double sizeKb = -12;
-        var file = new FileSystem.Models.File(rowkey, partitionkey, name, type, sizeKb);
+        var file = new File(rowkey, partitionkey, name, type, sizeKb);
 
-        await Assert.ThrowsExceptionAsync<ArgumentException>(() => s_metaDataProvider.CreateAsync(file));
+        await Assert.ThrowsExceptionAsync<ArgumentException>(() => TestMetaDataProvider.CreateAsync(file));
     }
     [TestMethod]
     [Description("Given a valid entity, when DeleteAsync is called" +
@@ -48,9 +51,9 @@ public class MetaDataTest : BaseClass
         string type = "TextDocument";
         double sizeKb = 18;
         var file = new FileSystem.Models.File(rowkey, partitionkey, name, type, sizeKb);
-        await s_metaDataProvider.CreateAsync(file);
+        await TestMetaDataProvider.CreateAsync(file);
         //act
-        var result = await s_metaDataProvider.DeleteAsync(rowkey, partitionkey);
+        var result = await TestMetaDataProvider.DeleteAsync(rowkey, partitionkey);
         //assert
         Assert.IsTrue(result);
     }
@@ -65,10 +68,10 @@ public class MetaDataTest : BaseClass
         string name = "fisier2";
         string type = "TextDocument";
         double sizeKb = 18;
-        var file = new FileSystem.Models.File(rowkey, partitionkey, name, type, sizeKb);
-        await s_metaDataProvider.CreateAsync(file);
+        var file = new File(rowkey, partitionkey, name, type, sizeKb);
+        await TestMetaDataProvider.CreateAsync(file);
         //act
-        var result = await s_metaDataProvider.DeleteAsync(Guid.NewGuid().ToString(), partitionkey);
+        var result = await TestMetaDataProvider.DeleteAsync(Guid.NewGuid().ToString(), partitionkey);
         //assert
         Assert.IsFalse(result);
     }
@@ -84,18 +87,23 @@ public class MetaDataTest : BaseClass
         string type = "TextDocument";
         double sizeKb = 12;
         var file = new FileSystem.Models.File(rowkey, partitionkey, name, type, sizeKb);
-        await s_metaDataProvider.CreateAsync(file);
+        await TestMetaDataProvider.CreateAsync(file);
         //act
-        var result = await s_metaDataProvider.GetAsync(rowkey, partitionkey);
+        List<File> files = new List<File>();
+        files.Add(file);
+        var result = TestMetaDataProvider.Get(files).FirstOrDefault();
         //assert
         Assert.IsNotNull(result);
     }
     [TestMethod]
     [Description("Given an invalid request (the rowkey does not exists in the azure table), when GetAsync is called" +
         "then it should return a null object")]
-    public async Task GetAsyncBadRequest_Test()
+    public void GetAsyncBadRequest_Test()
     {
-        var result = await s_metaDataProvider.GetAsync(Guid.NewGuid().ToString(), ".txt");
+        var file = new File(Guid.NewGuid().ToString(), ".png");
+        List<File> files = new List<File>();
+        files.Add(file);
+        var result = TestMetaDataProvider.Get(files).FirstOrDefault();
         //assert
         Assert.IsNull(result);
     }

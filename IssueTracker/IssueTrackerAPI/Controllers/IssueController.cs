@@ -11,6 +11,7 @@ using Models.Response;
 using System.Security.Claims;
 using Validation;
 using IssueTracker.FileSystem;
+using DataAccess;
 
 namespace IssueTrackerAPI.Controllers;
 
@@ -42,9 +43,16 @@ public class IssueController : ControllerBase
             List<ValidationFailure> failures = result.Errors;
             return BadRequest(failures);
         }
-        var issue = _mapper.Map<Issue>(entity);
-        await _issue.AddAsync(issue);
-        return Ok();
+        try
+        {
+            var issue = _mapper.Map<Issue>(entity);
+            await _issue.AddAsync(issue);
+            return Ok();
+        }
+        catch (RepositoryException ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
 
     [HttpGet("getAll-Issue")]
@@ -56,12 +64,19 @@ public class IssueController : ControllerBase
         List<IssueResponse> resultList = new();
         foreach (var issue in issues!)
         {
-            issue.Attachements = await _file.GetByIssueIdAsync(issue.Id);
-            resultList.Add(_mapper.Map<IssueResponse>(issue));
-            foreach (var result in resultList)
+            try
             {
-                if (issue.Attachements.Count() > 0)
-                    result.Attachments = await AutoMapperConfig.GetAttachements(issue.Attachements);
+                issue.Attachements = await _file.GetByIssueIdAsync(issue.Id);
+                resultList.Add(_mapper.Map<IssueResponse>(issue));
+                foreach (var result in resultList)
+                {
+                    if (issue.Attachements.Count() > 0)
+                        result.Attachments = await AutoMapperConfig.GetAttachements(issue.Attachements);
+                }
+            }
+            catch (FileSystemException ex)
+            {
+                return BadRequest(ex.Message);
             }
         }
         return Ok(resultList);
@@ -76,7 +91,14 @@ public class IssueController : ControllerBase
         issue!.Attachements = await _file.GetByIssueIdAsync(issue.Id);
         var result = _mapper.Map<IssueResponse>(issue);
         if (issue!.Attachements.Count() > 0)
-            result.Attachments = await AutoMapperConfig.GetAttachements(issue!.Attachements);
+            try
+            {
+                result.Attachments = await AutoMapperConfig.GetAttachements(issue!.Attachements);
+            }
+            catch (FileSystemException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         return Ok(result);
     }
 
@@ -137,9 +159,16 @@ public class IssueController : ControllerBase
         }
         if (entity.Id > 0)
         {
-            var issue = _mapper.Map<Issue>(entity);
-            await _issue.UpdateAsync(issue);
-            return Ok();
+            try
+            {
+                var issue = _mapper.Map<Issue>(entity);
+                await _issue.UpdateAsync(issue);
+                return Ok();
+            }
+            catch (RepositoryException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
         return BadRequest();
     }
@@ -150,8 +179,15 @@ public class IssueController : ControllerBase
     {
         if (id > 0)
         {
-            await _issue.DeleteAsync(id);
-            return Ok();
+            try
+            {
+                await _issue.DeleteAsync(id);
+                return Ok();
+            }
+            catch (RepositoryException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
         return BadRequest("Error validation!");
     }

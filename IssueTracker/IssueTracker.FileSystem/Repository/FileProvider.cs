@@ -1,43 +1,53 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using System.Runtime.CompilerServices;
+using Microsoft.Extensions.Configuration;
 
+[assembly: InternalsVisibleTo("IssueTracker.UnitTest")]
 namespace IssueTracker.FileSystem;
-internal class FileProvider : IFileProvider
+public class FileProvider : IFileProvider
 {
-    private readonly IMetaDataProvider _metadata;
-    private readonly IBolbStorageProvider _bolb;
+    private readonly IMetaDataProvider _metaDataProvider;
+    private readonly IBlobProvider _bolbProvider;
 
     public FileProvider(IConfiguration config)
     {
         IConfigurationFactory cf = new ConfigurationFactory(config);
         var metaDataConfig = cf.Create<IMetaDataConfiguration>();
-        _metadata = new MetaData(metaDataConfig);
-        var blobConfig = cf.Create<IBolbConfigurationFactory>();
-        _bolb = new BolbStorageProvider(blobConfig);
+        _metaDataProvider = new MetaDataProvider(metaDataConfig);
+        var blobConfig = cf.Create<IBlobConfigurationFactory>();
+        _bolbProvider = new BlobProvider(blobConfig);
     }
 
     public async Task<bool> DeleteAsync(Models.File file)
     {
-        var result = await _metadata.DeleteAsync(file.Id, file.Extension);
+        var result = await _metaDataProvider.DeleteAsync(file.Id, file.Extension);
         if (result == false) return false;
-        result = await _bolb.DeleteFileAsync(file.Id + file.Extension);
+        result = await _bolbProvider.DeleteAsync(file.Id + file.Extension);
         return result;
     }
 
     public async Task<IEnumerable<Models.File>> GetAsync(IEnumerable<Models.File> files)
     {
-        var entities = _metadata.GetAll(files);
-        if (!entities.Any()) throw new ArgumentException("Detail file is null!");
-        var bolb = await _bolb.GetFilesAsync(files);
-        if (!entities.Any()) throw new ArgumentException("File is null!");
+        var entities = Enumerable.Empty<Models.File>();
+        try
+        {
+            entities = _metaDataProvider.Get(files);
+        }
+        catch (FileSystemException ex)
+        {
+            throw ex;
+        }
+        if (!entities.Any()) throw new FileSystemException("Detail file is null!");
+        var bolb = await _bolbProvider.GetFilesAsync(files);
+        if (!entities.Any()) throw new FileSystemException("File is null!");
         foreach (var entity in entities)
         {
             var link = bolb.Where(b => b.Id == entity.Id).FirstOrDefault()?.Link;
-            if (link == null || link == String.Empty)
-                throw new ArgumentException("Link null or empty");
+            if (string.IsNullOrEmpty(link))
+                throw new FileSystemException("Link null or empty");
             entity.Link = link;
-            var extension = bolb.Where(b => b.Id == entity.Id).FirstOrDefault()?.Extension;
-            if (extension == null || extension == String.Empty)
-                throw new ArgumentException("Extension null or empty");
+            var extension = bolb.FirstOrDefault(b => b.Id == entity.Id)?.Extension;
+            if (string.IsNullOrEmpty(extension))
+                throw new FileSystemException("Extension null or empty");
             entity.Extension = extension;
         }
         return entities;
@@ -46,8 +56,8 @@ internal class FileProvider : IFileProvider
     public async Task UploadAsync(Models.File file)
     {
         if (file == null)
-            throw new ArgumentException("File is null!");
-        await _bolb.UploadFileAsync(file);
-        await _metadata.CreateAsync(file);
+            throw new FileSystemException("File is null!");
+        await _bolbProvider.UploadFileAsync(file);
+        await _metaDataProvider.CreateAsync(file);
     }
 }

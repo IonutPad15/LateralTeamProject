@@ -1,4 +1,5 @@
-﻿using DataAccess.DbAccess;
+﻿using System.Data.SqlClient;
+using DataAccess.DbAccess;
 using DataAccess.Models;
 
 namespace DataAccess.Repository;
@@ -13,9 +14,16 @@ public class ParticipantRepository : IParticipantRepository
 
     public async Task<int> AddAsync(Participant participant)
     {
-        var result = await _db.SaveDataAndGetIdAsync<dynamic, int>("dbo.spParticipant_Insert",
-            new { participant.UserId, participant.ProjectId, participant.RoleId });
-        return result;
+        try
+        {
+            var result = await _db.SaveDataAndGetIdAsync<object, int>("dbo.spParticipant_Insert",
+                new { participant.UserId, participant.ProjectId, participant.RoleId });
+            return result;
+        }
+        catch (SqlException ex)
+        {
+            throw new RepositoryException(ex.Message);
+        }
     }
 
     public async Task<IEnumerable<Participant>> GetAllAsync()
@@ -30,12 +38,26 @@ public class ParticipantRepository : IParticipantRepository
 
     public async Task UpdateAsync(Participant participant)
     {
-        await _db.SaveDataAsync("dbo.spParticipant_Update", new { participant.Id, participant.RoleId });
+        try
+        {
+            await _db.SaveDataAsync("dbo.spParticipant_Update", new { participant.Id, participant.RoleId });
+        }
+        catch (SqlException ex)
+        {
+            throw new RepositoryException(ex.Message);
+        }
     }
 
     public async Task DeleteAsync(int id)
     {
-        await _db.SaveDataAsync("dbo.spParticipant_Delete", new { Id = id });
+        try
+        {
+            await _db.SaveDataAsync("dbo.spParticipant_Delete", new { Id = id });
+        }
+        catch (SqlException ex)
+        {
+            throw new RepositoryException(ex.Message);
+        }
     }
 
     public async Task<IEnumerable<Participant>> GetOwnersAndCollabsByProjectIdAsync(int id)

@@ -3,6 +3,7 @@ public class File
 {
     public File()
     {
+
     }
     public File(string id, string extension)
     {
@@ -26,4 +27,5 @@ public class File
     public string? Link { get; set; }
     public string Type { get; set; } = string.Empty;
     public double SizeKb { get; set; }
+    public Guid UserId { get; set; }
 }

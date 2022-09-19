@@ -1,4 +1,5 @@
-﻿using File = IssueTracker.FileSystem.Models.File;
+﻿using IssueTracker.FileSystem;
+using File = IssueTracker.FileSystem.Models.File;
 
 namespace IssueTracker.UnitTest.FileSystemTests;
 
@@ -15,7 +16,7 @@ public class BlobDataTest : BaseClass
             Content = null
         };
 
-        await Assert.ThrowsExceptionAsync<ArgumentException>(() => s_blobStorageProvider.UploadFileAsync(file));
+        await Assert.ThrowsExceptionAsync<FileSystemException>(() => TestBlobProvider.UploadFileAsync(file));
     }
 
     [TestMethod]
@@ -28,7 +29,7 @@ public class BlobDataTest : BaseClass
             Content = File.Content
         };
 
-        await Assert.ThrowsExceptionAsync<ArgumentException>(() => s_blobStorageProvider.UploadFileAsync(file));
+        await Assert.ThrowsExceptionAsync<FileSystemException>(() => TestBlobProvider.UploadFileAsync(file));
     }
 
     [TestMethod]
@@ -41,20 +42,20 @@ public class BlobDataTest : BaseClass
             Content = File.Content
         };
 
-        await Assert.ThrowsExceptionAsync<ArgumentException>(() => s_blobStorageProvider.UploadFileAsync(file));
+        await Assert.ThrowsExceptionAsync<FileSystemException>(() => TestBlobProvider.UploadFileAsync(file));
     }
 
     [TestMethod]
     [Description("Upload Method with good object, i expected result")]
     public async Task Upload_GoodObjectAsync()
     {
-        var file = new File
+        var file = new File(Guid.NewGuid().ToString(), ".txt")
         {
             BlobName = Guid.NewGuid().ToString(),
             Content = File.Content
         };
 
-        await s_blobStorageProvider.UploadFileAsync(file);
+        await TestBlobProvider.UploadFileAsync(file);
 
         Assert.IsTrue(true);
     }
@@ -65,7 +66,7 @@ public class BlobDataTest : BaseClass
     {
         List<File> files = new();
 
-        await Assert.ThrowsExceptionAsync<ArgumentException>(() => s_blobStorageProvider.GetFilesAsync(files));
+        var result = await Assert.ThrowsExceptionAsync<FileSystemException>(() => TestBlobProvider.GetFilesAsync(files));
     }
 
     [TestMethod]
@@ -80,7 +81,7 @@ public class BlobDataTest : BaseClass
         };
         files.Add(file);
 
-        await Assert.ThrowsExceptionAsync<ArgumentException>(() => s_blobStorageProvider.GetFilesAsync(files));
+        await Assert.ThrowsExceptionAsync<FileSystemException>(() => TestBlobProvider.GetFilesAsync(files));
     }
 
     [TestMethod]
@@ -95,7 +96,7 @@ public class BlobDataTest : BaseClass
         };
         files.Add(file);
 
-        await Assert.ThrowsExceptionAsync<ArgumentException>(() => s_blobStorageProvider.GetFilesAsync(files));
+        await Assert.ThrowsExceptionAsync<FileSystemException>(() => TestBlobProvider.GetFilesAsync(files));
     }
 
     [TestMethod]
@@ -110,7 +111,7 @@ public class BlobDataTest : BaseClass
         };
         files.Add(file);
 
-        await Assert.ThrowsExceptionAsync<ArgumentException>(() => s_blobStorageProvider.GetFilesAsync(files));
+        await Assert.ThrowsExceptionAsync<FileSystemException>(() => TestBlobProvider.GetFilesAsync(files));
     }
 
     [TestMethod]
@@ -125,7 +126,7 @@ public class BlobDataTest : BaseClass
         };
         files.Add(file);
 
-        await Assert.ThrowsExceptionAsync<ArgumentException>(() => s_blobStorageProvider.GetFilesAsync(files));
+        await Assert.ThrowsExceptionAsync<FileSystemException>(() => TestBlobProvider.GetFilesAsync(files));
     }
 
     [TestMethod]
@@ -133,14 +134,10 @@ public class BlobDataTest : BaseClass
     public async Task Get_GoodObjectAsync()
     {
         List<File> files = new();
-        var file = new File
-        {
-            Id = File.Id,
-            Extension = ".txt"
-        };
+        var file = new File(Guid.NewGuid().ToString(), ".txt");
         files.Add(file);
 
-        var result = await s_blobStorageProvider.GetFilesAsync(files);
+        var result = await TestBlobProvider.GetFilesAsync(files);
 
         Assert.IsNotNull(result);
     }
