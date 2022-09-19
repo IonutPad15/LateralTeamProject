@@ -9,7 +9,7 @@ public class FileProviderTest : BaseClass
     [TestMethod]
     [Description("Given a invalid request Id is empty, when UploadAsync is called" +
         "then I'm waiting for an error")]
-    public async Task Upload_IdWrongAsync()
+    public async Task UploadAsyncWrongId_Test()
     {
         var file = File;
         file.Id = String.Empty;
@@ -20,7 +20,7 @@ public class FileProviderTest : BaseClass
     [TestMethod]
     [Description("Given a invalid request Id is null, when UploadAsync is called" +
         "then I'm waiting for an error")]
-    public async Task Upload_IdNullAsync()
+    public async Task UploadAsyncNullId_Test()
     {
         var file = File;
         file.Id = null!;
@@ -31,7 +31,7 @@ public class FileProviderTest : BaseClass
     [TestMethod]
     [Description("Given a invalid request Extension is null, when UploadAsync is called" +
         "then I'm waiting for an error")]
-    public async Task Upload_ExtensionNullAsync()
+    public async Task UploadAsyncNullExtension_Test()
     {
         var file = File;
         file.Extension = null!;
@@ -42,7 +42,7 @@ public class FileProviderTest : BaseClass
     [TestMethod]
     [Description("Given a invalid request Extension is empty, when UploadAsync is called" +
         "then I'm waiting for an error")]
-    public async Task Upload_ExtensionEmptyAsync()
+    public async Task UploadAsyncEmptyExtension_Test()
     {
         var file = File;
         file.Extension = String.Empty;
@@ -53,7 +53,7 @@ public class FileProviderTest : BaseClass
     [TestMethod]
     [Description("Given a invalid request Content is null, when UploadAsync is called" +
         "then I'm waiting for an error")]
-    public async Task Upload_ContentNullAsync()
+    public async Task UploadAsyncNullContent_Test()
     {
         var file = File;
         file.Content = null;
@@ -64,7 +64,7 @@ public class FileProviderTest : BaseClass
     [TestMethod]
     [Description("Given a invalid request Size is negative value, when UploadAsync is called" +
         "then I'm waiting for an error")]
-    public async Task Upload_SizeNegativeAsync()
+    public async Task UploadAsyncNegativeSize_Test()
     {
         var file = File;
         file.SizeKb = -21;
@@ -75,7 +75,7 @@ public class FileProviderTest : BaseClass
     [TestMethod]
     [Description("Given a invalid request BlobName is null, when UploadAsync is called" +
         "then I'm waiting for an error")]
-    public async Task Upload_BlobNameNullAsync()
+    public async Task UploadAsyncNullBlobName_Test()
     {
         var file = File;
         file.BlobName = null;
@@ -86,7 +86,7 @@ public class FileProviderTest : BaseClass
     [TestMethod]
     [Description("Given a invalid request BlobName is empty, when UploadAsync is called" +
         "then I'm waiting for an error")]
-    public async Task Upload_BlobNameEmptyAsync()
+    public async Task UploadAsyncEmptyBlobName_Test()
     {
         var file = File;
         file.BlobName = String.Empty;
@@ -97,7 +97,7 @@ public class FileProviderTest : BaseClass
     [TestMethod]
     [Description("Given a valid request, when GetAsync is called" +
         "then I'm waiting for an result")]
-    public void GetFiles_IdGood()
+    public void GetAsync_Test()
     {
         List<File> filesModels = new List<File>();
         var fileModel = new File
@@ -114,7 +114,7 @@ public class FileProviderTest : BaseClass
     [TestMethod]
     [Description("Given a invalid request object is null, when GetAsync is called" +
         "then I'm waiting for an error")]
-    public void GetFiles_ObjectNull()
+    public void GetAsyncNullObject_Test()
     {
         List<File> filesModels = new List<File>();
         IEnumerable<File> files = filesModels;
