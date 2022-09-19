@@ -10,14 +10,14 @@ public class FileRepository : IFileRepository
     }
     public async Task<string?> AddAsync(Models.File entity)
     {
-        DateTime upate = DateTime.UtcNow;
+        DateTime update = DateTime.UtcNow;
         var result = await _db.SaveDataAndGetIdAsync<object, string>("dbo.spFile_Insert", new
         {
             FileId = entity.FileId,
             Extension = entity.Extension,
             FileIssueId = entity.FileIssueId,
             FileCommentId = entity.FileCommentId,
-            Updated = upate,
+            Updated = update,
             FileUserId = entity.FileUserId
         });
         return result;
