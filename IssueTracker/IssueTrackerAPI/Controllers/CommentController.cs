@@ -13,6 +13,7 @@ using System.Net.Http.Headers;
 using System.Security.Claims;
 using Validation;
 using IssueTracker.FileSystem;
+using DataAccess;
 
 namespace IssueTrackerAPI.Controllers;
 
@@ -134,35 +135,13 @@ public class CommentController : ControllerBase
         var issue = _issueRepository.GetByIdAsync(commentRequest.IssueId);
         if (issue == null) return Results.BadRequest("There is no issue");
         var value = Request.Headers["Authorization"];
-        if (!AuthenticationHeaderValue.TryParse(Request.Headers["Authorization"], out AuthenticationHeaderValue? headerValue))
+        try
         {
-            Comment comment = new Comment();
-            comment.Body = commentRequest.Body;
-            comment.Author = $"Anonymous{RandomMaker.Next(99999)}";
-            comment.IssueId = commentRequest.IssueId;
-            comment.CommentId = commentRequest.CommentId;
-            comment.Updated = DateTime.Now;
-            comment.Created = DateTime.Now;
-            var commentId = await _commentData.AddAsync(comment);
-            if (commentId <= 0) return Results.Problem("Could not create the comment");
-            int projectId = await _issueRepository.GetProjectId(comment.IssueId);
-            _historyHandler.CreatedComment(projectId, comment.IssueId, commentId, comment.Author, comment.Body, DateTime.UtcNow);
-            return Results.Ok($"Id:{commentId}");
-
-        }
-        if (headerValue != null)
-        {
-            var token = headerValue.Parameter;
-            var handler = new JwtSecurityTokenHandler();
-            var jwtSecurityToken = handler.ReadJwtToken(token);
-            var userid = jwtSecurityToken.Claims.FirstOrDefault(x => x.Type.Equals("UserId"));
-            var userclaim = jwtSecurityToken.Claims.FirstOrDefault(x => x.Type.Equals(ClaimTypes.Name));
-            if (userid != null && userclaim != null)
+            if (!AuthenticationHeaderValue.TryParse(Request.Headers["Authorization"], out AuthenticationHeaderValue? headerValue))
             {
                 Comment comment = new Comment();
                 comment.Body = commentRequest.Body;
-                comment.Author = userclaim.Value;
-                comment.UserId = Guid.Parse(userid.Value);
+                comment.Author = $"Anonymous{RandomMaker.Next(99999)}";
                 comment.IssueId = commentRequest.IssueId;
                 comment.CommentId = commentRequest.CommentId;
                 comment.Updated = DateTime.Now;
@@ -172,7 +151,36 @@ public class CommentController : ControllerBase
                 int projectId = await _issueRepository.GetProjectId(comment.IssueId);
                 _historyHandler.CreatedComment(projectId, comment.IssueId, commentId, comment.Author, comment.Body, DateTime.UtcNow);
                 return Results.Ok($"Id:{commentId}");
+
             }
+            if (headerValue != null)
+            {
+                var token = headerValue.Parameter;
+                var handler = new JwtSecurityTokenHandler();
+                var jwtSecurityToken = handler.ReadJwtToken(token);
+                var userid = jwtSecurityToken.Claims.FirstOrDefault(x => x.Type.Equals("UserId"));
+                var userclaim = jwtSecurityToken.Claims.FirstOrDefault(x => x.Type.Equals(ClaimTypes.Name));
+                if (userid != null && userclaim != null)
+                {
+                    Comment comment = new Comment();
+                    comment.Body = commentRequest.Body;
+                    comment.Author = userclaim.Value;
+                    comment.UserId = Guid.Parse(userid.Value);
+                    comment.IssueId = commentRequest.IssueId;
+                    comment.CommentId = commentRequest.CommentId;
+                    comment.Updated = DateTime.Now;
+                    comment.Created = DateTime.Now;
+                    var commentId = await _commentData.AddAsync(comment);
+                    if (commentId <= 0) return Results.Problem("Could not create the comment");
+                    int projectId = await _issueRepository.GetProjectId(comment.IssueId);
+                    _historyHandler.CreatedComment(projectId, comment.IssueId, commentId, comment.Author, comment.Body, DateTime.UtcNow);
+                    return Results.Ok($"Id:{commentId}");
+                }
+            }
+        }
+        catch (RepositoryException ex)
+        {
+            return Results.BadRequest(ex.Message);
         }
         return Results.BadRequest();
     }
@@ -198,9 +206,15 @@ public class CommentController : ControllerBase
         }
         comment.Body = newBody;
         comment.Updated = DateTime.Now;
-
-        await _commentData.UpdateAsync(comment);
-        return Results.Ok();
+        try
+        {
+            await _commentData.UpdateAsync(comment);
+            return Results.Ok();
+        }
+        catch (RepositoryException ex)
+        {
+            return Results.BadRequest(ex.Message);
+        }
     }
     [HttpDelete("{id}")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]

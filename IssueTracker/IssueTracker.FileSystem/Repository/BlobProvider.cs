@@ -2,12 +2,12 @@
 using Azure.Storage.Sas;
 
 namespace IssueTracker.FileSystem;
-public class BlobData : IBlobProvider
+public class BlobProvider : IBlobProvider
 {
     private readonly IBlobConfigurationFactory _config;
     private readonly BlobServiceClient _blobServiceClient;
     private readonly BlobContainerClient _containerClient;
-    internal BlobData(IBlobConfigurationFactory config)
+    internal BlobProvider(IBlobConfigurationFactory config)
     {
         _config = config;
         _blobServiceClient = new BlobServiceClient(_config.ConnectionString);

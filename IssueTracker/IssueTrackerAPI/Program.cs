@@ -28,6 +28,7 @@ builder.Services.AddSingleton<IHistoryRepository, HistoryRepository>();
 
 
 
+
 builder.Services.AddAuthentication(options =>
 
 {

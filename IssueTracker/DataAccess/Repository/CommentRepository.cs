@@ -13,18 +13,25 @@ public class CommentRepository : ICommentRepository
     }
     public async Task<int> AddAsync(Comment comment)
     {
-        var result = await _db.SaveDataAndGetIdAsync<object, int>("dbo.spComment_Insert",
-            new
-            {
-                comment.UserId,
-                comment.IssueId,
-                comment.CommentId,
-                comment.Author,
-                comment.Body,
-                comment.Created,
-                comment.Updated
-            });
-        return result;
+        try
+        {
+            var result = await _db.SaveDataAndGetIdAsync<object, int>("dbo.spComment_Insert",
+                new
+                {
+                    comment.UserId,
+                    comment.IssueId,
+                    comment.CommentId,
+                    comment.Author,
+                    comment.Body,
+                    comment.Created,
+                    comment.Updated
+                });
+            return result;
+        }
+        catch (SqlException ex)
+        {
+            throw new RepositoryException(ex.Message);
+        }
     }
     public async Task<Comment?> GetByIdAsync(int id)
     {

@@ -1,16 +1,20 @@
 ﻿using DataAccess.Repository;
 using IssueTracker.FileSystem;
+using File = IssueTracker.FileSystem.Models.File;
 using System.Data;
 using System.Data.SqlClient;
 
 namespace IssueTracker.UnitTest;
 public abstract class BaseClass
 {
-    public static IIssueRepository TestIssueRepository = null!;
-    public static TestContext TestContext { get; set; } = null!;
-    public static DataTable? TestDataTable { get; set; }
-    public static IParticipantRepository TestParticipantRepository { get; set; } = null!;
-    public static IFileProvider TestFileProvider { get; set; } = null!;
+    internal static IIssueRepository IssueRepository { get; set; } = null!;
+    internal static TestContext TestContext { get; set; } = null!;
+    internal static File File { get; set; } = null!;
+    internal static DataTable? TestDataTable { get; set; }
+    internal static IParticipantRepository ParticipantRepository { get; set; } = null!;
+    internal static IFileProvider TestFileProvider { get; set; } = null!;
+    internal static IMetaDataProvider TestMetaDataProvider { get; set; } = null!;
+    internal static IBlobProvider TestBlobProvider { get; set; } = null!;
 
     public static DataTable? LoadDataTable(string sql, string connection)
     {
