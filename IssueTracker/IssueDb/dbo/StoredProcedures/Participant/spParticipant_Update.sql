@@ -3,7 +3,7 @@
 	@RoleId INT
 AS
 begin
-	IF EXISTS(SELECT * FROM dbo.[Participant] WHERE Id=@Id)
+	IF EXISTS(SELECT * FROM dbo.[Participant] WHERE Id = @Id and IsDeleted = 0)
 	begin
 		update dbo.[Participant]
 		set RoleId = @RoleId

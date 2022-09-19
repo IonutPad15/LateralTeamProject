@@ -2,16 +2,13 @@
 	@Id INT
 AS
 begin
-	if exists(select * from Issue where Id = @Id)
-		select *
-		from dbo.[Issue]
-		inner join Project on Project.Id = ProjectId 
-		inner join Status on Status.Id = StatusId
-		inner join Priority on Priority.Id = PriorityId
-		inner join Role on Role.Id = RoleId
-		inner join IssueType on IssueType.Id = IssueTypeId
-		inner join [User] on [User].Id = UserAssignedId
-		where Issue.IsDeleted = 0 and Issue.Id = @Id;
-	else
-		THROW 5100, 'The record does not exist.', 1;
+	select *
+	from dbo.[Issue]
+	left join Project on Project.Id = ProjectId 
+	left join Status on Status.Id = StatusId
+	left join Priority on Priority.Id = PriorityId
+	left join Role on Role.Id = RoleId
+	left join IssueType on IssueType.Id = IssueTypeId
+	left join [User] on [User].Id = UserAssignedId
+	where Issue.IsDeleted = 0 and Issue.Id = @Id;
 end

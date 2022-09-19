@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using DataAccess.Data.IData;
+using DataAccess.Repository;
 using DataAccess.Models;
 using DataAccess.Utils;
 using FluentValidation.Results;
@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using Models.Request;
 using Models.Response;
 using Validation;
+using DataAccess;
 
 namespace IssueTrackerAPI.Controllers;
 
@@ -17,9 +18,9 @@ namespace IssueTrackerAPI.Controllers;
 [ApiController]
 public class ParticipantController : ControllerBase
 {
-    private readonly IParticipantData _participantData;
+    private readonly IParticipantRepository _participantData;
     private readonly Mapper _mapper;
-    public ParticipantController(IParticipantData participantData, IRoleData roleData)
+    public ParticipantController(IParticipantRepository participantData, IRoleRepository roleData)
     {
         _participantData = participantData;
         _mapper = AutoMapperConfig.Config();
@@ -51,7 +52,7 @@ public class ParticipantController : ControllerBase
 
     }
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    public static async Task<bool> CreateOwner(int projectId, Guid userId, IParticipantData participantData)
+    public static async Task<bool> CreateOwner(int projectId, Guid userId, IParticipantRepository participantData)
     {
         if (projectId > 0)
         {
@@ -84,28 +85,35 @@ public class ParticipantController : ControllerBase
         var idclaim = User.Claims.FirstOrDefault(x => x.Type.Equals("UserId"));
         if (idclaim != null)
         {
-            if (participantRequest.RoleId == RoleType.Developer ||
-                participantRequest.RoleId == RoleType.Tester)
+            try
             {
-                var result = await CheckRole.IsOwnerOrColllab(_participantData,
-                Guid.Parse(idclaim.Value), participantRequest.ProjectId);
-                if (result == true)
+                if (participantRequest.RoleId == RoleType.Developer ||
+                    participantRequest.RoleId == RoleType.Tester)
                 {
-                    var participant = _mapper.Map<Participant>(participantRequest);
-                    await _participantData.AddAsync(participant);
-                    return Results.Ok();
+                    var result = await CheckRole.IsOwnerOrColllab(_participantData,
+                    Guid.Parse(idclaim.Value), participantRequest.ProjectId);
+                    if (result == true)
+                    {
+                        var participant = _mapper.Map<Participant>(participantRequest);
+                        await _participantData.AddAsync(participant);
+                        return Results.Ok();
+                    }
+                }
+                if (participantRequest.RoleId == RoleType.Collaborator)
+                {
+                    var result = await CheckRole.IsOwner(_participantData,
+                    Guid.Parse(idclaim.Value), participantRequest.ProjectId);
+                    if (result == true)
+                    {
+                        var participant = _mapper.Map<Participant>(participantRequest);
+                        await _participantData.AddAsync(participant);
+                        return Results.Ok();
+                    }
                 }
             }
-            if (participantRequest.RoleId == RoleType.Collaborator)
+            catch (RepositoryException ex)
             {
-                var result = await CheckRole.IsOwner(_participantData,
-                Guid.Parse(idclaim.Value), participantRequest.ProjectId);
-                if (result == true)
-                {
-                    var participant = _mapper.Map<Participant>(participantRequest);
-                    await _participantData.AddAsync(participant);
-                    return Results.Ok();
-                }
+                return Results.BadRequest(ex.Message);
             }
 
         }
@@ -141,9 +149,16 @@ public class ParticipantController : ControllerBase
             }
             if (result == true)
             {
-                participant.RoleId = (RolesType)participantRequest.RoleId;
-                await _participantData.UpdateAsync(participant);
-                return Results.Ok(participant.Id);
+                try
+                {
+                    participant.RoleId = (RolesType)participantRequest.RoleId;
+                    await _participantData.UpdateAsync(participant);
+                    return Results.Ok(participant.Id);
+                }
+                catch (RepositoryException ex)
+                {
+                    return Results.BadRequest(ex.Message);
+                }
             }
         }
         return Results.Unauthorized();

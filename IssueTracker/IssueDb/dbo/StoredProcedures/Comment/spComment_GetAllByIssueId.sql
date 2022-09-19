@@ -6,7 +6,6 @@ begin
 	into #comm_temp
 	from dbo.[Comment]
 	where [Comment].IsDeleted = 0 AND [Comment].IssueId = @IssueId
-	order by [Comment].Updated desc
 	SET IDENTITY_INSERT #comm_temp ON;
 	insert into #comm_temp (Id,UserId, IssueId, CommentId, Author, Body, Created, Updated, IsDeleted)
 	(
@@ -15,9 +14,15 @@ begin
 		where [Comment].IsDeleted = 0 AND [Comment].CommentId in 
 			(select Id from #comm_temp)
 		)
-	
-	select * 
-	from #comm_temp
-	order by #comm_temp.Updated desc
- 
+
+    SELECT *
+    INTO #file
+	FROM dbo.[File]
+	WHERE [File].FileCommentId in (select Id from #comm_temp) AND [File].FileIsDeleted = 0
+
+    SELECT *
+    FROM #comm_temp
+
+    SELECT *
+    FROM #file
 end

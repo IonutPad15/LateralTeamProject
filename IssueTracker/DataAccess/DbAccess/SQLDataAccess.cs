@@ -14,6 +14,12 @@ public class SQLDataAccess : ISQLDataAccess
     {
         _config = config;
     }
+    private void InitializeDapper()
+    {
+        SqlMapper.AddTypeHandler(new DateTimeOffsetHandler());
+        SqlMapper.AddTypeHandler(new GuidHandler());
+        SqlMapper.AddTypeHandler(new TimeSpanHandler());
+    }
 
     public async Task<IEnumerable<TFirst>> LoadDataAsync<TFirst>(
         string storedProcedure,
@@ -46,6 +52,25 @@ public class SQLDataAccess : ISQLDataAccess
 
         }
         return participants;
+    }
+    public async Task<IEnumerable<Comment>> LoadCommentAsync<TParameter>(string storedProcedure, TParameter parameter, string connectionId = "Default")
+    {
+        List<Comment> comments = new List<Comment>();
+        using (IDbConnection connection = new SqlConnection(_config.GetConnectionString(connectionId)))
+        {
+            var results = await connection.QueryMultipleAsync
+                (storedProcedure, parameter, commandType: CommandType.StoredProcedure);
+            comments = results.Read<Comment>().ToList();
+            var files = results.Read<Models.File>();
+            List<Models.File> tempfiles = new List<Models.File>();
+            foreach (var comment in comments)
+            {
+                tempfiles = files.Where(x => x.FileCommentId == comment.Id).ToList();
+                comment.Attachements = tempfiles;
+            }
+        }
+        var result = comments.AsEnumerable();
+        return result;
     }
     public async Task<IEnumerable<TFirst>> LoadDataAsync<TFirst, TParameter>(
         string storedProcedure,
@@ -283,9 +308,7 @@ public class SQLDataAccess : ISQLDataAccess
     {
         using (IDbConnection connection = new SqlConnection(_config.GetConnectionString(connectionId)))
         {
-            SqlMapper.AddTypeHandler(new DateTimeOffsetHandler());
-            SqlMapper.AddTypeHandler(new GuidHandler());
-            SqlMapper.AddTypeHandler(new TimeSpanHandler());
+            InitializeDapper();
             await connection.ExecuteAsync(storedProcedure, parameters,
                 commandType: CommandType.StoredProcedure);
         }
@@ -297,9 +320,7 @@ public class SQLDataAccess : ISQLDataAccess
     {
         using (IDbConnection connection = new SqlConnection(_config.GetConnectionString(connectionId)))
         {
-            SqlMapper.AddTypeHandler(new DateTimeOffsetHandler());
-            SqlMapper.AddTypeHandler(new GuidHandler());
-            SqlMapper.AddTypeHandler(new TimeSpanHandler());
+            InitializeDapper();
             var result = await connection.QueryAsync<U>(storedProcedure, parameters,
                 commandType: CommandType.StoredProcedure);
             return result.FirstOrDefault();
