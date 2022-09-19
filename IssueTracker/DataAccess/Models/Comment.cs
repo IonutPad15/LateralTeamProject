@@ -15,4 +15,5 @@ public class Comment
     public bool IsDeleted { get; set; }
     public User? User { get; set; }
     public IEnumerable<Comment> Replies { get; set; } = Enumerable.Empty<Comment>();
+    public IEnumerable<Models.File> Attachements { get; set; } = Enumerable.Empty<Models.File>();
 }

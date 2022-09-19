@@ -4,6 +4,6 @@ AS
 begin
 	select * 
 	from dbo.Participant
-	where Id=@Id AND IsDeleted = 0/*FALSE*/
+	where Id=@Id AND IsDeleted = 0
 end
 

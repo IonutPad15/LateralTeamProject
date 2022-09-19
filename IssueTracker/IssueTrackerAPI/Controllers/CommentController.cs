@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using DataAccess.Data.IData;
+using DataAccess.Repository;
 using DataAccess.Models;
 using FluentValidation.Results;
 using IssueTrackerAPI.Utils;
@@ -12,6 +12,8 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http.Headers;
 using System.Security.Claims;
 using Validation;
+using IssueTracker.FileSystem;
+using DataAccess;
 
 namespace IssueTrackerAPI.Controllers;
 
@@ -19,13 +21,14 @@ namespace IssueTrackerAPI.Controllers;
 [ApiController]
 public class CommentController : ControllerBase
 {
-    private readonly ICommentData _commentData;
-    private readonly IUserData _userData;
+    private readonly ICommentRepository _commentData;
+    private readonly IUserRepository _userData;
     private readonly Mapper _mapper;
-    public CommentController(ICommentData commentData, IUserData userData)
+    public CommentController(ICommentRepository commentData, IUserRepository userData, IFileProvider fileProvider)
     {
         _userData = userData;
         _commentData = commentData;
+        AutoMapperConfig.Initialize(fileProvider);
         _mapper = AutoMapperConfig.Config();
 
     }
@@ -35,31 +38,84 @@ public class CommentController : ControllerBase
         var comment = await _commentData.GetByIdAsync(id);
         if (comment == null) return Results.NotFound("Couldn't find any comment");
         var commentResponse = _mapper.Map<CommentResponse>(comment);
-        return Results.Ok(commentResponse);
+        try
+        {
+            commentResponse.Attachements = await AutoMapperConfig.GetAttachements(comment.Attachements);
+            return Results.Ok(commentResponse);
+        }
+        catch (FileSystemException ex)
+        {
+            return Results.BadRequest(ex.Message);
+        }
     }
     [HttpGet("issueid")]
     public async Task<IResult> GetByIssueId(int id)
     {
-        var comment = await _commentData.GetAllByIssueIdAsync(id);
-        if (comment.Count() == 0) return Results.NotFound("Couldn't find any comments");
-        var commentsResponse = _mapper.Map<IEnumerable<CommentResponse>>(comment);
-        return Results.Ok(commentsResponse);
+        var comments = await _commentData.GetAllByIssueIdAsync(id);
+        if (comments == null || comments.Count() == 0) return Results.NotFound("Couldn't find any comments");
+        var commentsResponse = _mapper.Map<IEnumerable<CommentResponse>>(comments);
+        try
+        {
+            commentsResponse = await GetAttachements(comments!, commentsResponse);
+            return Results.Ok(commentsResponse);
+        }
+        catch (FileSystemException ex)
+        {
+            return Results.BadRequest(ex.Message);
+        }
+    }
+    private async Task<IEnumerable<CommentResponse>> GetAttachements(IEnumerable<Comment> comments, IEnumerable<CommentResponse> commentsResponse)
+    {
+        int i = 0;
+        List<Comment> commentsList = comments.ToList()!;
+        foreach (var comment in commentsResponse)
+        {
+            comment.Attachements = await AutoMapperConfig.GetAttachements(commentsList[i].Attachements);
+            if (commentsList[i].Replies != null)
+            {
+                int j = 0;
+                List<Comment> replyList = commentsList[i].Replies.ToList();
+                foreach (var reply in comment.Replies)
+                {
+                    reply.Attachements = await AutoMapperConfig.GetAttachements(replyList[j].Attachements);
+                    ++j;
+                }
+            }
+            ++i;
+        }
+        return commentsResponse;
     }
     [HttpGet("replies")]
     public async Task<IResult> GetByCommentId(int id)
     {
-        var comment = await _commentData.GetAllByCommentIdAsync(id);
-        if (comment.Count() == 0) return Results.NotFound("Couldn't find any comments");
-        var commentsResponse = _mapper.Map<IEnumerable<CommentResponse>>(comment);
-        return Results.Ok(commentsResponse);
+        var comments = await _commentData.GetAllByCommentIdAsync(id);
+        if (comments.Count() == 0) return Results.NotFound("Couldn't find any comments");
+        var commentsResponse = _mapper.Map<IEnumerable<CommentResponse>>(comments);
+        try
+        {
+            commentsResponse = await GetAttachements(comments!, commentsResponse);
+            return Results.Ok(commentsResponse);
+        }
+        catch (FileSystemException ex)
+        {
+            return Results.BadRequest(ex.Message);
+        }
     }
     [HttpGet("userid")]
     public async Task<IResult> GetByUserId(Guid id)
     {
-        var comment = await _commentData.GetAllByUserIdAsync(id);
-        if (comment.Count() == 0) return Results.NotFound("Couldn't find any comments");
-        var commentsResponse = _mapper.Map<IEnumerable<CommentResponse>>(comment);
-        return Results.Ok(commentsResponse);
+        var comments = await _commentData.GetAllByUserIdAsync(id);
+        if (comments.Count() == 0) return Results.NotFound("Couldn't find any comments");
+        IEnumerable<CommentResponse> commentsResponse = _mapper.Map<IEnumerable<CommentResponse>>(comments);
+        try
+        {
+            commentsResponse = await GetAttachements(comments!, commentsResponse);
+            return Results.Ok(commentsResponse);
+        }
+        catch (FileSystemException ex)
+        {
+            return Results.BadRequest(ex.Message);
+        }
     }
     [HttpPost]
     public async Task<IResult> Create([FromBody] CommentRequest commentRequest)
@@ -72,39 +128,46 @@ public class CommentController : ControllerBase
             return Results.BadRequest(failures);
         }
         var value = Request.Headers["Authorization"];
-        if (!AuthenticationHeaderValue.TryParse(Request.Headers["Authorization"], out AuthenticationHeaderValue? headerValue))
+        try
         {
-            Comment comment = new Comment();
-            comment.Body = commentRequest.Body;
-            comment.Author = $"Anonymous{RandomMaker.Next(99999)}";
-            comment.IssueId = commentRequest.IssueId;
-            comment.CommentId = commentRequest.CommentId;
-            comment.Updated = DateTime.Now;
-            comment.Created = DateTime.Now;
-            await _commentData.AddAsync(comment);
-            return Results.Ok();
-
-        }
-        if (headerValue != null)
-        {
-            var token = headerValue.Parameter;
-            var handler = new JwtSecurityTokenHandler();
-            var jwtSecurityToken = handler.ReadJwtToken(token);
-            var userid = jwtSecurityToken.Claims.FirstOrDefault(x => x.Type.Equals("UserId"));
-            var userclaim = jwtSecurityToken.Claims.FirstOrDefault(x => x.Type.Equals(ClaimTypes.Name));
-            if (userid != null && userclaim != null)
+            if (!AuthenticationHeaderValue.TryParse(Request.Headers["Authorization"], out AuthenticationHeaderValue? headerValue))
             {
                 Comment comment = new Comment();
                 comment.Body = commentRequest.Body;
-                comment.Author = userclaim.Value;
-                comment.UserId = Guid.Parse(userid.Value);
+                comment.Author = $"Anonymous{RandomMaker.Next(99999)}";
                 comment.IssueId = commentRequest.IssueId;
                 comment.CommentId = commentRequest.CommentId;
                 comment.Updated = DateTime.Now;
                 comment.Created = DateTime.Now;
                 await _commentData.AddAsync(comment);
                 return Results.Ok();
+
             }
+            if (headerValue != null)
+            {
+                var token = headerValue.Parameter;
+                var handler = new JwtSecurityTokenHandler();
+                var jwtSecurityToken = handler.ReadJwtToken(token);
+                var userid = jwtSecurityToken.Claims.FirstOrDefault(x => x.Type.Equals("UserId"));
+                var userclaim = jwtSecurityToken.Claims.FirstOrDefault(x => x.Type.Equals(ClaimTypes.Name));
+                if (userid != null && userclaim != null)
+                {
+                    Comment comment = new Comment();
+                    comment.Body = commentRequest.Body;
+                    comment.Author = userclaim.Value;
+                    comment.UserId = Guid.Parse(userid.Value);
+                    comment.IssueId = commentRequest.IssueId;
+                    comment.CommentId = commentRequest.CommentId;
+                    comment.Updated = DateTime.Now;
+                    comment.Created = DateTime.Now;
+                    await _commentData.AddAsync(comment);
+                    return Results.Ok();
+                }
+            }
+        }
+        catch (RepositoryException ex)
+        {
+            return Results.BadRequest(ex.Message);
         }
         return Results.BadRequest();
     }
@@ -130,9 +193,15 @@ public class CommentController : ControllerBase
         }
         comment.Body = newBody;
         comment.Updated = DateTime.Now;
-
-        await _commentData.UpdateAsync(comment);
-        return Results.Ok();
+        try
+        {
+            await _commentData.UpdateAsync(comment);
+            return Results.Ok();
+        }
+        catch (RepositoryException ex)
+        {
+            return Results.BadRequest(ex.Message);
+        }
     }
     [HttpDelete("{id}")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
