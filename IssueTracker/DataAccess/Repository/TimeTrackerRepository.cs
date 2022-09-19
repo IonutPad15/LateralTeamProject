@@ -1,8 +1,8 @@
-﻿using DataAccess.Data.IData;
-using DataAccess.DbAccess;
+﻿using DataAccess.DbAccess;
 using DataAccess.Models;
+using DataAccess.Repository.IRepository;
 
-namespace DataAccess.Data;
+namespace DataAccess.Repository;
 public class TimeTrackerRepository : ITimeTrackerRepository
 {
     private readonly ISQLDataAccess _db;
@@ -19,7 +19,7 @@ public class TimeTrackerRepository : ITimeTrackerRepository
             Name = entity.Name,
             Description = entity.Description,
             Date = entity.Date,
-            Worked = entity.Worked,
+            //Worked = entity.Worked,
             Billable = entity.Billable,
             UserId = entity.UserId,
             IssueId = entity.IssueId

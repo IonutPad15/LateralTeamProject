@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using DataAccess.Data.IData;
 using DataAccess.Models;
+using DataAccess.Repository.IRepository;
 using IssueTrackerAPI.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Models.Request;

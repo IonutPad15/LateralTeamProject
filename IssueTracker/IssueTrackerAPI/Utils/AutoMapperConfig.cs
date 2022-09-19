@@ -45,8 +45,9 @@ public class AutoMapperConfig
             ForMember(f => f.Extension, f => f.MapFrom(x => x.GroupId));
 
             cfg.CreateMap<TimeTracker, TimeTracker>();
-            cfg.CreateMap<DataAccess.Models.TimeTracker, TimeTrackerResponse>();
+            cfg.CreateMap<TimeTracker, TimeTrackerResponse>();
         });
+        config.AssertConfigurationIsValid();
         Mapper mapper = new Mapper(config);
         return mapper;
     }
