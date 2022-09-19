@@ -27,6 +27,7 @@ builder.Services.AddSingleton<IFileProvider, FileProvider>();
 
 
 
+
 builder.Services.AddAuthentication(options =>
 
 {

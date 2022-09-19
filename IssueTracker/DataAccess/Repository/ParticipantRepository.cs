@@ -14,9 +14,16 @@ public class ParticipantRepository : IParticipantRepository
 
     public async Task<int> AddAsync(Participant participant)
     {
-        var result = await _db.SaveDataAndGetIdAsync<object, int>("dbo.spParticipant_Insert",
-            new { participant.UserId, participant.ProjectId, participant.RoleId });
-        return result;
+        try
+        {
+            var result = await _db.SaveDataAndGetIdAsync<object, int>("dbo.spParticipant_Insert",
+                new { participant.UserId, participant.ProjectId, participant.RoleId });
+            return result;
+        }
+        catch (SqlException ex)
+        {
+            throw new RepositoryException(ex.Message);
+        }
     }
 
     public async Task<IEnumerable<Participant>> GetAllAsync()

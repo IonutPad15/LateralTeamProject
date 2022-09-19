@@ -14,7 +14,7 @@ public class FileProvider : IFileProvider
         var metaDataConfig = cf.Create<IMetaDataConfiguration>();
         _metaDataProvider = new MetaDataProvider(metaDataConfig);
         var blobConfig = cf.Create<IBlobConfigurationFactory>();
-        _bolbProvider = new BlobData(blobConfig);
+        _bolbProvider = new BlobProvider(blobConfig);
     }
 
     public async Task<bool> DeleteAsync(Models.File file)

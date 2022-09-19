@@ -11,6 +11,7 @@ using Models.Response;
 using System.Security.Claims;
 using Validation;
 using IssueTracker.FileSystem;
+using DataAccess;
 
 namespace IssueTrackerAPI.Controllers;
 
@@ -42,9 +43,16 @@ public class IssueController : ControllerBase
             List<ValidationFailure> failures = result.Errors;
             return BadRequest(failures);
         }
-        var issue = _mapper.Map<Issue>(entity);
-        await _issue.AddAsync(issue);
-        return Ok();
+        try
+        {
+            var issue = _mapper.Map<Issue>(entity);
+            await _issue.AddAsync(issue);
+            return Ok();
+        }
+        catch (RepositoryException ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
 
     [HttpGet("getAll-Issue")]
@@ -151,9 +159,16 @@ public class IssueController : ControllerBase
         }
         if (entity.Id > 0)
         {
-            var issue = _mapper.Map<Issue>(entity);
-            await _issue.UpdateAsync(issue);
-            return Ok();
+            try
+            {
+                var issue = _mapper.Map<Issue>(entity);
+                await _issue.UpdateAsync(issue);
+                return Ok();
+            }
+            catch (RepositoryException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
         return BadRequest();
     }
@@ -164,8 +179,15 @@ public class IssueController : ControllerBase
     {
         if (id > 0)
         {
-            await _issue.DeleteAsync(id);
-            return Ok();
+            try
+            {
+                await _issue.DeleteAsync(id);
+                return Ok();
+            }
+            catch (RepositoryException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
         return BadRequest("Error validation!");
     }

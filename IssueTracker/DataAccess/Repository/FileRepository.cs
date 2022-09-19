@@ -1,4 +1,5 @@
-﻿using DataAccess.DbAccess;
+﻿using System.Data.SqlClient;
+using DataAccess.DbAccess;
 
 namespace DataAccess.Repository;
 public class FileRepository : IFileRepository
@@ -10,17 +11,24 @@ public class FileRepository : IFileRepository
     }
     public async Task<string?> AddAsync(Models.File entity)
     {
-        DateTime update = DateTime.UtcNow;
-        var result = await _db.SaveDataAndGetIdAsync<object, string>("dbo.spFile_Insert", new
+        try
         {
-            FileId = entity.FileId,
-            Extension = entity.Extension,
-            FileIssueId = entity.FileIssueId,
-            FileCommentId = entity.FileCommentId,
-            Updated = update,
-            FileUserId = entity.FileUserId
-        });
-        return result;
+            DateTime update = DateTime.UtcNow;
+            var result = await _db.SaveDataAndGetIdAsync<object, string>("dbo.spFile_Insert", new
+            {
+                FileId = entity.FileId,
+                Extension = entity.Extension,
+                FileIssueId = entity.FileIssueId,
+                FileCommentId = entity.FileCommentId,
+                Updated = update,
+                FileUserId = entity.FileUserId
+            });
+            return result;
+        }
+        catch (SqlException ex)
+        {
+            throw new RepositoryException(ex.Message);
+        }
     }
 
     public async Task DeleteAsync(string fileId)
@@ -44,6 +52,11 @@ public class FileRepository : IFileRepository
         var updated = DateTime.UtcNow;
         updated = updated.AddMilliseconds(-timeSpan.TotalMilliseconds);
         var result = await _db.LoadDataAsync<Models.File, object>("spFile_GetForCleanup", new { Updated = updated });
+        return result;
+    }
+    public async Task<IEnumerable<Models.File>> GetForCleanupAsync()
+    {
+        var result = await _db.LoadDataAsync<Models.File, dynamic>("spFile_GetForCleanup", new { Updated = DateTime.UtcNow });
         return result;
     }
 }

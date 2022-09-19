@@ -34,7 +34,14 @@ public class UserRepository : IUserRepository
     }
     public async Task InsertUserAsync(User user)
     {
-        await _db.SaveDataAsync("dbo.spUser_Insert", new { user.UserName, user.Email, user.Password });
+        try
+        {
+            await _db.SaveDataAsync("dbo.spUser_Insert", new { user.UserName, user.Email, user.Password });
+        }
+        catch (SqlException ex)
+        {
+            throw new RepositoryException(ex.Message);
+        }
     }
     public async Task UpdateUserAsync(User user)
     {

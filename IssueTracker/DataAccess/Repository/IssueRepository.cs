@@ -13,22 +13,29 @@ public class IssueRepository : IIssueRepository
     }
     public async Task<int> AddAsync(Issue entity)
     {
-        entity.Created = DateTime.UtcNow;
-        entity.Updated = entity.Created;
-        var result = await _db.SaveDataAndGetIdAsync<dynamic, int>("dbo.spIssue_Insert", new
+        try
         {
-            Title = entity.Title,
-            IssueTypeId = entity.IssueTypeId,
-            Created = entity.Created,
-            Updated = entity.Updated,
-            RoleId = entity.RoleId,
-            StatusId = entity.StatusId,
-            ProjectId = entity.ProjectId,
-            Description = entity.Description,
-            UserAssignedId = entity.UserAssignedId,
-            PriorityId = entity.PriorityId
-        });
-        return result;
+            entity.Created = DateTime.UtcNow;
+            entity.Updated = entity.Created;
+            var result = await _db.SaveDataAndGetIdAsync<dynamic, int>("dbo.spIssue_Insert", new
+            {
+                Title = entity.Title,
+                IssueTypeId = entity.IssueTypeId,
+                Created = entity.Created,
+                Updated = entity.Updated,
+                RoleId = entity.RoleId,
+                StatusId = entity.StatusId,
+                ProjectId = entity.ProjectId,
+                Description = entity.Description,
+                UserAssignedId = entity.UserAssignedId,
+                PriorityId = entity.PriorityId
+            });
+            return result;
+        }
+        catch (SqlException ex)
+        {
+            throw new RepositoryException(ex.Message);
+        }
     }
     public async Task<IEnumerable<Issue>> GetAllAsync()
     {

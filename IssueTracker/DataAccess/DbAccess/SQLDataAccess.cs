@@ -13,7 +13,6 @@ public class SQLDataAccess : ISQLDataAccess
     public SQLDataAccess(IConfiguration config)
     {
         _config = config;
-        InitializeDapper();
     }
     private void InitializeDapper()
     {
@@ -309,6 +308,7 @@ public class SQLDataAccess : ISQLDataAccess
     {
         using (IDbConnection connection = new SqlConnection(_config.GetConnectionString(connectionId)))
         {
+            InitializeDapper();
             await connection.ExecuteAsync(storedProcedure, parameters,
                 commandType: CommandType.StoredProcedure);
         }
@@ -320,6 +320,7 @@ public class SQLDataAccess : ISQLDataAccess
     {
         using (IDbConnection connection = new SqlConnection(_config.GetConnectionString(connectionId)))
         {
+            InitializeDapper();
             var result = await connection.QueryAsync<U>(storedProcedure, parameters,
                 commandType: CommandType.StoredProcedure);
             return result.FirstOrDefault();
