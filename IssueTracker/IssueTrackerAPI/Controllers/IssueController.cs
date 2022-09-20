@@ -19,23 +19,30 @@ namespace IssueTrackerAPI.Controllers;
 [ApiController]
 public class IssueController : ControllerBase
 {
-    private readonly IIssueRepository _issue;
-    private readonly IParticipantRepository _participant;
-    private readonly IFileRepository _file;
+    private readonly IIssueRepository _issueRepository;
+    private readonly IParticipantRepository _participantRepository;
+    private readonly IFileRepository _fileRepository;
     private readonly Mapper _mapper;
-    public IssueController(IIssueRepository issue, IParticipantRepository participant, IFileRepository file, IFileProvider fileProvider)
+    private readonly HistoryHandler _historyHandler;
+    private readonly IHistoryRepository _historyRepository;
+    public IssueController(IIssueRepository issueRepository, IParticipantRepository participantRepository,
+        IFileRepository fileRepository, IFileProvider fileProvider, IHistoryRepository historyRepository)
     {
-        _participant = participant;
-        _issue = issue;
+        _participantRepository = participantRepository;
+        _issueRepository = issueRepository;
         AutoMapperConfig.Initialize(fileProvider);
         _mapper = AutoMapperConfig.Config();
-        _file = file;
+        _fileRepository = fileRepository;
+        _historyHandler = new HistoryHandler(historyRepository);
+        _historyRepository = historyRepository;
     }
 
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [HttpPost("add-Issue")]
     public async Task<IActionResult> AddIssue(IssueRequest entity)
     {
+        var userclaim = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimTypes.Name));
+        if (userclaim == null) return Unauthorized();
         var validator = new IssueValidation();
         ValidationResult result = validator.Validate(entity);
         if (!result.IsValid)
@@ -46,7 +53,9 @@ public class IssueController : ControllerBase
         try
         {
             var issue = _mapper.Map<Issue>(entity);
-            await _issue.AddAsync(issue);
+            var issueId = await _issueRepository.AddAsync(issue);
+            var projectId = await _issueRepository.GetProjectId(issueId);
+            _historyHandler.CreatedIssue(projectId, userclaim.Value, issueId, DateTime.Now);
             return Ok();
         }
         catch (RepositoryException ex)
@@ -58,7 +67,7 @@ public class IssueController : ControllerBase
     [HttpGet("getAll-Issue")]
     public async Task<IActionResult> GetAllIssue()
     {
-        var issues = await _issue.GetAllAsync();
+        var issues = await _issueRepository.GetAllAsync();
         if (issues == null)
             return NotFound("Couldn't find any issue");
         List<IssueResponse> resultList = new();
@@ -66,7 +75,8 @@ public class IssueController : ControllerBase
         {
             try
             {
-                issue.Attachements = await _file.GetByIssueIdAsync(issue.Id);
+                issue.Attachements = await _fileRepository.GetByIssueIdAsync(issue.Id);
+                issue.Histories = await _historyRepository.GetByIssueIdAsync(issue.Id);
                 resultList.Add(_mapper.Map<IssueResponse>(issue));
                 foreach (var result in resultList)
                 {
@@ -85,10 +95,11 @@ public class IssueController : ControllerBase
     [HttpGet("getById-Issue")]
     public async Task<IActionResult> GetByIdIssue(int id)
     {
-        var issue = await _issue.GetByIdAsync(id);
+        var issue = await _issueRepository.GetByIdAsync(id);
         if (issue == null)
             return NotFound("Couldn't find any issue");
-        issue!.Attachements = await _file.GetByIssueIdAsync(issue.Id);
+        issue!.Attachements = await _fileRepository.GetByIssueIdAsync(issue.Id);
+        issue.Histories = await _historyRepository.GetByIssueIdAsync(issue.Id);
         var result = _mapper.Map<IssueResponse>(issue);
         if (issue!.Attachements.Count() > 0)
             try
@@ -106,18 +117,23 @@ public class IssueController : ControllerBase
     [HttpPut("nextStatusIssue")]
     public async Task<IActionResult> NextStatusIssue(int id)
     {
+        var userclaim = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimTypes.Name));
+        if (userclaim == null) return Unauthorized();
         var userId = ClaimsPrincipal.Current!.FindFirst("UserId")!.Value;
 
-        var issue = await _issue.GetByIdAsync(id);
+        var issue = await _issueRepository.GetByIdAsync(id);
         if (issue == null) return NotFound("Issue not found!");
+        var oldIssue = issue;
         issue.StatusId++;
         if (issue.StatusId > 4) return BadRequest("Id of Status is out of range!");
-        var participants = await _participant.GetOwnersAndCollabsByProjectIdAsync(issue.ProjectId);
+        var participants = await _participantRepository.GetOwnersAndCollabsByProjectIdAsync(issue.ProjectId);
         if (participants == null) return NotFound("Project not found!");
 
         if (participants.Any(p => p.UserId == Guid.Parse(userId)))
         {
-            await _issue.NextStatusOfIssueAsync(id, issue.StatusId);
+            await _issueRepository.NextStatusOfIssueAsync(id, issue.StatusId);
+            _historyHandler.UpdatedIssue(issue.ProjectId, userclaim.Value, issue.Id,
+                DateTime.UtcNow, "Status", oldIssue.StatusId.ToString(), issue.StatusId.ToString());
             return Ok("Status update successful!");
         }
         return BadRequest("Error validation!");
@@ -127,20 +143,24 @@ public class IssueController : ControllerBase
     [HttpPut("previousStatusIssue")]
     public async Task<IActionResult> PreviousStatusIssue(int id)
     {
+        var userclaim = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimTypes.Name));
+        if (userclaim == null) return Unauthorized();
         var userId = ClaimsPrincipal.Current!.FindFirst("UserId")!.Value;
 
-        var issue = await _issue.GetByIdAsync(id);
+        var issue = await _issueRepository.GetByIdAsync(id);
         if (issue == null) return NotFound("Issue not found!");
-
+        var oldIssue = issue;
         issue.StatusId--;
         if (issue.StatusId < 1) return BadRequest("Id of Status is out of range!");
 
-        var participants = await _participant.GetOwnersAndCollabsByProjectIdAsync(issue.ProjectId);
+        var participants = await _participantRepository.GetOwnersAndCollabsByProjectIdAsync(issue.ProjectId);
         if (participants == null) return NotFound("Project not found!");
 
         if (participants.Any(p => p.UserId == Guid.Parse(userId)))
         {
-            await _issue.PreviousStatusOfIssueAsync(id, issue.StatusId);
+            await _issueRepository.PreviousStatusOfIssueAsync(id, issue.StatusId);
+            _historyHandler.UpdatedIssue(issue.ProjectId, userclaim.Value, issue.Id,
+                DateTime.UtcNow, "Status", oldIssue.StatusId.ToString(), issue.StatusId.ToString());
             return Ok("Status update successful!");
         }
         return BadRequest("Error validation!");
@@ -150,6 +170,8 @@ public class IssueController : ControllerBase
     [HttpPut("update-Issue")]
     public async Task<IActionResult> UpdateIssue(IssueRequest entity)
     {
+        var userclaim = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimTypes.Name));
+        if (userclaim == null) return Unauthorized();
         var validator = new IssueValidation();
         ValidationResult result = validator.Validate(entity);
         if (!result.IsValid)
@@ -157,12 +179,20 @@ public class IssueController : ControllerBase
             List<ValidationFailure> failures = result.Errors;
             return BadRequest(failures);
         }
+
+        var oldIssue = await _issueRepository.GetByIdAsync(entity.Id);
+        if (oldIssue == null) return NotFound("No issue found with that id");
+        if (oldIssue.ProjectId != entity.ProjectId) return BadRequest("You can't move an issue to another project");
         if (entity.Id > 0)
         {
             try
             {
                 var issue = _mapper.Map<Issue>(entity);
-                await _issue.UpdateAsync(issue);
+                await _issueRepository.UpdateAsync(issue);
+                string field, oldValue, newValue;
+                _historyHandler.IssueUpdatedValues(oldIssue, issue, out field, out oldValue, out newValue);
+                _historyHandler.UpdatedIssue(oldIssue.ProjectId, userclaim.Value, oldIssue.Id,
+                    DateTime.UtcNow, field, oldValue, newValue);
                 return Ok();
             }
             catch (RepositoryException ex)
@@ -175,13 +205,18 @@ public class IssueController : ControllerBase
 
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [HttpDelete("delete-Issue")]
-    public async Task<IActionResult> DeleteIssue(int id)
+    public async Task<IActionResult> DeleteIssue([FromQuery] int id)
     {
+        var userclaim = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimTypes.Name));
+        if (userclaim == null) return Unauthorized();
         if (id > 0)
         {
             try
             {
-                await _issue.DeleteAsync(id);
+                var issue = await _issueRepository.GetByIdAsync(id);
+                if (issue == null) return NotFound("There is no issue to delete");
+                await _issueRepository.DeleteAsync(id);
+                _historyHandler.DeletedIssue(issue.ProjectId, userclaim.Value, id, DateTime.UtcNow);
                 return Ok();
             }
             catch (RepositoryException ex)

@@ -1,4 +1,4 @@
-﻿using System.Data.SqlClient;
+﻿using System.Security.Claims;
 using AutoMapper;
 using DataAccess;
 using DataAccess.Repository;
@@ -20,21 +20,26 @@ public class FileController : ControllerBase
     private readonly IFileProvider _fileProvider;
     private readonly Mapper _mapper;
     private readonly IFileRepository _fileRepository;
-    public FileController(IFileRepository fileRepository, IFileProvider fileProvider)
+    private readonly HistoryHandler _historyHandler;
+    private readonly IIssueRepository _issueRepository;
+    public FileController(IFileRepository fileRepository, IFileProvider fileProvider,
+        IHistoryRepository historyRepository, IIssueRepository issueRepository)
     {
         _fileProvider = fileProvider;
         _fileRepository = fileRepository;
         _mapper = AutoMapperConfig.Config();
+        _historyHandler = new HistoryHandler(historyRepository);
+        _issueRepository = issueRepository;
     }
 
     [HttpPost]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    public async Task<IResult> PostFile([FromForm] IFormFile formFile, [FromForm] int? issueId, [FromForm] int? commentId)
+    public async Task<IResult> PostFile([FromForm] IFormFile formFile, [FromForm] int issueId, [FromForm] int? commentId)
     {
         var idclaim = User.Claims.FirstOrDefault(x => x.Type.Equals("UserId"));
-        if (idclaim == null) return Results.Unauthorized();
-        FileRequest fileRequest = new FileRequest(formFile);
-        fileRequest.IssueId = issueId;
+        var userclaim = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimTypes.Name));
+        if (idclaim == null || userclaim == null) return Results.Unauthorized();
+        FileRequest fileRequest = new FileRequest(formFile, issueId);
         fileRequest.CommentId = commentId;
         var validator = new FileRequestValidation();
         ValidationResult results = validator.Validate(fileRequest);
@@ -60,15 +65,31 @@ public class FileController : ControllerBase
         fileModel.FileIssueId = issueId;
         fileModel.FileCommentId = commentId;
         fileModel.FileUserId = Guid.Parse(idclaim.Value);
-        await _fileRepository.AddAsync(fileModel);
-        await _fileProvider.UploadAsync(file);
-        return Results.Ok();
+        try
+        {
+            var resultFileId = await _fileRepository.AddAsync(fileModel);
+            if (resultFileId == null) return Results.BadRequest("Couldn't create");
+            await _fileProvider.UploadAsync(file);
+            int projectId = await _issueRepository.GetProjectId(fileModel.FileIssueId);
+            _historyHandler.CreatedFile(projectId, issueId, resultFileId, userclaim.Value, DateTime.UtcNow);
+            return Results.Ok();
+        }
+        catch (RepositoryException ex)
+        {
+            return Results.BadRequest(ex.Message);
+        }
+        catch (FileSystemException ex)
+        {
+            return Results.BadRequest(ex.Message);
+        }
     }
 
     [HttpDelete]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public async Task<IResult> Delete([FromBody] FileDeleteRequest fileDelete)
     {
+        var userclaim = User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimTypes.Name));
+        if (userclaim == null) return Results.Unauthorized();
         var validator = new FileDeleteRequestValidation();
         ValidationResult results = validator.Validate(fileDelete);
         if (!results.IsValid)
@@ -83,6 +104,8 @@ public class FileController : ControllerBase
         try
         {
             await _fileRepository.DeleteAsync(fileDelete.FileId);
+            int projectId = await _issueRepository.GetProjectId(file.FileIssueId);
+            _historyHandler.DeletedFile(projectId, file.FileIssueId, "FileId", file.FileId, userclaim.Value, DateTime.UtcNow);
         }
         catch (RepositoryException ex)
         {

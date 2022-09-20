@@ -2,7 +2,7 @@
 (
 	[FileId] VARCHAR(36) NOT NULL PRIMARY KEY,
     [Extension] NVARCHAR(350) NOT NULL,
-    [FileIssueId] INT,
+    [FileIssueId] INT NOT NULL,
     [FileCommentId] INT,
     [FileIsDeleted] BIT DEFAULT (CONVERT([bit],(0))) NOT NULL,
     [Updated] DATETIME NOT NULL,

@@ -70,6 +70,7 @@
     <Folder Include="dbo\StoredProcedures\Issue" />
     <Folder Include="dbo\StoredProcedures\TimeTracker" />
     <Folder Include="dbo\StoredProcedures\File" />
+    <Folder Include="dbo\StoredProcedures\History" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="dbo\Tables\User.sql" />
@@ -132,6 +133,10 @@
     <Build Include="dbo\StoredProcedures\TimeTracker\spTimeTracker_Delete.sql" />
     <Build Include="dbo\StoredProcedures\TimeTracker\spTimeTracker_Insert.sql" />
     <Build Include="dbo\Tables\TimeTracker.sql" />
+    <Build Include="dbo\StoredProcedures\History\spHistory_GetByIssueId.sql" />
+    <Build Include="dbo\StoredProcedures\History\spHistory_GetByProjectId.sql" />
+    <Build Include="dbo\StoredProcedures\History\spHistory_Insert.sql" />
+    <Build Include="dbo\Tables\History.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Script.PostDeployment.sql" />

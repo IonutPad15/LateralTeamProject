@@ -12,5 +12,6 @@ public class IssueResponse
     public RoleResponse Role { get; set; } = null!;
     public ProjectResponse Project { get; set; } = new();
     public IEnumerable<FileResponse> Attachments { get; set; } = Enumerable.Empty<FileResponse>();
+    public IEnumerable<HistoryResponse> Histories { get; set; } = Enumerable.Empty<HistoryResponse>();
 }
 

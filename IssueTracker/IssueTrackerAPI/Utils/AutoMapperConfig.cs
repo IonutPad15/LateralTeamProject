@@ -17,6 +17,9 @@ public class AutoMapperConfig
     {
         MapperConfiguration config = new MapperConfiguration(cfg =>
         {
+            cfg.CreateMap<DataAccess.Models.HistoryType, Models.Response.HistoryType>();
+            cfg.CreateMap<DataAccess.Models.ReferenceType, Models.Response.ReferenceType>();
+            cfg.CreateMap<History, HistoryResponse>();
             cfg.CreateMap<Comment, CommentResponse>()
                .ForMember(dest => dest.Created, opt => opt.Ignore());
             cfg.CreateMap<Comment, CommentRequest>();
@@ -27,7 +30,6 @@ public class AutoMapperConfig
             cfg.CreateMap<ParticipantRequest, Participant>();
             cfg.CreateMap<Participant, ParticipantResponse>();
             cfg.CreateMap<Role, RoleResponse>();
-            cfg.CreateMap<Project, ProjectResponse>();
             cfg.CreateMap<IssueType, IssueTypeResponse>();
             cfg.CreateMap<Status, StatusResponse>();
             cfg.CreateMap<Priority, PriorityResponse>();
@@ -43,6 +45,7 @@ public class AutoMapperConfig
             cfg.CreateMap<FileDeleteRequest, IssueTracker.FileSystem.Models.File>().
             ForMember(f => f.Id, f => f.MapFrom(x => x.FileId)).
             ForMember(f => f.Extension, f => f.MapFrom(x => x.GroupId));
+            cfg.CreateMap<Project, ProjectResponse>();
 
             cfg.CreateMap<TimeTracker, TimeTracker>();
             cfg.CreateMap<TimeTracker, TimeTrackerResponse>();

@@ -21,21 +21,26 @@ namespace IssueTrackerAPI.Controllers;
 [ApiController]
 public class CommentController : ControllerBase
 {
-    private readonly ICommentRepository _commentData;
+    private readonly ICommentRepository _commentRepository;
     private readonly IUserRepository _userData;
     private readonly Mapper _mapper;
-    public CommentController(ICommentRepository commentData, IUserRepository userData, IFileProvider fileProvider)
+    private readonly HistoryHandler _historyHandler;
+    private readonly IIssueRepository _issueRepository;
+    public CommentController(ICommentRepository commentRepository, IUserRepository userData,
+        IFileProvider fileProvider, IHistoryRepository historyRepository, IIssueRepository issueRepository)
     {
+        _issueRepository = issueRepository;
         _userData = userData;
-        _commentData = commentData;
+        _commentRepository = commentRepository;
         AutoMapperConfig.Initialize(fileProvider);
         _mapper = AutoMapperConfig.Config();
+        _historyHandler = new HistoryHandler(historyRepository);
 
     }
     [HttpGet]
     public async Task<IResult> GetById(int id)
     {
-        var comment = await _commentData.GetByIdAsync(id);
+        var comment = await _commentRepository.GetByIdAsync(id);
         if (comment == null) return Results.NotFound("Couldn't find any comment");
         var commentResponse = _mapper.Map<CommentResponse>(comment);
         try
@@ -51,7 +56,7 @@ public class CommentController : ControllerBase
     [HttpGet("issueid")]
     public async Task<IResult> GetByIssueId(int id)
     {
-        var comments = await _commentData.GetAllByIssueIdAsync(id);
+        var comments = await _commentRepository.GetAllByIssueIdAsync(id);
         if (comments == null || comments.Count() == 0) return Results.NotFound("Couldn't find any comments");
         var commentsResponse = _mapper.Map<IEnumerable<CommentResponse>>(comments);
         try
@@ -88,7 +93,7 @@ public class CommentController : ControllerBase
     [HttpGet("replies")]
     public async Task<IResult> GetByCommentId(int id)
     {
-        var comments = await _commentData.GetAllByCommentIdAsync(id);
+        var comments = await _commentRepository.GetAllByCommentIdAsync(id);
         if (comments.Count() == 0) return Results.NotFound("Couldn't find any comments");
         var commentsResponse = _mapper.Map<IEnumerable<CommentResponse>>(comments);
         try
@@ -104,7 +109,7 @@ public class CommentController : ControllerBase
     [HttpGet("userid")]
     public async Task<IResult> GetByUserId(Guid id)
     {
-        var comments = await _commentData.GetAllByUserIdAsync(id);
+        var comments = await _commentRepository.GetAllByUserIdAsync(id);
         if (comments.Count() == 0) return Results.NotFound("Couldn't find any comments");
         IEnumerable<CommentResponse> commentsResponse = _mapper.Map<IEnumerable<CommentResponse>>(comments);
         try
@@ -127,6 +132,8 @@ public class CommentController : ControllerBase
             List<ValidationFailure> failures = result.Errors;
             return Results.BadRequest(failures);
         }
+        var issue = _issueRepository.GetByIdAsync(commentRequest.IssueId);
+        if (issue == null) return Results.BadRequest("There is no issue");
         var value = Request.Headers["Authorization"];
         try
         {
@@ -139,8 +146,11 @@ public class CommentController : ControllerBase
                 comment.CommentId = commentRequest.CommentId;
                 comment.Updated = DateTime.Now;
                 comment.Created = DateTime.Now;
-                await _commentData.AddAsync(comment);
-                return Results.Ok();
+                var commentId = await _commentRepository.AddAsync(comment);
+                if (commentId <= 0) return Results.Problem("Could not create the comment");
+                int projectId = await _issueRepository.GetProjectId(comment.IssueId);
+                _historyHandler.CreatedComment(projectId, comment.IssueId, commentId, comment.Author, comment.Body, DateTime.UtcNow);
+                return Results.Ok($"Id:{commentId}");
 
             }
             if (headerValue != null)
@@ -160,8 +170,11 @@ public class CommentController : ControllerBase
                     comment.CommentId = commentRequest.CommentId;
                     comment.Updated = DateTime.Now;
                     comment.Created = DateTime.Now;
-                    await _commentData.AddAsync(comment);
-                    return Results.Ok();
+                    var commentId = await _commentRepository.AddAsync(comment);
+                    if (commentId <= 0) return Results.Problem("Could not create the comment");
+                    int projectId = await _issueRepository.GetProjectId(comment.IssueId);
+                    _historyHandler.CreatedComment(projectId, comment.IssueId, commentId, comment.Author, comment.Body, DateTime.UtcNow);
+                    return Results.Ok($"Id:{commentId}");
                 }
             }
         }
@@ -183,7 +196,7 @@ public class CommentController : ControllerBase
         {
             return Results.BadRequest("Couldn't find you");
         }
-        var comment = await _commentData.GetByIdAsync(id);
+        var comment = await _commentRepository.GetByIdAsync(id);
         if (comment == null) return Results.NotFound();
 
         var user = await _userData.GetUserByUsernameAndEmailAsync(userclaim.Value, emailclaim.Value);
@@ -191,11 +204,15 @@ public class CommentController : ControllerBase
         {
             return Results.BadRequest("Not your comment");
         }
+        var oldComment = comment;
         comment.Body = newBody;
         comment.Updated = DateTime.Now;
         try
         {
-            await _commentData.UpdateAsync(comment);
+            await _commentRepository.UpdateAsync(comment);
+            int projectId = await _issueRepository.GetProjectId(comment.IssueId);
+            _historyHandler.UpdatedComment(projectId, userclaim.Value, comment.IssueId, DateTime.UtcNow,
+                comment.Id, "Body", oldComment.Body, comment.Body);
             return Results.Ok();
         }
         catch (RepositoryException ex)
@@ -214,7 +231,7 @@ public class CommentController : ControllerBase
         {
             return Results.BadRequest("Couldn't find you");
         }
-        var comment = await _commentData.GetByIdAsync(id);
+        var comment = await _commentRepository.GetByIdAsync(id);
         if (comment == null) return Results.NotFound();
 
         var user = await _userData.GetUserByUsernameAndEmailAsync(userclaim.Value, emailclaim.Value);
@@ -222,7 +239,9 @@ public class CommentController : ControllerBase
         {
             return Results.BadRequest("Not your comment");
         }
-        await _commentData.DeleteAsync(id);
+        await _commentRepository.DeleteAsync(id);
+        int projectId = await _issueRepository.GetProjectId(comment.IssueId);
+        _historyHandler.DeletedComment(projectId, userclaim.Value, comment.IssueId, DateTime.UtcNow, comment.Id, comment.Body);
         return Results.Ok();
 
     }

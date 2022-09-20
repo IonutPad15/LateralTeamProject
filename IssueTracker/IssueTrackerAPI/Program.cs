@@ -25,6 +25,8 @@ builder.Services.AddSingleton<ICommentRepository, CommentRepository>();
 builder.Services.AddSingleton<IFileRepository, FileRepository>();
 builder.Services.AddFileSystemServices();
 builder.Services.AddSingleton<IFileProvider, FileProvider>();
+builder.Services.AddSingleton<IHistoryRepository, HistoryRepository>();
+
 builder.Services.AddSingleton<ITimeTrackerRepository, TimeTrackerRepository>();
 
 
