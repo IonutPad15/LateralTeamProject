@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using Models.Request;
 using Validation;
 using System.Security.Claims;
+using Models.Response;
 
 namespace IssueTrackerAPI.Controllers;
 
@@ -21,6 +22,7 @@ public class ProjectController : ControllerBase
     private readonly IParticipantRepository _participantdb;
     private readonly Mapper _mapper;
     private readonly HistoryHandler _historyHandler;
+    private readonly IHistoryRepository _historyRepository;
     public ProjectController(IProjectRepository projectdb, IParticipantRepository participantdb,
         IHistoryRepository historyRepository)
     {
@@ -28,6 +30,7 @@ public class ProjectController : ControllerBase
         _participantdb = participantdb;
         _mapper = AutoMapperConfig.Config();
         _historyHandler = new HistoryHandler(historyRepository);
+        _historyRepository = historyRepository;
     }
 
     [HttpPost("add-project")]
@@ -57,14 +60,30 @@ public class ProjectController : ControllerBase
     }
 
     [HttpGet("getAll-project")]
-    public async Task<IEnumerable<Project>> GetAll() =>
-        await _projectdb.GetAllAsync();
+    public async Task<IActionResult> GetAll()
+    {
+        var projects = await _projectdb.GetAllAsync();
+        if (projects.Any())
+        {
+            foreach (var project in projects)
+            {
+                project.History = await _historyRepository.GetByProjectIdAsync(project.Id);
+            }
+            IEnumerable<ProjectResponse> results = _mapper.Map<IEnumerable<ProjectResponse>>(projects);
+            return Ok(results);
+        }
+        return BadRequest();
+    }
 
     [HttpGet("getById-project")]
     public async Task<IActionResult> GetById(int id)
     {
         if (id == 0) return BadRequest("Invalid Id!");
-        return Ok(await _projectdb.GetByIdAsync(id));
+        var project = await _projectdb.GetByIdAsync(id);
+        if (project == null) return NotFound("Didn't find any project with this id");
+        project.History = await _historyRepository.GetByProjectIdAsync(project.Id);
+        var response = _mapper.Map<ProjectResponse>(project);
+        return Ok(response);
     }
     [HttpPut("update-project")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]

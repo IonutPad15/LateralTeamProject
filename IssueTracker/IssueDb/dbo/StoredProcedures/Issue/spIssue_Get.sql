@@ -11,4 +11,5 @@ begin
 	left join IssueType on IssueType.Id = IssueTypeId
 	left join [User] on [User].Id = UserAssignedId
 	where Issue.IsDeleted = 0 and Issue.Id = @Id;
+
 end

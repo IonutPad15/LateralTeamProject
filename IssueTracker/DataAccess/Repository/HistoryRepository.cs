@@ -11,7 +11,7 @@ public class HistoryRepository : IHistoryRepository
     }
     public async Task<IEnumerable<History>> GetByProjectIdAsync(int projectId)
     {
-        var history = await _db.LoadDataAsync<History, object>("spHistory_GetByProjeectId", new { ProjectId = projectId });
+        var history = await _db.LoadDataAsync<History, object>("spHistory_GetByProjectId", new { ProjectId = projectId });
         return history;
     }
     public async Task<IEnumerable<History>> GetByIssueIdAsync(int issueId)

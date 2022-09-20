@@ -9,5 +9,6 @@ public class Project
     public bool IsDeleted { get; set; }
     public IEnumerable<Participant> Participants { get; set; } = Enumerable.Empty<Participant>();
     public IEnumerable<Issue> Issues { get; set; } = Enumerable.Empty<Issue>();
+    public IEnumerable<History> History { get; set; } = Enumerable.Empty<History>();
 }
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.

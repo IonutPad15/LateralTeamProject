@@ -22,14 +22,12 @@ public class ParticipantController : ControllerBase
     private readonly IParticipantRepository _participantRepository;
     private readonly Mapper _mapper;
     private readonly HistoryHandler _historyHandler;
-    private readonly IIssueRepository _issueRepository;
     public ParticipantController(IParticipantRepository participantRepository, IRoleRepository roleData,
-        IHistoryRepository historyRepository, IIssueRepository issueRepository)
+        IHistoryRepository historyRepository)
     {
         _participantRepository = participantRepository;
         _mapper = AutoMapperConfig.Config();
         _historyHandler = new HistoryHandler(historyRepository);
-        _issueRepository = issueRepository;
     }
     [HttpGet]
     public async Task<IResult> GeParticipants()
