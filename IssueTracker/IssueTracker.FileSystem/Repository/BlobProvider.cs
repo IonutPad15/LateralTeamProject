@@ -12,6 +12,7 @@ public class BlobProvider : IBlobProvider
         _config = config;
         _blobServiceClient = new BlobServiceClient(_config.ConnectionString);
         _containerClient = _blobServiceClient.GetBlobContainerClient(_config.Container);
+        _containerClient.CreateIfNotExists();
     }
 
     public Task<IEnumerable<Models.File>> GetFilesAsync(IEnumerable<Models.File> files)

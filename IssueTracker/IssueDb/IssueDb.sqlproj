@@ -68,6 +68,7 @@
     <Folder Include="dbo\StoredProcedures\Project" />
     <Folder Include="dbo\StoredProcedures\Comment" />
     <Folder Include="dbo\StoredProcedures\Issue" />
+    <Folder Include="dbo\StoredProcedures\TimeTracker" />
     <Folder Include="dbo\StoredProcedures\File" />
     <Folder Include="dbo\StoredProcedures\History" />
   </ItemGroup>
@@ -129,6 +130,9 @@
     <Build Include="dbo\StoredProcedures\File\spFile_GetByFileId.sql" />
     <Build Include="dbo\StoredProcedures\File\spFile_GetByIssueId.sql" />
     <Build Include="dbo\StoredProcedures\File\spFile_GetForCleanup.sql" />
+    <Build Include="dbo\StoredProcedures\TimeTracker\spTimeTracker_Delete.sql" />
+    <Build Include="dbo\StoredProcedures\TimeTracker\spTimeTracker_Insert.sql" />
+    <Build Include="dbo\Tables\TimeTracker.sql" />
     <Build Include="dbo\StoredProcedures\History\spHistory_GetByIssueId.sql" />
     <Build Include="dbo\StoredProcedures\History\spHistory_GetByProjectId.sql" />
     <Build Include="dbo\StoredProcedures\History\spHistory_Insert.sql" />
